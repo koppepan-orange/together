@@ -1,5 +1,6 @@
 import asyncio
 import websockets # type: ignore
+import webbrowser
 import tkinter as tk
 import subprocess
 import re
@@ -207,13 +208,15 @@ async def main():
 async def mainloop_in_async():
     global root
     try:
-        subprocess.run("index.html", shell=True)
+        webbrowser.open("index.html")
         while True:
             for roots in list(root.values()):
                 roots.update()
-            await delay(1/120)
+            await asyncio.sleep(1/120)
     except asyncio.exceptions.CancelledError:
         print("tkinter:mainloop Cancelling now...")
+
+
 
 def end():
     global task
