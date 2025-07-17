@@ -5,22 +5,38 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "chrome",
+            "type": "msedge",
+            // "type": "chrome",
             "request": "launch",
             "name": "from now on",
             "file": "${file}",
         },
         {
-            "type": "chrome",
+            "type": "msedge",
+            // "type": "chrome",
             "request": "launch",
             "name": "debugのあれ",
             "file": "aaaa/index.html",
         },
         {
-            "type": "chrome",
-            "request": "debugpy",
-            "name": "from now python",
-            "file": "${file}",
-        }
+            "type": "msedge",
+            // "type": "chrome",
+            "request": "launch",
+            "name": "koppe's over site",
+            "file": "koppe/index.html",
+        },
+        {
+            "type": "msedge",
+            // "type": "chrome",
+            "request": "launch",
+            "name": "2048のやつ",
+            "file": "koppe/puz/index.html",
+        },
+        // {
+        //     "type": "msedge",
+        //     "request": "debugpy",
+        //     "name": "from now python",
+        //     "file": "${file}",
+        // }
     ]
 }
