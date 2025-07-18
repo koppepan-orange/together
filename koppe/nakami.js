@@ -202,10 +202,12 @@ document.addEventListener('mousedown', e => {
 //#region swipe
 let startX, startY, endX, endY;
 document.addEventListener("touchstart", (e) => {
+    if(pMoving) return;
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
 });
 document.addEventListener("touchend", (e) => {
+    if(pMoving) return;
     endX = e.changedTouches[0].clientX;
     endY = e.changedTouches[0].clientY;
 
@@ -221,7 +223,6 @@ document.addEventListener("keydown", (e) => {
     let key = e.key;
     if(key == " ") key = "space"; 
     keys[key] = true;
-    console.log(key)
 });
 document.addEventListener("keyup", (e) => {
     let key = e.key;
@@ -231,20 +232,23 @@ document.addEventListener("keyup", (e) => {
 
 // PC用：マウスによるスワイプ対応
 document.addEventListener("keydown", e => {
+    if(pMoving) return;
     let key = e.key;
-    console.log("何か押されたed")
-    if(!keys['Shift']) return;
-    console.log("実行するing")
-    if(key == "arrowright") swiped(1);
-    if(key == "arrowleft") swiped(-1);
+    if (!e.shiftKey && (key === "ArrowRight" || key === "ArrowLeft")) return;
+
+    if (key === "ArrowRight") swiped(1);
+    if (key === "ArrowLeft") swiped(-1);
 });
+
 
 //#endregion
 
+//#region page
 let page = 'home';
 let pagen = 0;
 let Pages = ['home', 'memo', 'tool', 'login', 'chat'];
 let pagenMax = Pages.length - 1;
+let pMoving = 0;
 function swiped(code){
     //-1 = l, 1 = r
     //console.log(`${pagen} => ${Pages[pagen + code]}`);
@@ -255,9 +259,8 @@ function swiped(code){
     pageChange(code);
 }
 function pageAdd(name, att = null){
-
     //["mae", code]
-    if(att == null)
+    if(att == null) att = [null, null]
     if(att[0] == 'mae'){
         n = pageGet(att[1]);
         if (n != -1) Pages.splice(n - 1, 0, name);
@@ -270,7 +273,7 @@ function pageAdd(name, att = null){
         n = pageGet(att[1]);
         if (n != -1) Pages.splice(n + 1, 0, name);
     }
-    if(att == null){
+    if(att[0] == null){
         Pages.push(name);
     }
 }
@@ -285,6 +288,7 @@ function pageDel(name){
 }
 async function pageChange(code){
     //-1 = l, 1 = r
+    pMoving = 1;
     let moto = page;
     page = Pages[pagen];
     let dir = 0;
@@ -310,7 +314,9 @@ async function pageChange(code){
     await delay(500);
 
     mdiv.style.opacity = '0';
+    pMoving = 0;
 }
+//#endregion page
 
 //#region home
 //#region リンクたちの動き
@@ -739,50 +745,133 @@ searchButton.addEventListener('click', () => {
 //#endregion memo
 
 //#region tool
-let input
-let words = ['ア','イ','ウ','エ','オ','カ','キ','ク','ケ','コ','サ','シ','ス','セ','ソ','タ','チ','ツ','テ','ト','ナ','ニ','ヌ','ネ','ノ','ハ','ヒ','フ','ヘ','ホ','マ','ミ','ム','メ','モ','ヤ','ユ','ヨ','ラ','リ','ル','レ','ロ','ワ','ヲ','ン','ガ','ギ','グ','ゲ','ゴ','ザ','ジ','ズ','ゼ','ゾ','ダ','ヂ','ヅ','デ','ド','バ','ビ','ブ','ベ','ボ','パ','ピ','プ','ペ','ポ']
-function Toggle(){
-    switch(document.querySelector('#ToggleButton').textContent){
-        case 'more':
-            document.querySelector('#ToggleButton').textContent = 'less'
-            words = ['ア','イ','ウ','エ','オ','カ','キ','ク','ケ','コ','サ','シ','ス','セ','ソ','タ','チ','ツ','テ','ト','ナ','ニ','ヌ','ネ','ノ','ハ','ヒ','フ','ヘ','ホ','マ','ミ','ム','メ','モ','ヤ','ユ','ヨ','ラ','リ','ル','レ','ロ','ワ','ヲ','ン','ガ','ギ','グ','ゲ','ゴ','ザ','ジ','ズ','ゼ','ゾ','ダ','ヂ','ヅ','デ','ド','バ','ビ','ブ','ベ','ボ','パ','ピ','プ','ペ','ポ'];
-            break
-        case 'less':
-            document.querySelector('#ToggleButton').textContent = 'more'
-            words = ['ア','イ','ウ','エ','オ','カ','キ','ク','ケ','コ','サ','シ','ス','セ','ソ','タ','チ','ツ','テ','ト','ナ','ニ','ヌ','ネ','ノ','ハ','ヒ','フ','ヘ','ホ','マ','ミ','ム','メ','モ','ヤ','ユ','ヨ','ラ','リ','ル','レ','ロ','ワ','ヲ','ン','ガ','ギ','グ','ゲ','ゴ','ザ','ジ','ズ','ゼ','ゾ','ダ','ヂ','ヅ','デ','ド','バ','ビ','ブ','ベ','ボ','パ','ピ','プ','ペ','ポ','ァ','ィ','ゥ','ェ','ォ','ッ','ャ','ュ','ョ','ー'];
-            break
-    }
+
+
+const Ccount = document.getElementById('count');
+const Cin = Ccount.querySelector('.in');
+const Cout = Ccount.querySelector('.out');
+Cin.addEventListener('input', () => {
+    let text = Cin.value;
+    let count = text.length;
+    let size = arraySize(text.split(''))
+    Cout.textContent = `文字数${count} 種類${size}`;
+});
+
+let Aanag = document.getElementById('anagram');
+let Ain = Aanag.querySelector('.in');
+let Asend = Aanag.querySelector('.send');
+let Aout = Aanag.querySelector('.out');
+Asend.addEventListener('click', () => {
+    let text = Ain.value;
+    let res = anagramSaySay(text);
+    Aout.innerHTML = res;
+});
+
+//#region 偏差値計算するやつ
+let Hen = {
+    valI: document.querySelector('#tool .Hen .input'),
+    aveI: document.querySelector('#tool .Hen .average'),
+    sumB: document.querySelector('#tool .Hen .sum'),
+    outD: document.querySelector('#tool .Hen .output')
+};
+Hen.sumB.addEventListener('click', () => {
+    let val = +Hen.valI.value;
+    let ave = +Hen.aveI.value;
+    let res = ((val - ave) / 18 * 10) + 50;
+     //18の部分は変更可能。得点分布だから一点集中なら1とかなんじゃないかな
+    res *= 100;
+    res = Math.round(res);
+    res /= 100;
+    Hen.outD.textContent = res;
+})
+//#endregion
+
+//#region カタカナランダム言葉生成器
+let RanKana = {
+    togB: document.querySelector('#tool .RanKana .toggle'),
+    tog: 'stan',
+    togs: [
+        {
+            name: 'stan',
+            color: '#b5d9ff',
+            desc: 'もっともオーソドックス',
+            words: ['ア','イ','ウ','エ','オ','カ','キ','ク','ケ','コ','サ','シ','ス','セ','ソ','タ','チ','ツ','テ','ト','ナ','ニ','ヌ','ネ','ノ','ハ','ヒ','フ','ヘ','ホ','マ','ミ','ム','メ','モ','ヤ','ユ','ヨ','ラ','リ','ル','レ','ロ','ワ','ヲ','ン','ガ','ギ','グ','ゲ','ゴ','ザ','ジ','ズ','ゼ','ゾ','ダ','ヂ','ヅ','デ','ド','バ','ビ','ブ','ベ','ボ','パ','ピ','プ','ペ','ポ']
+        },
+        {
+            name: 'more',
+            color: '#ffddcc',
+            desc: '切れ音や長音、小文字を含むやつ',
+            words: ['ア','イ','ウ','エ','オ','カ','キ','ク','ケ','コ','サ','シ','ス','セ','ソ','タ','チ','ツ','テ','ト','ナ','ニ','ヌ','ネ','ノ','ハ','ヒ','フ','ヘ','ホ','マ','ミ','ム','メ','モ','ヤ','ユ','ヨ','ラ','リ','ル','レ','ロ','ワ','ヲ','ン','ガ','ギ','グ','ゲ','ゴ','ザ','ジ','ズ','ゼ','ゾ','ダ','ヂ','ヅ','デ','ド','バ','ビ','ブ','ベ','ボ','パ','ピ','プ','ペ','ポ','ァ','ィ','ゥ','ェ','ォ','ッ','ャ','ュ','ョ','ー'] 
+        },
+    ],
+    actB: document.querySelector('#tool .RanKana .active'),
+    inpI: document.querySelector('#tool .RanKana .input'),
+    outD: document.querySelector('#tool .RanKana .output'),
+    ove: 0,
+    oveB: document.querySelector('#tool .RanKana .over'),
 }
-function Activate(){
-    input = document.querySelector('#Input').value
-    if(input == ''||input <= 0){document.querySelector('#OutPut').textContent = '死ね'}
-    else{
-    let output = [];
-    document.querySelector('#OutPut').innerHTML = ''
+RanKana.togB.addEventListener('click', () => {
+    let val = RanKana.togB.textContent;
+    let arr = RanKana.togs.map(a => a.name);
+    console.log(arr);
+    let valn = arr.indexOf(val);
+    let ele = RanKana.togs[valn];
+    let nexn = (valn + 1) % RanKana.togs.length;
+    let nexele = RanKana.togs[nexn];
+
+    RanKana.tog = nexele.name;
+    RanKana.togB.textContent = nexele.name;
+    RanKana.togB.style.backgroundColor = nexele.color;
+    RanKana.togB.setAttribute('data-description', nexele.desc);
+})
+RanKana.oveB.addEventListener('click', () => {
+    console.log(RanKana.ove)
+    if(RanKana.ove == 0){
+        RanKana.ove = 1;
+        RanKana.oveB.style.backgroundColor = '#a2ffa8';
+    }else{
+        RanKana.ove = 0;
+        RanKana.oveB.style.backgroundColor = '#c4c4c4';
+    }
+})
+RanKana.actB.addEventListener('click', () => {
+    let ele = RanKana.togs.find(a => a.name == RanKana.tog);
+    let words = ele.words;
+    let val = RanKana.inpI.value
+    if(val == '' || val <= 0) return nicoText('死ね');
+
+    let outputs = [];
+    RanKana.outD.innerHTML = '';    
     for(let i = 0; i < 10; i++){
-        for(let i = 0; i < input; i++){
-            output.push(words[Math.floor(Math.random() * words.length)])
+        if(RanKana.ove == 0){
+            let res = arrayShuffle(words).slice(0, val);
+            res = res.join('');
+            if(outputs.includes(res)){
+                i -= 1;
+                continue;
+            }
+            outputs.push(res);
+        }   
+        if(RanKana.ove == 1){
+            let res = [];
+            for(let i = 0; i < val; i++){
+                let ares = arraySelect(words);
+                res.push(ares);
+            }
+            res = res.join('');
+            if(outputs.includes(res)){
+                i -= 1;
+                continue;
+            }
+            outputs.push(res);
         }
-        document.querySelector('#OutPut').innerHTML += output.join('')+'<br>';
-        output = [];
     }
-    }
-}
-//HensatiSagasuYatu = HEN
-let HENpoint = 0;
-let HENave = 0;
-let HENx = 0;
-let HENy = 0;
-let HENanswer = 0;
-function  HENsum(){
-    HENpoint = document.getElementById("HENPoint").value;
-    HENave = document.getElementById("HENAve").value;
-    HENx = HENpoint - HENave;
-    HENy = HENx / 18 * 10; //18の部分は変更可能。得点分布だから一点集中なら1とかなんじゃないかな
-    HENanswer = Math.floor(HENy + 50);
-    document.getElementById("HENAnswer").textContent = '偏差値は' + HENanswer + 'です';
-}
-//CountGame = COUNT
+    RanKana.outD.innerHTML = outputs.join('<br>');
+})
+//#endregion
+
+
+//#region マリパのハチの巣のやつ
 let COUNTx = 0;
 let COUNTope = 0;
 let COUNTgamebar = 0;
@@ -853,7 +942,9 @@ function COUNTGameReset(){
     document.getElementById("COUNTButton").innerHTML = '<button onclick="COUNTGameStart()">start</button>';
     COUNTx = 0;
     }
-//RaceGame = RACE
+//#endregion
+
+//#田中のレースのあれ
 let RACEgamenow = 0;
 let RACEtimer = 0;
 let RACEnumber = ['one', 'two', 'three', 'four'];
@@ -1012,7 +1103,9 @@ async function RACEstanOthers(num) {
     RACEgameloop(others[1]);
     RACEgameloop(others[2]);
 }
-//RengaGame = RG
+//#endregion
+
+//#region 連打するやつ
 let count = 0;
 let startTime;
 let duration = 5000;
@@ -1034,7 +1127,9 @@ function RENDAchange(time) {
     document.getElementById(`RENDABUTTON${time}`).style.color = '#23aa23';
     duration = time;
 }
-//CookingGame = CG
+//#endregion
+
+//#region WiiPartyのコックのあれ
 let CGx = 0;
 let CGy = 0;
 let CGAllow = 0;
@@ -1091,6 +1186,8 @@ function CookingGameChoeese(num){
     }
     }
 }
+//#endregion
+
 //#endregion tool
 
 //#region login //ワルシャワログイン機構

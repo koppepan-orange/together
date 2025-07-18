@@ -46,16 +46,31 @@
         </div>
         <div id="tool" class="page" style="right: -100%;">
             <!-- こちら偏差値計算機です！！！！ -->
-            <p align="center">偏差値計算機<br>
-                <input id="HENPoint" type="text" placeholder="write 得点" size="20" style="width:80px;"></input>　
-                <input id="HENAve" type="text" placeholder="write 平均" size="20" style="width:80px;"><br>   
-                <button onclick="HENsum()">go</button>
-                <br><span id="HENAnswer"></span>
-            </p>
-            <p align="center">
-            <input type="text" id="Input" size="3" maxlength="2" placeholder="num"><button id="ToggleButton" onclick="Toggle()">less</button><button onclick="Activate()">Go!</button><br>
-            <span id="OutPut"></span>
-            </p>
+            <div class="Hen">
+                <input class="input" type="text" placeholder="write 得点" size="20" style="width:80px;"/>
+                <input class="average" type="text" placeholder="write 平均" size="20" style="width:80px;"/>
+                <button class="sum">go</button>
+                <div class="output"></div>
+            </div>
+            <div id="TextCount">
+                <div class="label">mozisu-count</div>
+                <input type="text" class="in"/>
+                <div class="out">0</div>
+            </div>
+            <div id="Anagram">
+                <div class="label">anagram-saysay</div>
+                <input type="text" class="in"/>
+                <button class="send">check</button>
+                <div class="out"></div>
+            </div>
+            <div class="RanKana">
+                <input type="text" class="input" maxlength="2" placeholder="num">
+                <button class="toggle">less</button>
+                <button class="over">重複</button>
+                <button class="active">act</button><br>
+                <span class="output"></span>
+            </div>
+            
             <!-- まりぱのげーむをちょっとだけいれようかな〜と -->
             <details style="margin:0 auto;"><summary>Game-Center</summary>
             <p align="center">Count Game Desu

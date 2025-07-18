@@ -1,8 +1,8 @@
 import asyncio
-import websockets # type: ignore
+import websockets
 import webbrowser
 import tkinter as tk
-import subprocess
+#import subprocess
 import re
 import random
 import csv

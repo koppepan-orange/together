@@ -205,7 +205,14 @@ body{
 #tool{
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
     opacity: 0;
+}
+#tool .Hen{
+    border: 1px solid #cfe9ff;
+    background-color: #f0f8ff;
 }
 
 /*こっからlogin*/
