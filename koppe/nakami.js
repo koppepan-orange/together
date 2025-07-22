@@ -319,6 +319,7 @@ async function pageChange(code){
 //#endregion page
 
 //#region home
+
 //#region リンクたちの動き
 const Links = {
     'memo':{
@@ -596,6 +597,7 @@ Object.keys(Links).forEach(type => {
     document.getElementById(`${type}tachi`).appendChild(document.createElement('br'));
 })
 //#endregion
+
 //#region rakuraku-memo
 let numberOfMemo = 4;
 function memoRead(){
@@ -683,6 +685,7 @@ function memoAddCreate(){
     return memoAdd;
 }
 //#endregion
+
 //#region iframeのお話
 let NowLinkframe = 1;
 function LinkframeGo(){
@@ -711,6 +714,7 @@ document.querySelector('#linkSite .iframe-full').addEventListener('click', event
     // iframe.webkitRequestFullscreen();
 })
 //#endregion
+
 //#endregion home
 
 //#region memo
@@ -746,7 +750,7 @@ searchButton.addEventListener('click', () => {
 
 //#region tool
 
-
+//#region 文字数カウント
 const Ccount = document.getElementById('count');
 const Cin = Ccount.querySelector('.in');
 const Cout = Ccount.querySelector('.out');
@@ -756,7 +760,9 @@ Cin.addEventListener('input', () => {
     let size = arraySize(text.split(''))
     Cout.textContent = `文字数${count} 種類${size}`;
 });
+//#endregion
 
+//#region アナグラム生成器
 let Aanag = document.getElementById('anagram');
 let Ain = Aanag.querySelector('.in');
 let Asend = Aanag.querySelector('.send');
@@ -766,6 +772,7 @@ Asend.addEventListener('click', () => {
     let res = anagramSaySay(text);
     Aout.innerHTML = res;
 });
+//#endregion
 
 //#region 偏差値計算するやつ
 let Hen = {
@@ -870,7 +877,6 @@ RanKana.actB.addEventListener('click', () => {
 })
 //#endregion
 
-
 //#region マリパのハチの巣のやつ
 let COUNTx = 0;
 let COUNTope = 0;
@@ -944,7 +950,7 @@ function COUNTGameReset(){
     }
 //#endregion
 
-//#田中のレースのあれ
+//#region 田中のレースのあれ
 let RACEgamenow = 0;
 let RACEtimer = 0;
 let RACEnumber = ['one', 'two', 'three', 'four'];
