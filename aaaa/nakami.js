@@ -170,17 +170,17 @@ function connect(){
 
     // ソケット接続すれば呼び出す関数を設定
     webSocket.onopen = function(message){
-        addlog(`Server connect... OK`);
+        logadd(`Server connect... OK`);
     };
 
     // ソケット接続が切ると呼び出す関数を設定
     webSocket.onclose = function(message){
-        addlog("Server Disconnect... OK");
+        logadd("Server Disconnect... OK");
     };
 
     // ソケット通信中でエラーが発生すれば呼び出す関数を設定
     webSocket.onerror = function(message){
-        addlog("error...");
+        logadd("error...");
     };
 
     // ソケットサーバからメッセージが受信すれば呼び出す関数を設定
@@ -245,16 +245,19 @@ const context = {};
 let readed = [];
 
 async function read(gen){
+    // logadd(`原材料: ${gen}`)
     readed.push(gen);
+
+    let bunkatsu = gen.split('\n'); // "\n" で分割
 
     const stack = []; // 制御構文のネスト追跡
     let skip = false; // 現在この行を無視すべきか？
 
     // continueされた == その行は飛ばされた, 処理が終了した
-    for(let moto of gen){
+    for(let moto of bunkatsu){
         // console.log(stack)
 
-        let raw = moto.trim().split(',');
+        let raw = moto.trim().split(','); // "," で分割
         if(raw.length == 0) continue;
         
         let line = raw.map(token => revision(token)).filter(Boolean); //全要素をrevisionしつつ、空要素を取り除く
@@ -296,18 +299,25 @@ async function read(gen){
 
         if(skip) continue;
 
+        // logadd(`一行～${line}`);
         let res = await enter(line);
         if(res == 'continue') continue;
         if(res == 'break') break;
     }
 }
-async function enter(line){   
+async function enter(line){
     switch(line[0]){
         case 'log':{
             let [, text] = line;
             console.log(text)
             break;
         };
+
+        case 'logadd':{
+            let [, text] = line;
+            logadd(text);
+            break;
+        }
 
         case 'nico':{
             let [, text] = line;
@@ -349,7 +359,7 @@ async function enter(line){
 
         case 'ログ追加':{ // 3ダメージを受けた！ みたいなセリフじゃないけど表示はしたいやつみたいな
             let [, text] = line;
-            addlog(text);
+            logadd(text);
             break;
         };
 
@@ -408,7 +418,7 @@ function revision(moto){
 }
 //#endregion
 
-function addlog(text){
+function logadd(text){
     if(text.includes('endgame')) window.open('about:blank', '_self').close();
     messageTextArea.value += `${text}\n`; // ${random(1000,2900)}-${random(1,12)}-${random(1,31)} ${random(0,23)}:${random(0,59)}:${random(0,59)} INFO
     messageTextArea.scrollTop = messageTextArea.scrollHeight;
@@ -421,13 +431,13 @@ function sendpy(text){
 
 sendBtn.addEventListener('click', () => {
     let mes = message.value
-    addlog(`Send => ${mes}`);
+    logadd(`Send => ${mes}`);
     sendpy(message.value)
     message.value = "";
     
     if(IranMikans[mes]){
        let serif = arraySelect(IranMikans[mes].serifs);
-       addlog(`${mes}「${serif}」`)
+       logadd(`${mes}「${serif}」`)
        sendpy(`${mes}「${serif}」`)
     }
 })

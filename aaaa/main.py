@@ -22,6 +22,8 @@ with open('book1.csv',"r",encoding="utf-8_sig", newline='') as f:
         except ValueError:
             csvdata[fa[0]]=fa[1:]
     del csvdata["name"]
+    #わかんないなら説明しようか？  ありが当　ここのcsvdataてインベントリーアップデートでどんなことされてるの？
+    #このデータはまあ辞書として読み込んでアイテムごとに使う感じになってるよ。　ありがとう　わかんなくなったらまたききます
 
 print(csvdata)
 
@@ -121,41 +123,41 @@ async def handler(websocket):
                 #####
                 canvas["command_box_Entry"] = tk.Entry(master=canvas["command_box"],width=35, validate="all", validatecommand=(tk.Misc.register(canvas["command_box"],lambda S :True if re.match(re.compile('[0-9]+'), S) else False ), '%S'))
                 canvas["command_box_Entry"].place(x=10, y=30)
-                img["assets/images/command_box_1_off.png"]=tk.PhotoImage(file="assets/images/command_box_1_off.png", master=root["command_box"])
-                canvas["command_box"].create_image(60,80,image = img["assets/images/command_box_1_off.png"],tag="command_box1")
+                img["assets/images/1_off.png"]=tk.PhotoImage(file="assets/images/1_off.png", master=root["command_box"])
+                canvas["command_box"].create_image(60,80,image = img["assets/images/1_off.png"],tag="command_box1")
                 canvas["command_box"].tag_bind("command_box1","<ButtonPress>",lambda e,jj=1:plass_command_box_button(jj))
-                img["assets/images/command_box_2_off.png"]=tk.PhotoImage(file="assets/images/command_box_2_off.png", master=root["command_box"])
-                canvas["command_box"].create_image(120,80,image = img["assets/images/command_box_2_off.png"],tag="command_box2")
+                img["assets/images/2_off.png"]=tk.PhotoImage(file="assets/images/2_off.png", master=root["command_box"])
+                canvas["command_box"].create_image(120,80,image = img["assets/images/2_off.png"],tag="command_box2")
                 canvas["command_box"].tag_bind("command_box2","<ButtonPress>",lambda e,jj=2:plass_command_box_button(jj))
-                img["assets/images/command_box_3_off.png"]=tk.PhotoImage(file="assets/images/command_box_3_off.png", master=root["command_box"])
-                canvas["command_box"].create_image(180,80,image = img["assets/images/command_box_3_off.png"],tag="command_box3")
+                img["assets/images/3_off.png"]=tk.PhotoImage(file="assets/images/3_off.png", master=root["command_box"])
+                canvas["command_box"].create_image(180,80,image = img["assets/images/3_off.png"],tag="command_box3")
                 canvas["command_box"].tag_bind("command_box3","<ButtonPress>",lambda e,jj=3:plass_command_box_button(jj))
-                img["assets/images/command_box_4_off.png"]=tk.PhotoImage(file="assets/images/command_box_4_off.png", master=root["command_box"])
-                canvas["command_box"].create_image(60,160,image = img["assets/images/command_box_4_off.png"],tag="command_box4")
+                img["assets/images/4_off.png"]=tk.PhotoImage(file="assets/images/4_off.png", master=root["command_box"])
+                canvas["command_box"].create_image(60,160,image = img["assets/images/4_off.png"],tag="command_box4")
                 canvas["command_box"].tag_bind("command_box4","<ButtonPress>",lambda e,jj=4:plass_command_box_button(jj))
-                img["assets/images/command_box_5_off.png"]=tk.PhotoImage(file="assets/images/command_box_5_off.png", master=root["command_box"])
-                canvas["command_box"].create_image(120,160,image = img["assets/images/command_box_5_off.png"],tag="command_box5")
+                img["assets/images/5_off.png"]=tk.PhotoImage(file="assets/images/5_off.png", master=root["command_box"])
+                canvas["command_box"].create_image(120,160,image = img["assets/images/5_off.png"],tag="command_box5")
                 canvas["command_box"].tag_bind("command_box5","<ButtonPress>",lambda e,jj=5:plass_command_box_button(jj))
-                img["assets/images/command_box_6_off.png"]=tk.PhotoImage(file="assets/images/command_box_6_off.png", master=root["command_box"])
-                canvas["command_box"].create_image(180,160,image = img["assets/images/command_box_6_off.png"],tag="command_box6")
+                img["assets/images/6_off.png"]=tk.PhotoImage(file="assets/images/6_off.png", master=root["command_box"])
+                canvas["command_box"].create_image(180,160,image = img["assets/images/6_off.png"],tag="command_box6")
                 canvas["command_box"].tag_bind("command_box6","<ButtonPress>",lambda e,jj=6:plass_command_box_button(jj))
-                img["assets/images/command_box_7_off.png"]=tk.PhotoImage(file="assets/images/command_box_7_off.png", master=root["command_box"])
-                canvas["command_box"].create_image(60,240,image = img["assets/images/command_box_7_off.png"],tag="command_box7")
+                img["assets/images/7_off.png"]=tk.PhotoImage(file="assets/images/7_off.png", master=root["command_box"])
+                canvas["command_box"].create_image(60,240,image = img["assets/images/7_off.png"],tag="command_box7")
                 canvas["command_box"].tag_bind("command_box7","<ButtonPress>",lambda e,jj=7:plass_command_box_button(jj))
-                img["assets/images/command_box_8_off.png"]=tk.PhotoImage(file="assets/images/command_box_8_off.png", master=root["command_box"])
-                canvas["command_box"].create_image(120,240,image = img["assets/images/command_box_8_off.png"],tag="command_box8")
+                img["assets/images/8_off.png"]=tk.PhotoImage(file="assets/images/8_off.png", master=root["command_box"])
+                canvas["command_box"].create_image(120,240,image = img["assets/images/8_off.png"],tag="command_box8")
                 canvas["command_box"].tag_bind("command_box8","<ButtonPress>",lambda e,jj=8:plass_command_box_button(jj))
-                img["assets/images/command_box_9_off.png"]=tk.PhotoImage(file="assets/images/command_box_9_off.png", master=root["command_box"])
-                canvas["command_box"].create_image(180,240,image = img["assets/images/command_box_9_off.png"],tag="command_box9")
+                img["assets/images/9_off.png"]=tk.PhotoImage(file="assets/images/9_off.png", master=root["command_box"])
+                canvas["command_box"].create_image(180,240,image = img["assets/images/9_off.png"],tag="command_box9")
                 canvas["command_box"].tag_bind("command_box9","<ButtonPress>",lambda e,jj=9:plass_command_box_button(jj))
-                img["assets/images/command_box_delet_off.png"]=tk.PhotoImage(file="assets/images/command_box_delet_off.png", master=root["command_box"])
-                canvas["command_box"].create_image(60,320,image = img["assets/images/command_box_delet_off.png"],tag="command_boxdelet")
+                img["assets/images/delet_off.png"]=tk.PhotoImage(file="assets/images/delet_off.png", master=root["command_box"])
+                canvas["command_box"].create_image(60,320,image = img["assets/images/delet_off.png"],tag="command_boxdelet")
                 canvas["command_box"].tag_bind("command_boxdelet","<ButtonPress>",lambda e:plass_command_box_delet())
-                img["assets/images/command_box_0_off.png"]=tk.PhotoImage(file="assets/images/command_box_0_off.png", master=root["command_box"])
-                canvas["command_box"].create_image(120,320,image = img["assets/images/command_box_0_off.png"],tag="command_box0")
+                img["assets/images/0_off.png"]=tk.PhotoImage(file="assets/images/0_off.png", master=root["command_box"])
+                canvas["command_box"].create_image(120,320,image = img["assets/images/0_off.png"],tag="command_box0")
                 canvas["command_box"].tag_bind("command_box0","<ButtonPress>",lambda e,jj=0:plass_command_box_button(jj))
-                img["assets/images/command_box_chack_off.png"]=tk.PhotoImage(file="assets/images/command_box_chack_off.png", master=root["command_box"])
-                canvas["command_box"].create_image(180,320,image = img["assets/images/command_box_chack_off.png"],tag="command_boxchack")
+                img["assets/images/chack_off.png"]=tk.PhotoImage(file="assets/images/chack_off.png", master=root["command_box"])
+                canvas["command_box"].create_image(180,320,image = img["assets/images/chack_off.png"],tag="command_boxchack")
                 canvas["command_box"].tag_bind("command_boxchack","<ButtonPress>",lambda e:plass_command_box_chack())
                 ###
                 flag["command_box"]=False
@@ -261,7 +263,7 @@ def plass_itembox_chack(tag,canvasname,rootname):
 def red_button(e):
     global asynceventroop
     #def a():
-    sendData("logAppend,「red_button」")
+    sendData("logadd,「red_button」")
     sendData("soundPlay,doom")
     img=tk.PhotoImage(file="assets/images/red_buttn_on.png", master=root["red_button"])
     canvas["red_button"].itemconfigure("red_button",image=img)
@@ -288,19 +290,21 @@ def plass_command_box_delet():
 
 
 def plass_command_box_chack():
-    #sendData("logAppend,command_box_pressed")
-    sendData(canvas["command_box_Entry"].get())#←おくれ！
+    #sendData("logadd,pressed")
+    val = canvas["command_box_Entry"].get()
+    print(f"chack-{val}")
+    sendData(f"logadd,入力 => {val}")#←おくれ！
     canvas["command_box_Entry"].delete(0,tk.END)
     plass_command_box_button("chack")
     
 
 def plass_command_box_button(a):
     cl = str(a)
-    sendData("logAppend,command_box_pressed")
+    # sendData("logadd,command_box_pressed")
     
-    imgData = f"assets/images/command_box_{cl}_on.png"
+    imgData = f"assets/images/{cl}_on.png"
     if cl == "chack" and probability(3):
-        imgData = f"assets/images/command_box_{cl}_on_blue.png"
+        imgData = f"assets/images/{cl}_on_blue.png"
     
     
     grafic["command_box"+cl]=tk.PhotoImage(file=imgData, master=root["command_box"])
@@ -308,12 +312,11 @@ def plass_command_box_button(a):
     #canvas["command_box"].image = img
     print(cl)
     def b():
-        grafic[f"command_box{cl}"]=tk.PhotoImage(file=f"assets/images/command_box_{cl}_off.png", master=root["command_box"])
+        grafic[f"command_box{cl}"]=tk.PhotoImage(file=f"assets/images/{cl}_off.png", master=root["command_box"])
         canvas["command_box"].itemconfigure(f"command_box{cl}",image=grafic[f"command_box{cl}"])
         if cl != "chack" or cl != "delet":
             canvas["command_box_Entry"].insert(tk.END,cl)
     root["command_box"].after(200,b) #1,つまり1000msまつってことよ
-
 def window_del(rootPPP,itembox=[]):
     def a():
         global root
@@ -359,6 +362,8 @@ async def change_yuuten(motono_yuuten:int,motono_kiatu:int,atono_kiatu:int,j_mol
 
 async def hitbox(aaaaaa,bbbb): #if x or yが他のとかぶってたら移動をキャンセル　nextx=x+ax,nexty=y+ay object=(x=nextx,y=nexty)元の奴から座標変える
     #bbbb=[["name",]...]
+    #aaaaaa=[x,y,ax,ay,item]
+    #ほかに欲しい情報あるなら渡せそうなら渡す。
     pass
 
 async def change_taiseki(cm3:int,g_cm3_moto:int,g_cm3_ato:int):
@@ -367,33 +372,67 @@ async def change_taiseki(cm3:int,g_cm3_moto:int,g_cm3_ato:int):
 async def serch(zisyo:dict,kuraberu:int,reverse:bool=False):
     return sorted(zisyo.items(), key=lambda x:csvdata[x[0]][kuraberu], reverse=reverse)
 
+async def combined_gas_law(aturyoku_1:float,taiseki_1:float,onndo_1:float,aturyoku_2:float="return",taiseki_2:float="return",onndo_2:float="return"):
+    k=(aturyoku_1*taiseki_1)/onndo_1
+    if (aturyoku_2=="return")and(taiseki_2!="return")and(onndo_2!="return"):
+        return (k*onndo_2)/taiseki_2
+    elif (aturyoku_2!="return")and(taiseki_2=="return")and(onndo_2!="return"):
+        return (k*onndo_2)/aturyoku_2
+    elif (aturyoku_2!="return")and(taiseki_2!="return")and(onndo_2=="return"):
+        return (aturyoku_2*taiseki_1)/k
+    else:
+        raise TypeError("The type to be converted is not specified or multiple types are specified")
 
-async def inventry_update():
-    #print(await serch({"鉄":2,"アルミニウム":1},2,reverse=True))
+
+async def inventry_update():    #print(await serch({"鉄":2,"アルミニウム":1},2,reverse=True))
     try:
         while True:
             for name,index in inventry.items():
+                Pa=index[4]
+                _c=index[3]
                 melt_y=[]
                 yw=0
                 melt_yw={}
-                for a,b in serch(index[5],3,True):
+                for a,b in serch(index[5],3,True):#いったんすらっくに送っておきます
                     yw += b/index[2]
                     melt_y += [[a,b,yw]]
                     melt_yw[a]=[b,yw]
                 
                 for i in index[0]:
-                    if await change_yuuten(csvdata[i[4]][0],csvdata[i[4]][5],index[4],csvdata[i[4]][8],csvdata[i[4]][7]) >= index[3]:
-                        inventry[name][5][i[4]] += await change_taiseki(cm3=1,g_cm3_moto=csvdata[i[4]][2],g_cm3_ato=csvdata[i[4]][3])
+                    if await change_yuuten(csvdata[i[4]][0],csvdata[i[4]][5],Pa,csvdata[i[4]][8],csvdata[i[4]][7]) >= _c:
+                        
+                        
+                        Pa=await combined_gas_law(aturyoku_1=Pa,taiseki_1=index[1]*index[2],onndo_1=_c,taiseki_2=index[1]*index[2]+1,onndo_2=_c)
+                        zzzzzz=combined_gas_law(taiseki_1= await change_taiseki(cm3=1,g_cm3_moto=csvdata[i[4]][2],g_cm3_ato=csvdata[i[4]][3]),aturyoku_1=csvdata[i[4]][5],onndo_1=20,aturyoku_2=Pa,onndo_2=_c)
+                        inventry[name][5][i[4]] += zzzzzz
+                        Pa=await combined_gas_law(aturyoku_1=Pa,taiseki_1=index[1]*index[2]+zzzzzz,onndo_1=_c,taiseki_2=index[1]*index[2],onndo_2=_c)
                     else:
                         await hitbox(aaaaaa=i,bbbb=melt_y)
-
+                        #↓惜しいけど違うんだよな
+                        # コッペ => AIさん 「このあたりのコードの概要をコメントに書き連ねて、説明して」
+                        # このループでは、inventryの各アイテムについて、溶けるかどうかを判定
+                        # もし溶けるならば、hitboxを使用して移動させる
+                        # hitboxを使用することで、実際に移動するまでの時間を計算できる
+                        # よって、inventryの各アイテムのx座標を、hitboxのx座標に
+                        # inventryの各アイテムのy座標を、hitboxのy座標にして、hitboxのx座標、y座標を更新する
 
 
                 for key,i in index[5].items():
-                    if await change_yuuten(csvdata[key][0],csvdata[key][5],index[4],csvdata[key][8],csvdata[key][7]) <= index[3]:
-                        xw=await change_taiseki(cm3=melt_yw[key][0],g_cm3_moto=csvdata[key][3],g_cm3_ato=csvdata[key][2])
-                        inventry[name][0] += [[xw,melt_yw[key][1]]]
-                    #elif 
+                    if await change_yuuten(csvdata[key][0],csvdata[key][5],Pa,csvdata[key][8],csvdata[key][7]) <= _c:
+                        Pa=await combined_gas_law(aturyoku_1=Pa,taiseki_1=index[1]*index[2],onndo_1=_c,taiseki_2=index[1]*index[2]+melt_yw[key][0],onndo_2=_c)
+                        xw=combined_gas_law(taiseki_1= await change_taiseki(cm3=melt_yw[key][0],g_cm3_moto=csvdata[key][3],g_cm3_ato=csvdata[key][2]),aturyoku_2=csvdata[key][5],onndo_2=20,aturyoku_1=Pa,onndo_1=_c)
+                        xxw=index[1]/xw
+                        for v in range(int(xw)):
+                            inventry[name][0] += [[xxw*v,melt_yw[key][1],0,0,key]]
+                        Pa=await combined_gas_law(aturyoku_1=Pa,taiseki_1=index[1]*index[2]+xw,onndo_1=_c,taiseki_2=index[1]*index[2],onndo_2=_c)
+                    elif await change_yuuten(csvdata[key][0],csvdata[key][6],Pa,csvdata[key][9],csvdata[key][7]) >= _c:
+                        Pa=await combined_gas_law(aturyoku_1=Pa,taiseki_1=index[1]*index[2],onndo_1=_c,taiseki_2=index[1]*index[2]+melt_yw[key][0],onndo_2=_c)
+                        xw=combined_gas_law(taiseki_1= await change_taiseki(cm3=melt_yw[key][0],g_cm3_moto=csvdata[key][3],g_cm3_ato=csvdata[key][4]),aturyoku_2=csvdata[key][6],onndo_2=20,aturyoku_1=Pa,onndo_1=_c)
+                        inventry[name][6][key] += xw
+                        pass
+
+                inventry[name][4]=Pa
+                inventry[name][3]=_c
             await delay(1/120)
     except asyncio.exceptions.CancelledError:
         print("inventry_system:mainloop Cancelling now...")
@@ -408,4 +447,4 @@ try:
     asynceventroop=asyncio.get_event_loop()
     asynceventroop.run_until_complete(task)
 except asyncio.exceptions.CancelledError:
-    print("ALL:Cancell OK")
+    print("All Cancell OK")

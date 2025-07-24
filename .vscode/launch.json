@@ -22,8 +22,8 @@
             "type": "msedge",
             // "type": "chrome",
             "request": "launch",
-            "name": "koppe's over site",
-            "file": "koppe/index.html",
+            "name": "clicker-of-mugen",
+            "file": "koppe/clicker-of-mugen/index.html",
         },
         {
             "type": "msedge",
