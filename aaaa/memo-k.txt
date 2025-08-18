@@ -1,6 +1,10 @@
 koppepan-orange's memoですわ
 メモ兼動向報告場
 
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+
 - やるべきこと
 素材のイラスト
 

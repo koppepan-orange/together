@@ -363,7 +363,11 @@ async def change_yuuten(motono_yuuten:int,motono_kiatu:int,atono_kiatu:int,j_mol
 async def hitbox(aaaaaa,bbbb): #if x or yが他のとかぶってたら移動をキャンセル　nextx=x+ax,nexty=y+ay object=(x=nextx,y=nexty)元の奴から座標変える
     #bbbb=[["name",]...]
     #aaaaaa=[x,y,ax,ay,item]
-    #ほかに欲しい情報あるなら渡せそうなら渡す。
+    #name,融点 (℃),沸点 (℃),固体密度 (g/cm3) (20℃),液体密度,気体密度,融点気圧(Pa),沸点気圧(Pa),m3/mol,誘拐熱(J/mol),蒸発熱(J/mol),コメント     ほかに欲しい情報あるなら渡せそうなら渡す。
+    """aaaaaa[1] += -2
+    if aaaaaa[3] >= 0:
+        a= bbbb[4]*(aaaaaa[3]**2)
+        aaaaaa[2] +=  """
     pass
 
 async def change_taiseki(cm3:int,g_cm3_moto:int,g_cm3_ato:int):
@@ -393,7 +397,7 @@ async def inventry_update():    #print(await serch({"鉄":2,"アルミニウム"
                 melt_y=[]
                 yw=0
                 melt_yw={}
-                for a,b in serch(index[5],3,True):#いったんすらっくに送っておきます
+                for a,b in serch(index[5],3,True):
                     yw += b/index[2]
                     melt_y += [[a,b,yw]]
                     melt_yw[a]=[b,yw]
