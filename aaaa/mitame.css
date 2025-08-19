@@ -7,6 +7,14 @@ html{
     margin: -8px;
     overflow: hidden;
 }
+.row{
+    display: flex;
+    flex-direction: row;
+}
+.column{
+    display: flex;
+    flex-direction: column;
+}
 
 /*nicotext*/
 .nicotext{
@@ -19,6 +27,80 @@ html{
     transition: right 2.0s linear;
     white-space: nowrap;
     pointer-events: none;
+}
+/*logとtext*/
+#log{
+    display: none;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 320px;
+    height: 200px;
+    border: 1px solid #ffffff;
+    background-color: rgba(0,0,0,0);
+    position: fixed;
+    bottom: 150px;
+    right: -300px;
+    color: #fefefe;
+    overflow-y: hidden;
+    transition: right 0.3s;
+    z-index: 254;
+}
+#log .opener{
+    width: 20px;
+    height: 100%;
+    background-color: rgba(0,0,0,0.9);
+    color: #fefefe;
+    text-align: center;
+    cursor: pointer;
+    z-index: 254;
+}
+#log .log{
+    width: 300px;
+    height: 100%;
+    max-height: 200px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    background-color: rgba(0,0,0,0.8);
+    color: #fefefe;
+    text-align: left;
+    font-size: 14px;
+    transition: right 0.3s;
+    z-index: 253;
+}
+#text{
+    display: none;
+    background: rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 1.2em;
+    position: fixed;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000;
+
+    white-space: nowrap;
+    overflow: hidden;
+    width: fit-content; /* 文字の長さに応じた幅 */
+    animation: fadeIn 0.5s ease forwards;
+}
+@keyframes fadeIn {
+    0%{
+        opacity: 0;
+    }
+    100%{
+        opacity: 1;
+    }
+}
+.color-red{
+    color: #ff1919;
+}
+.color-pink{
+    color: #ff56e9;
+}
+.color-blue{
+    color: #1919ff;
 }
 
 /* description */
@@ -34,12 +116,15 @@ html{
     z-index: 256;
 }
 
-::-webkit-scrollbar{
-    display: none;
-}
-.row{
-    display: flex;
-    flex-direction: row;
+水色 #f0f8ff, #eaf5ff, #def0ff, #cfe9ff, #b5dcff
+紫色 #f8f6ff, #f5f2ff, #f1edff, #ece8ff, #e9e4ff
+橙色 #fffaf3, #fff7eb, #fff3e2, #fff0d9, #ffeccf
+緑色 #f6fff2, #eeffe7, #e6ffdc, #ddffd0, #d4ffc3
+
+#dummy{
+    color: #cfe9ff;
+    /* 上の謎の4つの文章によって、なんか最初のやつ無効化されるっぽい */
+    /* 謎に */
 }
 
 textarea{
@@ -49,27 +134,31 @@ textarea{
     /* font-family: kurundeco; */
 }
 
-/* 
-囧: 色リスト
-ー水色系列
-#f0f8ff //aliceblue
-#eaf5ff
-#def0ff
-#cfe9ff
-#b5dcff
-#00a0ff //クロノアさん
-#4473ad //特殊枠で濃いめ
-*/
-
 #mainArea{
     width: calc(100vw - 80px);
     height: calc(100vh - 80px);
     /* height: 100vh; */
     padding: 40px;
-    /* background: linear-gradient(to right, #f0f8ff, #eaf5ff, #def0ff,  #cfe9ff, #b5dcff); */
-    background: linear-gradient(to right, #e8ffdf, #cfe9ff, #e4dff8, #ffeccf);
+    background: none;
     user-select:none;
     font-family: hangyaku;
+}
+#back.rainback{
+    width: 400%;
+    height: 100%; /* 適当 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+.rainback{
+    background: linear-gradient(to right, #f0f8ff,#eaf5ff,#def0ff,#cfe9ff,#b5dcff,#d4ffc3,#ddffd0,#e6ffdc,#eeffe7,#f6fff2,#fffaf3,#fff7eb,#fff3e2,#fff0d9,#ffeccf,#e9e4ff,#ece8ff,#f1edff,#f5f2ff,#f8f6ff);
+    background-size: 400% 100%;
+    animation: slideBG 5s linear infinite;
+}
+@keyframes slideBG {
+    0%   { background-position: 0 0; }
+    100% { background-position: -400% 0; }
 }
 
 #commands{
@@ -131,4 +220,69 @@ textarea{
     transition: left 0.5s ease;
     opacity: 0;
     z-index: 48;
+}
+
+#bigmashmaro{
+    z-index: 69;
+}
+#bigmashmaro .kitekey{
+    display: block;
+    width: 60px;
+    height: 70px;
+    background: #def0ff;
+    border-radius: 0 0 5px 5px;
+    position: fixed;
+    top: 0;
+    right: 10%;
+    transition: top 0.5s ease;
+    z-index: 69;
+}
+#bigmashmaro .kitekey .column{
+    width: 80%;
+    height: 80%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 69;
+}
+#bigmashmaro .kitekey .theta{
+    width: 100%;
+    height: 50%; 
+    background: #90ccff;
+    clip-path: polygon(0% 0%, 50% 50%, 100% 0%, 100% 50%, 50% 100%, 0% 50%);
+    box-sizing: border-box;
+    z-index: 69;
+}
+#bigmashmaro .kitekey.tap{
+    top: 80%;   
+}
+#rainbt{
+    position: fixed;
+    top: 0;
+    left: 10px;
+    width: 50px;
+    height: 50px;
+    background: radial-gradient(#f0f8ff,#eaf5ff,#def0ff,#cfe9ff,#b5dcff,#d4ffc3,#ddffd0,#e6ffdc,#eeffe7,#f6fff2,#fffaf3,#fff7eb,#fff3e2,#fff0d9,#ffeccf,#e9e4ff,#ece8ff,#f1edff,#f5f2ff,#f8f6ff)!important;
+    border-radius: 50%;
+    z-index: 69;
+    box-sizing: border-box;
+}
+#bigmashmaro .bodies{
+    width: 50%;
+    height: 80%;
+    background: #e4f2ff;
+    border: 10px solid #def0ff;
+    border-radius: 0 0 0 5px;
+    border-top: none;
+    font-size: 20px;
+    position: fixed;
+    top: -80%;
+    right: 10%;
+    transition: top 0.5s ease;
+    box-sizing: border-box;
+    z-index: 69;
+}
+#bigmashmaro .bodies.tap{
+    top: 0;
 }

@@ -2,26 +2,44 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <title>Websocket Demo</title>
+  <title>debug-room!!</title>
   <link rel="stylesheet" href="mitame.css"/>
 </head>
 <body>
   <div id="movableDescription"></div>
-  <!-- こっからHTML -->
+  <div id="text"></div>
+  <div id="log">
+    <div class="opener"></div>
+    <div class="log"></div>
+  </div>
+  
+  <div id="back"></div>
+
   <div id="mainArea">
+
+    <div id="bigmashmaro">
+      <textarea type="text" class="bodies"></textarea>
+      <div class="kitekey">
+        <div class="column">
+          <div class="theta"></div>      
+          <div class="theta"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="rainbt" class="draggable"></div>
+    
     <div id="commands">
       <div class="row">
         <input id="textMessage" type="text">
-        <!-- <button onclick="connect()">Connect</button> -->
         <button class="send">Send</button>
-        <!-- <button onclick="disconnect()">Disconnect</button> -->
       </div>
       <textarea id="messageTextArea" rows="10" cols="50"></textarea>
     </div>
+
   </div>
 
 
-  <!-- こっからjavascript -->
   <script src="nakami.js" defer></script>
   <script src="data.js" defer></script>
 </body>

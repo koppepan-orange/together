@@ -6,6 +6,7 @@ import tkinter as tk
 import re
 import random
 import csv
+import copy
 #from random import randint as randomRange
 #from random import shuffle as arrayShuffle
 #from random import choice as arraySelect
@@ -14,6 +15,7 @@ from asyncio import sleep as delay
 import os"""
 
 csvdata={}
+kakikae_list=[]
 
 with open('book1.csv',"r",encoding="utf-8_sig", newline='') as f:
     for fa in csv.reader(f):
@@ -25,7 +27,8 @@ with open('book1.csv',"r",encoding="utf-8_sig", newline='') as f:
     #わかんないなら説明しようか？  ありが当　ここのcsvdataてインベントリーアップデートでどんなことされてるの？
     #このデータはまあ辞書として読み込んでアイテムごとに使う感じになってるよ。　ありがとう　わかんなくなったらまたききます
 
-print(csvdata)
+# print(csvdata)
+# 一旦消させてもらいますね
 
 itembox_item={}
 
@@ -36,7 +39,7 @@ flag={"red_button":True,"command_box":True,"craft_table":True}
 canvas={}
 pic_item="item_box"
 
-inventry={}#name:{[[[x,y,ax,ay,item]..],width,hight,℃,Pa,{item:mutch,..}<-melt_item,{item:mutch,..}<-are_item]}
+inventry={} #name:{[[[x,y,ax,ay,item]..],width,hight,℃,Pa,{item:mutch,..}<-melt_item,{item:mutch,..}<-are_item]}
 
 
 img={}
@@ -182,16 +185,22 @@ async def handler(websocket):
                         create_itembox("craft_table","craft_table",f"craft_table_{aded}",sx,sy)
                 flag["craft_table"]=False
             elif message[:5]=="pick_":
-                
                 pic_item=message[5:]
             elif message[:11]=="input_item_":#f"imput_item_{name}_{x}_{y}_{item}"
                 x=message[11:].split("_")
                 inventry[str(x[0])][0]+=[[x[1],x[2],0,0,x[3]]]
+            elif message[:11]=="imput_melt_":#imput_melt_{name}_{item}_{cm3}
+                x=message[11:].split("_")
+                inventry[str(x[0])][5][x[1]]+=x[2]
+            elif message[:10]=="imput_are_":#imput_melt_{name}_{item}_{cm3}
+                x=message[10:].split("_")
+                inventry[str(x[0])][6][x[1]]+=x[2]
             elif message[:16]=="create_inventry_":#f"create_inventry_{name}_{windth}_{higth}_{onndo}_{aturyoku}"
                 x=message[16:].split("_")
                 inventry[x[0]]=[[],x[1],x[2],x[3],x[4],{},{}]
             else:
-                await websocket.send("だまれ～～～～～～～～")
+                await websocket.send("Are you a cheater?") #楽しくなるぞ～～！
+            
             
             #print(message[:5])
             #print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
@@ -360,14 +369,25 @@ def window_del(rootPPP,itembox=[]):
 async def change_yuuten(motono_yuuten:int,motono_kiatu:int,atono_kiatu:int,j_mol:int,m3_mol:int) -> int:
     return (motono_yuuten+((motono_yuuten+273.15)*m3_mol/j_mol)*(atono_kiatu-motono_kiatu)*1000000)
 
-async def hitbox(aaaaaa,bbbb): #if x or yが他のとかぶってたら移動をキャンセル　nextx=x+ax,nexty=y+ay object=(x=nextx,y=nexty)元の奴から座標変える
-    #bbbb=[["name",]...]
+async def hitbox(aaaaaa,bbbb,cccc,dens,width,hight): #if x or yが他のとかぶってたら移動をキャンセル　nextx=x+ax,nexty=y+ay object=(x=nextx,y=nexty)元の奴から座標変える
+    #bbbb=[["name",]...]　#気体密度,3,3/沸点　　←このywが何してるか教えてもらう
     #aaaaaa=[x,y,ax,ay,item]
-    #name,融点 (℃),沸点 (℃),固体密度 (g/cm3) (20℃),液体密度,気体密度,融点気圧(Pa),沸点気圧(Pa),m3/mol,誘拐熱(J/mol),蒸発熱(J/mol),コメント     ほかに欲しい情報あるなら渡せそうなら渡す。
-    """aaaaaa[1] += -2
-    if aaaaaa[3] >= 0:
-        a= bbbb[4]*(aaaaaa[3]**2)
-        aaaaaa[2] +=  """
+    #cccc=name,融点 (℃),沸点 (℃),固体密度 (g/cm3) (20℃),液体密度,気体密度,融点気圧(Pa),沸点気圧(Pa),m3/mol,誘拐熱(J/mol),蒸発熱(J/mol),コメント
+    #dens= 固体密度
+    #問題点：　他のと接触判定がない。　移動範囲を指定してないので画面外まで動く。
+
+    #ここには固体しか入らないよ？
+
+    """
+    if bbbb[1][3] <= 1:  #気体かどうか判定
+        aaaaaa[2] += -3  #itemboxの最下層まで動かす
+    else
+        if aaaaaa >= 0:
+            a = dens*(aaaaaa[4]**)
+            aaaaaa[1] += -(a)
+        if aaaaaa[3] >= 0:
+            a= dens*(aaaaaa[3]**2)
+            aaaaaa[1] += -(a) """
     pass
 
 async def change_taiseki(cm3:int,g_cm3_moto:int,g_cm3_ato:int):
@@ -387,31 +407,31 @@ async def combined_gas_law(aturyoku_1:float,taiseki_1:float,onndo_1:float,aturyo
     else:
         raise TypeError("The type to be converted is not specified or multiple types are specified")
 
-
 async def inventry_update():    #print(await serch({"鉄":2,"アルミニウム":1},2,reverse=True))
+    global inventry
     try:
         while True:
+            inventry2=copy.deepcopy(inventry) #囧_err: inventryっていう変数は存在しないぜ
             for name,index in inventry.items():
-                Pa=index[4]
-                _c=index[3]
                 melt_y=[]
                 yw=0
                 melt_yw={}
                 for a,b in serch(index[5],3,True):
                     yw += b/index[2]
-                    melt_y += [[a,b,yw]]
+                    melt_y += [[a,b,yw]] 
                     melt_yw[a]=[b,yw]
                 
                 for i in index[0]:
-                    if await change_yuuten(csvdata[i[4]][0],csvdata[i[4]][5],Pa,csvdata[i[4]][8],csvdata[i[4]][7]) >= _c:
+                    if await change_yuuten(csvdata[i[4]][0],csvdata[i[4]][5],inventry2[name][4],csvdata[i[4]][8],csvdata[i[4]][7]) >= inventry2[name][3]:
                         
                         
-                        Pa=await combined_gas_law(aturyoku_1=Pa,taiseki_1=index[1]*index[2],onndo_1=_c,taiseki_2=index[1]*index[2]+1,onndo_2=_c)
-                        zzzzzz=combined_gas_law(taiseki_1= await change_taiseki(cm3=1,g_cm3_moto=csvdata[i[4]][2],g_cm3_ato=csvdata[i[4]][3]),aturyoku_1=csvdata[i[4]][5],onndo_1=20,aturyoku_2=Pa,onndo_2=_c)
-                        inventry[name][5][i[4]] += zzzzzz
-                        Pa=await combined_gas_law(aturyoku_1=Pa,taiseki_1=index[1]*index[2]+zzzzzz,onndo_1=_c,taiseki_2=index[1]*index[2],onndo_2=_c)
+                        #inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]+1,onndo_2=inventry2[name][3])
+                        zzzzzz=combined_gas_law(taiseki_1= await change_taiseki(cm3=1,g_cm3_moto=csvdata[i[4]][2],g_cm3_ato=csvdata[i[4]][3]),aturyoku_1=csvdata[i[4]][5],onndo_1=20,aturyoku_2=inventry2[name][4],onndo_2=inventry2[name][3])
+                        inventry2[name][5][i.pop(4)] += zzzzzz
+                        inventry2[name][3]+=(1)*100/(csvdata[i[4]][7])*(csvdata[i[4]][8])*4.184*inventry2[name][1]*inventry2[name][2]
+                        inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]+zzzzzz-1,onndo_2=inventry2[name][3])
                     else:
-                        await hitbox(aaaaaa=i,bbbb=melt_y)
+                        await hitbox(aaaaaa=i,bbbb=melt_y,cccc=index,dens=inventry2[name][3],width=inventry2[name][1],hight=inventry2[name][2])
                         #↓惜しいけど違うんだよな
                         # コッペ => AIさん 「このあたりのコードの概要をコメントに書き連ねて、説明して」
                         # このループでは、inventryの各アイテムについて、溶けるかどうかを判定
@@ -422,24 +442,40 @@ async def inventry_update():    #print(await serch({"鉄":2,"アルミニウム"
 
 
                 for key,i in index[5].items():
-                    if await change_yuuten(csvdata[key][0],csvdata[key][5],Pa,csvdata[key][8],csvdata[key][7]) <= _c:
-                        Pa=await combined_gas_law(aturyoku_1=Pa,taiseki_1=index[1]*index[2],onndo_1=_c,taiseki_2=index[1]*index[2]+melt_yw[key][0],onndo_2=_c)
-                        xw=combined_gas_law(taiseki_1= await change_taiseki(cm3=melt_yw[key][0],g_cm3_moto=csvdata[key][3],g_cm3_ato=csvdata[key][2]),aturyoku_2=csvdata[key][5],onndo_2=20,aturyoku_1=Pa,onndo_1=_c)
+                    if await change_yuuten(csvdata[key][0],csvdata[key][5],inventry2[name][4],csvdata[key][8],csvdata[key][7]) <= inventry2[name][3]:
+                        #inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]+melt_yw[key][0],onndo_2=inventry2[name][3])
+                        save=melt_yw[key][0]
+                        xw=combined_gas_law(taiseki_1= await change_taiseki(cm3=melt_yw[key][0],g_cm3_moto=csvdata[key][3],g_cm3_ato=csvdata[key][2]),aturyoku_2=csvdata[key][5],onndo_2=20,aturyoku_1=inventry2[name][4],onndo_1=inventry2[name][3])
+                        inventry2[name][3]-=(inventry2[name][5][key])*100/(csvdata[key][7])*(csvdata[key][8])*4.184*inventry2[name][1]*inventry2[name][2]
                         xxw=index[1]/xw
+                        inventry2[name][5][key] = 0
                         for v in range(int(xw)):
-                            inventry[name][0] += [[xxw*v,melt_yw[key][1],0,0,key]]
-                        Pa=await combined_gas_law(aturyoku_1=Pa,taiseki_1=index[1]*index[2]+xw,onndo_1=_c,taiseki_2=index[1]*index[2],onndo_2=_c)
-                    elif await change_yuuten(csvdata[key][0],csvdata[key][6],Pa,csvdata[key][9],csvdata[key][7]) >= _c:
-                        Pa=await combined_gas_law(aturyoku_1=Pa,taiseki_1=index[1]*index[2],onndo_1=_c,taiseki_2=index[1]*index[2]+melt_yw[key][0],onndo_2=_c)
-                        xw=combined_gas_law(taiseki_1= await change_taiseki(cm3=melt_yw[key][0],g_cm3_moto=csvdata[key][3],g_cm3_ato=csvdata[key][4]),aturyoku_2=csvdata[key][6],onndo_2=20,aturyoku_1=Pa,onndo_1=_c)
-                        inventry[name][6][key] += xw
-                        pass
+                            inventry2[name][0] += [[xxw*v,melt_yw[key][1],0,0,key]]
+                        inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=(index[1]*index[2])-save+xw,onndo_2=inventry2[name][3])
+                    elif await change_yuuten(csvdata[key][1],csvdata[key][6],inventry2[name][4],csvdata[key][9],csvdata[key][7]) >= inventry2[name][3]:
+                        #inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]+melt_yw[key][0],onndo_2=inventry2[name][3])
+                        save=melt_yw[key][0]
+                        xw=combined_gas_law(taiseki_1= await change_taiseki(cm3=melt_yw[key][0],g_cm3_moto=csvdata[key][3],g_cm3_ato=csvdata[key][4]),aturyoku_2=csvdata[key][6],onndo_2=20,aturyoku_1=inventry2[name][4],onndo_1=inventry2[name][3])
+                        inventry2[name][6][key] += xw
+                        inventry2[name][3]+=(inventry2[name][5][key])*100/(csvdata[key][7])*(csvdata[key][9])*4.184*inventry2[name][1]*inventry2[name][2]
+                        inventry2[name][5][key] = 0
+                        inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]-save+xw,onndo_2=inventry2[name][3])
+                
+                for key,i in index[5].items():
+                    if await change_yuuten(csvdata[key][1],csvdata[key][6],inventry2[name][4],csvdata[key][9],csvdata[key][7]) <= inventry2[name][3]:
+                        #inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]+melt_yw[key][0],onndo_2=inventry2[name][3])
+                        save=inventry2[name][6][key]
+                        xw=combined_gas_law(taiseki_1= await change_taiseki(cm3=inventry2[name][6][key],g_cm3_moto=csvdata[key][4],g_cm3_ato=csvdata[key][3]),aturyoku_2=csvdata[key][6],onndo_2=20,aturyoku_1=inventry2[name][4],onndo_1=inventry2[name][3])
+                        inventry2[name][5][key] += xw 
+                        inventry2[name][3]-=(inventry2[name][6][key])*100/(csvdata[key][7])*(csvdata[key][9])*4.184*inventry2[name][1]*inventry2[name][2]
+                        inventry2[name][6][key] = 0
+                        inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=(index[1]*index[2])-save+xw,onndo_2=inventry2[name][3])
 
-                inventry[name][4]=Pa
-                inventry[name][3]=_c
+            inventry=copy.deepcopy(inventry2)
             await delay(1/120)
     except asyncio.exceptions.CancelledError:
         print("inventry_system:mainloop Cancelling now...")
+
 
         
 

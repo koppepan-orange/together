@@ -39,24 +39,31 @@ function arrayGacha(array,probability){
         random -= probability[i];
     }
 };
-function copy(obj){
-    if (obj === null || typeof obj !== 'object') {
-        return obj; // 基本型はそのまま返す
-    }
-    if (Array.isArray(obj)) {
-        return obj.map(copy); // 配列の各要素を再帰コピー
-    }
-    const result = {};
-    for (const key in obj) {
-        if (obj.hasOwnProperty(key)) {
-            result[key] = copy(obj[key]); // オブジェクトのプロパティを再帰コピー
+function copy(moto) {
+    if(Array.isArray(moto)) {
+        let arr = [];
+        for (let i = 0; i < moto.length; i++) {
+            arr.push(copy(moto[i]));
         }
+        return arr;
     }
-    return result;
-};
+    else if(moto != null && typeof moto == 'object'){
+        let obj = {};
+        for (let key in moto) {
+            if (moto.hasOwnProperty(key)) {
+            obj[key] = copy(moto[key]);
+            }
+        }
+        return obj;
+    }
+    else {
+        return moto;
+    }
+}
+  
 function probability(num){
     return Math.random()*100 <= num;
-    //例:num == 20 → randomが20以内ならtrue,elseならfalseを返す
+    //例:num == 20 → randomが20以内ならtrue,elseならfalseを返す ==> つまり20%
 };
 function random(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -83,6 +90,180 @@ async function error(){
     addtext('errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
     await delay(2000);
     window.open('about:blank', '_self').close();
+}
+//#endregion
+//#region log&text
+let textDiv = document.querySelector('#text');
+let autoDelay = 1;
+let skipText = false; // スキップフラグ
+let clearText = false; // テキスト消去フラグ
+let textShowing = 0;
+
+function colorcheck(rawtext) {
+    const text = [];
+    let isRed = false; // ** で囲まれた部分かどうか
+    let isPink = false; // && で囲まれた部分かどうか
+    let isBlue = false; // ^^ で囲まれた部分かどうか
+
+    for(let i = 0; i < rawtext.length; i++){
+        if(rawtext[i] == "*" && rawtext[i + 1] == "*"){
+            isRed = !isRed; // 状態を切り替える
+            i++; // 次の * をスキップ
+        }else if(rawtext[i] == "&" && rawtext[i + 1] == "&"){
+            isPink = !isPink;
+            i++; // 次の & をスキップ
+        }else if(rawtext[i] == "^" && rawtext[i + 1] == "^"){
+            isBlue = !isBlue;
+            i++;
+        }else{
+            let color = null;
+            if(isRed) color = 'red';
+            if(isPink) color = 'pink';
+            if(isBlue) color = 'blue';
+            text.push({
+                char: rawtext[i],
+                color: color
+            });
+        }
+    }
+    return text;
+}
+
+// ↓一瞬これにしようとしてた
+// if(textShowing){
+//     queueAddtext.push(text);
+//     while(textShowing){
+//         await delay(10);
+//     }
+// };
+
+let queueAddtext = [];
+let loopAddtext = 0;
+async function waitforAddtext(){
+    let len = queueAddtext.length;
+
+    if(len == 0) loopAddtext = 0;
+    else loopAddtext = 1;
+
+    if(!loopAddtext) return console.log('loopがないんでしゅーりょー');
+    requestAnimationFrame(waitforAddtext);
+    
+    if(textShowing) return console.log('文字表示されたんでスキップ');
+    
+    let raw = queueAddtext.shift();
+    console.log(`${raw}を送信します`);
+    console.log(`残り: (${len - 1})[${queueAddtext}]`);
+    await addtext(raw);
+}
+async function addtext(raw){
+    if(!raw) return console.log('「内容が？内容が〜〜？ないよ〜〜〜つってwwww直せ」');
+
+    if(textShowing){
+        queueAddtext.push(raw);
+
+        if(!loopAddtext) waitforAddtext();
+        return;
+    }
+    
+    textShowing = 1;
+    text = colorcheck(raw);
+    textDiv.innerHTML = ""; // 中身をリセット
+    textDiv.style.display = "block"; // 表示
+    let index = 0;
+    clearText = false; // 消去フラグをリセット
+
+    return new Promise((resolve) => {
+        async function type() {
+                if (index < text.length) {
+                if (skipText) {
+                    // スキップ処理
+                    while (index < text.length) {
+                            const span = document.createElement("span");
+                            span.textContent = text[index].char;
+                            if (text[index].color) {
+                            span.classList.add(`color-${text[index].color}`);
+                            }
+                            textDiv.appendChild(span);
+                            index++;
+                    }
+                    index = text.length; // 全ての文字を表示済みにする
+                    skipText = false;
+                    setTimeout(type, 10);
+                } else {
+                    // 通常の文字表示
+                    const span = document.createElement("span");
+                    span.textContent = text[index].char;
+                    if (text[index].color) {
+                            span.classList.add(`color-${text[index].color}`);
+                    }
+                    textDiv.appendChild(span);
+
+                    index++;
+                    setTimeout(type, 80); // 次の文字を表示する間隔
+                }
+                } else {
+                addlog(textDiv.innerHTML);
+                const waitTime = autoDelay * 1000;
+                const timeout = new Promise(resolve => setTimeout(resolve, waitTime));
+                const userAction = new Promise(resolve => {
+                    function waitToClear(event) {
+                            if (event.type === 'click' || event.key === 'z' || event.key === 'Enter') {
+                            document.removeEventListener('click', waitToClear);
+                            document.removeEventListener('keydown', waitToClear);
+                            resolve();
+                            }
+                    }
+                    document.addEventListener('click', waitToClear);
+                    document.addEventListener('keydown', waitToClear);
+                });
+
+                Promise.race([timeout, userAction]).then(() => {
+                    textDiv.textContent = "";
+                    textDiv.style.display = "none";
+                    clearText = true;
+                    skipText = false
+                    textShowing = 0;
+                    resolve('end'); // Promiseを解決
+                });
+                }
+        }
+        type();
+    });
+}
+document.addEventListener('keydown', (event) => {
+    if(event.key === 'z' || event.key === 'Enter'){
+        skipText = true;
+    }
+});
+
+document.addEventListener('keyup', (event) => {
+    if(event.key === 'z' || event.key === 'Enter'){
+        skipText = false;
+    }
+});
+
+document.addEventListener('click', () => {
+    skipText = true;
+    setTimeout(() => skipText = false, 50); // 一時的にスキップを有効化
+});
+
+let logOOmoto = document.querySelector('#log');
+let log = document.querySelector('#log .log');
+let logOpener = document.querySelector('#log .opener');
+let log_open = (code) => {
+   if((logOOmoto.style.right == '-300px' || code == 'o') && code != 'c'){
+      logOOmoto.style.right = '0px';
+      logOpener.textContent = '>';
+   }else{
+      logOOmoto.style.right = '-300px';
+      logOpener.textContent = '<';
+   }
+}
+logOpener.addEventListener('click', log_open);
+
+function addlog(text){
+    log.innerHTML += text + '<br>';
+    log.scrollTop = log.scrollHeight;
 }
 //#endregion
 //#region description
@@ -168,33 +349,49 @@ let sendBtn = document.querySelector('#commands .send')
 function connect(){
     webSocket = new WebSocket("ws://localhost:8001"); // インスタンスを作り、サーバと接続
 
-    // ソケット接続すれば呼び出す関数を設定
+    // 接続したで～～！！
     webSocket.onopen = function(message){
-        logadd(`Server connect... OK`);
+        logadd(`Server connecten。`);
     };
 
-    // ソケット接続が切ると呼び出す関数を設定
+    // 接続、切断...
     webSocket.onclose = function(message){
-        logadd("Server Disconnect... OK");
+        logadd("Server Disconnected！！");
     };
 
-    // ソケット通信中でエラーが発生すれば呼び出す関数を設定
+    // エラー発生時の処理
     webSocket.onerror = function(message){
-        logadd("error...");
+        logadd("errrrrrrrrrrrrrrrrrrr");
+        Senvonbary_Gyosatsu();
     };
 
-    // ソケットサーバからメッセージが受信すれば呼び出す関数を設定
+    // 受け取ったとき
     webSocket.onmessage = function(message){
         let mes = message.data;
         read(mes);
         nicoText(mes);
         
         if(mes == 'Are you a cheater?'){
-            for(let i = 0; i < 100; i++){
-                nicoText('lasbdfaosjhfoapisdvcaoidgasfdaosufdgbalasbdfaosjhfoapisdvcaoidgasfdaosufdgbalasbdfaosjhfoapisdvcaoidgasfdaosufdgbalasbdfaosjhfoapisdvcaoidgasfdaosufdgbalasbdfaosjhfoapisdvcaoidgasfdaosufdgbalasbdfaosjhfoapisdvcaoidgasfdaosufdgbalasbdfaosjhfoapisdvcaoidgasfdaosufdgbalasbdfaosjhfoapisdvcaoidgasfdaosufdgbalasbdfaosjhfoapisdvcaoidgasfdaosufdgbalasbdfaosjhfoapisdvcaoidgasfdaosufdgbalasbdfaosjhfoapisdvcaoidgasfdaosufdgbalasbdfaosjhfoapisdvcaoidgasfdaosufdgbalasbdfaosjhfoapisdvcaoidgasfdaosufdgbalasbdfaosjhfoapisdvcaoidgasfdaosufdgbalasbdfaosjhfoapisdvcaoidgasfdaosufdgba')
-            }
+            Senvonbary_Gyosatsu();
+            Senvonbary_Gyosatsu();
         }
     };
+}
+
+async function Senvonbary_Gyosatsu(){
+    nicoText('血気術..千本針魚殺！！');
+    await delay(1000);
+
+    for(let i = 0; i < 23; i++){
+        nicoText('<8≣≣ミ'); //魚
+        nicoText('<8≣≣ミ');
+        nicoText('<8≣≣ミ');
+        nicoText('<8≣≣ミ');
+        nicoText('<8≣≣ミ');
+        nicoText('<8≣≣≣≣ミ');
+        await delay(50);
+    }
+    //↑かわいい
 }
 
 //#region reads
@@ -260,7 +457,35 @@ async function read(gen){
         let raw = moto.trim().split(','); // "," で分割
         if(raw.length == 0) continue;
         
+        console.log('↓↓↓↓↓')
         let line = raw.map(token => revision(token)).filter(Boolean); //全要素をrevisionしつつ、空要素を取り除く
+
+        for(i = 0; i < line.length; i++){
+            let le = line[i];
+            if(typeof le != 'string' && typeof le != 'number'){
+                //array または object)
+                if(le instanceof Array){
+                    let num = le.length;
+                    if(num == 0) line.splice(i, 1); // 空の配列は削除
+                    console.log(`配列の長さ: ${num}、内容: ${le}`);
+
+                    line.splice(i, 1);  
+
+                    for(let i2 = 0; i2 < num; i2++){
+                        line.splice(i + i2, 0, revision(le[i2]));
+                    }
+                    continue;
+                }
+
+                if(le instanceof Object){
+                    console.log(line)
+                    console.error('さすがにエラー...もっかい↑これ↑、確認して？')
+                }
+            }
+        }
+        console.log('↑↑↑↑↑')
+
+        console.log(line)
 
         let cmd = line[0]
 
@@ -268,12 +493,12 @@ async function read(gen){
             let [, left, operator, right] = line;
             let condition = false;
             switch(operator){
-                case '==': condition = left == right; break;
-                case '!=': condition = left != right; break;
-                case '<':  condition = left <  right; break;
-                case '>':  condition = left >  right; break;
-                case '<=': condition = left <= right; break;
-                case '>=': condition = left >= right; break;
+                case '==': condition = +left == +right; break;
+                case '!=': condition = +left != +right; break;
+                case '<':  condition = +left <  +right; break;
+                case '>':  condition = +left >  +right; break;
+                case '<=': condition = +left <= +right; break;
+                case '>=': condition = +left >= +right; break;
                 default: console.error(`演算子${operator}は使えませんわ〜〜〜！！`);
             }
             console.log(`if:: (${left} ${operator} ${right}) => ${condition}`);
@@ -309,12 +534,6 @@ async function enter(line){
     switch(line[0]){
         case 'log':{
             let [, text] = line;
-            console.log(text)
-            break;
-        };
-
-        case 'logadd':{
-            let [, text] = line;
             logadd(text);
             break;
         }
@@ -328,15 +547,17 @@ async function enter(line){
         case '変数':{ 
             // 変数,変数名,値
             let [, name, value, value2] = line;
+            console.log(`変数:: ${name} ${value} ${value2}`);
 
             if(value2){
                 switch(value){
-                case '=' : context[name]  = value2;
-                case '+=': context[name] += value2;
-                case '-=': context[name] -= value2;
-                case '*=': context[name] *= value2;
-                case '/=': context[name] /= value2;
+                    case '=' : context[name]  = value2; break;
+                    case '+=': context[name] += +value2; break;
+                    case '-=': context[name] -= +value2; break;
+                    case '*=': context[name] *= +value2; break;
+                    case '/=': context[name] /= +value2; break;
                 }
+                console.log(`=> ${context[name]}`);
             }else{
                 context[name] = value;
             }
@@ -359,7 +580,7 @@ async function enter(line){
 
         case 'ログ追加':{ // 3ダメージを受けた！ みたいなセリフじゃないけど表示はしたいやつみたいな
             let [, text] = line;
-            logadd(text);
+            addlog(text);
             break;
         };
 
@@ -390,9 +611,10 @@ function revision(moto){
 
     if(after == '') return after;
 
+    
     //数字またはなんか変なやつならばそのままお返し申す
     if(typeof after !== 'string'){
-        //誰お前ら(array, object)
+        //array または object)
         if(after instanceof Array){
             return after.map(revision);
         }
@@ -403,17 +625,20 @@ function revision(moto){
         return after;
     }
 
-    // %%パンは['変数', 'パン']に置換
+    // %%パンは['変数', 'パン']に置換 
     if (after.startsWith('%%')){
+        // return ['変数', after.slice(2)].flat();
         return ['変数', after.slice(2)];
     }
 
     // %パンはcontext['パン']に置換
-    if (after.startsWith('%')) {
+    if (after.startsWith('%') && !after.startsWith('%{')){
         return context[after.slice(1)];
     }
 
     // 文字列内の%{パン}はcontext['パン']に置換
+    console.log(after)
+
     return after.replace(/\%{(.*?)}/g, (_, v) => context[v] ?? '');
 }
 //#endregion
@@ -425,29 +650,42 @@ function logadd(text){
 };
 function sendpy(text){
     if(IranMikans[text]) return 0;
+    logadd(`Send => ${text}`);
     webSocket.send(text);
 };
 
 
+
+
 sendBtn.addEventListener('click', () => {
-    let mes = message.value
-    logadd(`Send => ${mes}`);
-    sendpy(message.value)
+    let mes = message.value.trim();
     message.value = "";
+    
+    mesSend(mes)
+});
+function mesSend(mes){
+    if(mes.startsWith('execute_')){
+        console.log(mes)
+        console.log(JSON.stringify(mes));
+        read(mes.slice(8));
+        return;
+    };
+
+    sendpy(mes)
     
     if(IranMikans[mes]){
        let serif = arraySelect(IranMikans[mes].serifs);
-       logadd(`${mes}「${serif}」`)
+       addtext(`${mes}「${serif}」`)
        sendpy(`${mes}「${serif}」`)
-    }
-})
+    };
+}
 
 // サーバとの通信を切断する関数
 function disconnect(){
     webSocket.close();
 }
 
-
+//#region may
 let mayList = document.getElementById('mayList');
 let maylists = {
     'command':{
@@ -564,7 +802,6 @@ async function mayImport(){
         div.appendChild(desc);
 
         for(a of maylists[moto].list){
-            console.log(a)
             let item = document.createElement('div');
             let itemn = a.name;
             let itemd = a.description;
@@ -613,3 +850,39 @@ async function mayImport(){
 //     list.style.opacity = 0;
 //     list.style.height = '0px';
 // });
+
+//#endregion may
+
+//#region ビッグマシュマロ（唐突）
+let bigmmD = document.getElementById('bigmashmaro');
+let bigmmC = {
+    kitekeyD: bigmmD.querySelector('.kitekey'),
+    bodyD:bigmmD.querySelector('.bodies'),
+}
+bigmmC.kitekeyD.addEventListener('click', () =>{
+    bigmmC.kitekeyD.classList.toggle('tap');
+    bigmmC.bodyD.classList.toggle('tap');
+
+    let gen = bigmmC.bodyD.value.trim('');
+    bigmmC.bodyD.value = '';
+    if(gen == '') return;
+    
+    mesSend(gen)
+})
+//#endregion bigmashmaro
+
+
+let rainB = document.querySelector('#rainbt');
+let rainC = {
+    tapend: 0
+}
+rainB.addEventListener('click', () => {
+    let f = 0;
+    if(rainC.tapend) f = 1, rainC.tapend = 0;
+                else f = 0, rainC.tapend = 1;
+
+    document.querySelectorAll('*').forEach(el => {
+        if(f) el.classList.remove('rainback');
+        if(!f) el.classList.add('rainback');
+    });
+});
