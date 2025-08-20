@@ -460,12 +460,12 @@ let p = {
 
 
 function SetStageBar(){
-
+   
 }
 
 function LetsGoBattle(num,code){
    let irankamo = num;
-   irankamo += 1;//ちゃんと道順作るってなったら道程要員になりそう
+   irankamo += 1;
    switch(code){
       case 1:
          EnemyAppear(0);

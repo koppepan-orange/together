@@ -6,41 +6,63 @@ async function nicoText(mes){
     const newDiv = document.createElement('div');
     newDiv.textContent = mes;
     newDiv.className = 'nicotext';
-    newDiv.style.top = `calc(${random(0,100)}vh - 20px)`;
+    newDiv.style.top = `calc(${random(0, 100)}vh - 20px)`;
     newDiv.style.right = '0px';
     document.querySelector('body').appendChild(newDiv);
- 
+
     requestAnimationFrame(() => {
-       newDiv.style.right = `${window.innerWidth + newDiv.offsetWidth}px`; //なんか電車の問題解いてるみたいだね
+    newDiv.style.right = `${window.innerWidth + newDiv.offsetWidth}px`; //なんか電車の問題解いてるみたいだね
     });
     
     await delay(2000); 
     newDiv.remove();
 };
+function kaijou(num){
+    if(num == 0) return 0;
+    if(num == 1) return 1;
+    return num * kaijou(num - 1);
+}
 function arraySelect(array){
     let select = Math.floor(Math.random()*array.length);
     return array[select];
 };
 function arrayShuffle(array) {
     for(let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
     }
     return array;
 };
+function arraySize(array){
+    let res = new Set(array).size;
+    return res;
+};
+function arrayCount(array){
+    const counts = {};
+    for (let value of array) {
+    counts[value] = (counts[value] || 0) + 1;
+    }
+    return counts;
+}
+function arrayMult(array){
+    return array.reduce((a, v) => a * v, 1);
+}
 function arrayGacha(array,probability){
-    if(array.length !== probability.length){throw new Error("長さがあってないっす！先輩、ちゃんとチェックした方がいいっすよ〜？");}
+    if(array.length != probability.length) throw new Error("長さがあってないっす！先輩、ちゃんとチェックした方がいいっすよ〜？");
     const total = probability.reduce((sum, p) => sum + p, 0);
     let random = Math.random() * total;
     for (let i = 0; i < array.length; i++) {
-        if(random < probability[i]){
-        return array[i];
-        }
+        if(random < probability[i]) return array[i];
         random -= probability[i];
     }
 };
+function hask(obj, key){
+   let res = obj.hasOwnProperty(key);
+   res = res ? 1 : 0;
+   return res;
+}
 function copy(moto) {
-    if(Array.isArray(moto)) {
+    if(Array.isArray(moto)){
         let arr = [];
         for (let i = 0; i < moto.length; i++) {
             arr.push(copy(moto[i]));
@@ -60,25 +82,49 @@ function copy(moto) {
         return moto;
     }
 }
-  
 function probability(num){
     return Math.random()*100 <= num;
-    //例:num == 20 → randomが20以内ならtrue,elseならfalseを返す ==> つまり20%
+    //例:num == 20 → randomが20以内ならtrue,elseならfalseを返す
 };
 function random(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 };
-function countText(text){
-    if(typeof text !== 'string'){text = text.toString();}
-    let count = 0;
-    text.split('').forEach(a => {
-        if(/^[a-z_0-9]+$/.test(a)){
-            count += 1;
-        }else{
-            count += 2;
-        }
-    })
-    return count;
+
+function anagramSaySay(text, loop = 10, bet = '<br>'){
+    let menjo = 0;
+    let len = text.length;
+    if(len < 4) menjo = 1, console.log('長さが3以下なんで最大6っす');
+    
+    let optout = text.split('');
+    let optcou = arrayCount(optout);
+    let optvals = [];
+    for(a of Object.keys(optcou)){
+        let b = optcou[a];
+        b = kaijou(b);
+        optvals.push(b);
+    }
+    let optmat = arrayMult(optvals);
+    let cal = (kaijou(len) / optmat) - 1;
+
+    let loopen = loop;
+    console.log(`総数:${cal} 回数:${loopen}`);
+    if(cal < loopen) menjo = 1;
+    
+    let reses = [];
+    while(loopen > 0){
+        loopen -= 1;
+        let res = arrayShuffle(optout).join(''); 
+        if(reses.includes(res)){loopen += 1; continue}
+        
+        if(res == text && !menjo){loopen += 1; continue;}
+
+        if(res == text && menjo && reses.length < cal){loopen += 1; continue}
+        else if(res == text && menjo) res = '[重複エラー]';
+
+        reses.push(res);
+    }
+    
+    return reses.join(bet);
 }
 function setLocalStorage(name, value) {
     localStorage.setItem(name, value || "");
@@ -86,10 +132,63 @@ function setLocalStorage(name, value) {
 function getLocalStorage(name) {
     return localStorage.getItem(name);
 }
+let r = {
+    and: function(lef, rig){
+        if(lef && rig) return 1
+        return 0
+    },
+    or: function(lef, rig){
+        if(lef || rig) return 1
+        return 0
+    },
+    xor: function(lef, rig){
+        console.log('排他的論理和発動！！')
+        let l = lef ? 1 : 0
+        let r = rig ? 1 : 0
+        if(l != r) return 1
+        return 0
+    },
+    not: function(lef){
+        if(lef) return 0
+        return 1
+    },
+    nand: function(lef, rig){
+        if(lef && rig) return 0
+        return 1
+    },
+    nor: function(lef, rig){
+        if(lef || rig) return 0
+        return 1
+    },
+    xnor: function(lef, rig){
+        console.log('逆排他的論理和発動！！')
+        let l = lef ? 1 : 0
+        let r = rig ? 1 : 0
+        if(l != r) return 0
+        return 1
+    }
+}
 async function error(){
     addtext('errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
     await delay(2000);
     window.open('about:blank', '_self').close();
+}
+function hoshoku(color) {
+    color = color.replace(/^#/, ''); // #付きなら取る
+
+    if(color.length != 6) return console.log('カラーコードは6桁、ですよ〜？楽しないでくださいね〜♪')
+
+    // RGB分解
+    const r = parseInt(color.slice(0, 2), 16);
+    const g = parseInt(color.slice(2, 4), 16);
+    const b = parseInt(color.slice(4, 6), 16);
+
+    // 補色：255から引く
+    const compR = (255 - r).toString(16).padStart(2, '0');
+    const compG = (255 - g).toString(16).padStart(2, '0');
+    const compB = (255 - b).toString(16).padStart(2, '0');
+
+    return `#${compR}${compG}${compB}`;
 }
 //#endregion
 //#region log&text
@@ -457,7 +556,7 @@ async function read(gen){
         let raw = moto.trim().split(','); // "," で分割
         if(raw.length == 0) continue;
         
-        console.log('↓↓↓↓↓')
+        // console.log('↓↓↓↓↓')
         let line = raw.map(token => revision(token)).filter(Boolean); //全要素をrevisionしつつ、空要素を取り除く
 
         for(i = 0; i < line.length; i++){
@@ -467,7 +566,6 @@ async function read(gen){
                 if(le instanceof Array){
                     let num = le.length;
                     if(num == 0) line.splice(i, 1); // 空の配列は削除
-                    console.log(`配列の長さ: ${num}、内容: ${le}`);
 
                     line.splice(i, 1);  
 
@@ -483,7 +581,7 @@ async function read(gen){
                 }
             }
         }
-        console.log('↑↑↑↑↑')
+        // console.log('↑↑↑↑↑')
 
         console.log(line)
 
@@ -551,7 +649,7 @@ async function enter(line){
 
             if(value2){
                 switch(value){
-                    case '=' : context[name]  = value2; break;
+                    case '=' : context[name]  =  value2; break;
                     case '+=': context[name] += +value2; break;
                     case '-=': context[name] -= +value2; break;
                     case '*=': context[name] *= +value2; break;
@@ -563,9 +661,9 @@ async function enter(line){
             }
             break;
         };
-
+addlog
         case '乱数生成':{
-            let [, min, max] = line.map(Number);;
+            let [, min, max] = line.map(Number);
             let num = random(min, max);
             console.log(`乱数生成:: ${min} ~ ${max} => ${num}`);
             context['乱数'] = num;
@@ -611,7 +709,6 @@ function revision(moto){
 
     if(after == '') return after;
 
-    
     //数字またはなんか変なやつならばそのままお返し申す
     if(typeof after !== 'string'){
         //array または object)
@@ -637,8 +734,6 @@ function revision(moto){
     }
 
     // 文字列内の%{パン}はcontext['パン']に置換
-    console.log(after)
-
     return after.replace(/\%{(.*?)}/g, (_, v) => context[v] ?? '');
 }
 //#endregion
@@ -654,7 +749,62 @@ function sendpy(text){
     webSocket.send(text);
 };
 
-
+document.addEventListener('keydown', e => {
+    if(e.key != 'p') return;
+    bigmmC.bodyD.value = `execute_
+話者変更,コッペ
+セリフ,っ...？？！
+セリフ,こ、ここは、どこだ...？
+%%パン,=,12
+乱数生成,1,90
+セリフ,%{パン}は%{乱数}よりも大きい...のか？
+話者変更,クロワ
+if,%パン,>,%乱数生成
+    セリフ,そうだけど..ひとまずは身の安全から
+    話者変更,コッペ
+    セリフ,ひとまず？
+    話者変更,ティーヌ
+    セリフ,ひと..w
+    セリフ,ふたまず？
+    話者変更,コッペ
+    セリフ,みつまず？
+    話者変更,ティーヌ
+    セリフ,よつまず？
+    話者変更,コッペ
+    セリフ,ごつまず？
+    話者変更,ティーヌ
+    セリフ,む、むずまず？
+    話者変更,コッペ
+    セリフ,ナマズン
+    話者変更,ティーヌ
+    セリフ,wwww
+    edif
+if,%パン,<=,%乱数
+    セリフ,...叩いたら混乱が治るか、試してみようか？
+    話者変更,コッペ
+    セリフ,嘘嘘嘘ww
+    if,%パン,==,%乱数
+        セリフ,てか待って？？
+        セリフ,1/90の確率引いてない？？
+        セリフ,やばすぎワロタンゴ草々
+        話者変更,クロワ
+        セリフ,よくわからないけど、とにかくこのあたりを探索しましょうか
+        話者変更,コッペ
+        セリフ,そねね、
+        edif
+    セリフ,んじゃぁ～まずは木を採るところから...
+    セリフ,ってマイクラかーーい言うてますけどね
+    話者変更,クロワ
+    セリフ,...やっぱり殴ろうか？一撃で終わらせる
+    話者変更,コッペ
+    セリフ,ごめんごめんww
+    if,%乱数,>,70
+        セリフ,待ってなんで拳に力込めてるのっ
+        セリフ,やめっ、じょ、冗談だからさ、ほら、ね？？ほらっ
+        サウンド,鈍い音1
+        edif
+    edif`
+})
 
 
 sendBtn.addEventListener('click', () => {

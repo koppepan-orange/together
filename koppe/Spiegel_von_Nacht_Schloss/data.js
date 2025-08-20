@@ -1,5 +1,20 @@
 let mapItems = {
   //なのです口調のサポーターとかつけたいね〜〜
+  'none':{
+    id: 'none',
+    name: 'none',
+    desc: '空白なのです'
+  },
+  'blank':{
+    id: 'blank',
+    name: '「　」',
+    desc: '空白なのです...が\n乗れるタイプの空白なのです！' //頭パラッパーン 存在の証明を'
+  },
+  'wall':{
+    id: 'wall',
+    name: '壁',
+    desc: '壁なのです'
+  },
   'start':{
     id: 'start',
     name: 'すた〜と',
