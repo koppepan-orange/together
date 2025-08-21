@@ -493,6 +493,22 @@ async function Senvonbary_Gyosatsu(){
     //↑かわいい
 }
 
+function logadd(text){
+    if(text.includes('endgame')) window.open('about:blank', '_self').close();
+    messageTextArea.value += `${text}\n`; // ${random(1000,2900)}-${random(1,12)}-${random(1,31)} ${random(0,23)}:${random(0,59)}:${random(0,59)} INFO
+    messageTextArea.scrollTop = messageTextArea.scrollHeight;
+};
+function sendpy(text){
+    if(IranMikans[text]) return 0;
+    logadd(`Send => ${text}`);
+    webSocket.send(text);
+};
+
+// サーバとの通信を切断する関数
+function disconnect(){
+    webSocket.close();
+}
+
 //#region reads
 let executions = {}
 async function execute(arr){
@@ -738,102 +754,7 @@ function revision(moto){
 }
 //#endregion
 
-function logadd(text){
-    if(text.includes('endgame')) window.open('about:blank', '_self').close();
-    messageTextArea.value += `${text}\n`; // ${random(1000,2900)}-${random(1,12)}-${random(1,31)} ${random(0,23)}:${random(0,59)}:${random(0,59)} INFO
-    messageTextArea.scrollTop = messageTextArea.scrollHeight;
-};
-function sendpy(text){
-    if(IranMikans[text]) return 0;
-    logadd(`Send => ${text}`);
-    webSocket.send(text);
-};
 
-document.addEventListener('keydown', e => {
-    if(e.key != 'p') return;
-    bigmmC.bodyD.value = `execute_
-話者変更,コッペ
-セリフ,っ...？？！
-セリフ,こ、ここは、どこだ...？
-%%パン,=,12
-乱数生成,1,90
-セリフ,%{パン}は%{乱数}よりも大きい...のか？
-話者変更,クロワ
-if,%パン,>,%乱数生成
-    セリフ,そうだけど..ひとまずは身の安全から
-    話者変更,コッペ
-    セリフ,ひとまず？
-    話者変更,ティーヌ
-    セリフ,ひと..w
-    セリフ,ふたまず？
-    話者変更,コッペ
-    セリフ,みつまず？
-    話者変更,ティーヌ
-    セリフ,よつまず？
-    話者変更,コッペ
-    セリフ,ごつまず？
-    話者変更,ティーヌ
-    セリフ,む、むずまず？
-    話者変更,コッペ
-    セリフ,ナマズン
-    話者変更,ティーヌ
-    セリフ,wwww
-    edif
-if,%パン,<=,%乱数
-    セリフ,...叩いたら混乱が治るか、試してみようか？
-    話者変更,コッペ
-    セリフ,嘘嘘嘘ww
-    if,%パン,==,%乱数
-        セリフ,てか待って？？
-        セリフ,1/90の確率引いてない？？
-        セリフ,やばすぎワロタンゴ草々
-        話者変更,クロワ
-        セリフ,よくわからないけど、とにかくこのあたりを探索しましょうか
-        話者変更,コッペ
-        セリフ,そねね、
-        edif
-    セリフ,んじゃぁ～まずは木を採るところから...
-    セリフ,ってマイクラかーーい言うてますけどね
-    話者変更,クロワ
-    セリフ,...やっぱり殴ろうか？一撃で終わらせる
-    話者変更,コッペ
-    セリフ,ごめんごめんww
-    if,%乱数,>,70
-        セリフ,待ってなんで拳に力込めてるのっ
-        セリフ,やめっ、じょ、冗談だからさ、ほら、ね？？ほらっ
-        サウンド,鈍い音1
-        edif
-    edif`
-})
-
-
-sendBtn.addEventListener('click', () => {
-    let mes = message.value.trim();
-    message.value = "";
-    
-    mesSend(mes)
-});
-function mesSend(mes){
-    if(mes.startsWith('execute_')){
-        console.log(mes)
-        console.log(JSON.stringify(mes));
-        read(mes.slice(8));
-        return;
-    };
-
-    sendpy(mes)
-    
-    if(IranMikans[mes]){
-       let serif = arraySelect(IranMikans[mes].serifs);
-       addtext(`${mes}「${serif}」`)
-       sendpy(`${mes}「${serif}」`)
-    };
-}
-
-// サーバとの通信を切断する関数
-function disconnect(){
-    webSocket.close();
-}
 
 //#region may
 let mayList = document.getElementById('mayList');
@@ -1021,7 +942,7 @@ bigmmC.kitekeyD.addEventListener('click', () =>{
 })
 //#endregion bigmashmaro
 
-
+//#region rainbow
 let rainB = document.querySelector('#rainbt');
 let rainC = {
     tapend: 0
@@ -1036,3 +957,123 @@ rainB.addEventListener('click', () => {
         if(!f) el.classList.add('rainback');
     });
 });
+//#endregion rainbow
+
+//#region インベン
+let invD = document.querySelector('#inventory');
+let invC = {
+    openD: invD.querySelector('.opener'),
+    areaD: invD.querySelector('.area'),
+    hotD: invD.querySelector('.area .hot'),
+    bagD: invD.querySelector('.area .bag'),
+    hot: [],
+    bag: [
+        [],
+        [],
+        [],
+        []
+    ],
+}
+function inv_open(code = null){
+    invC.openD.classList.toggle('tog');
+    invC.areaD.classList.toggle('tog');
+
+    if(code == 1) invC.openD.classList.add('tog'), invC.areaD.classList.add('tog');
+    if(code == 0) invC.openD.classList.remove('tog'), invC.areaD.classList.remove('tog');
+}
+invC.openD.addEventListener('click', inv_open);
+document.addEventListener('keydown', (e) => {if(e.key == 'e') inv_open()});
+
+function inv_make(){
+    //hot
+    for(let i = 0; i < 9; i++){
+        let cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.index = `c${i}`;
+        cell.dataset.item = {name:''}
+        invC.hotD.appendChild(cell);
+        invC.hot.push('');
+    }
+
+    //bag
+    for(let i = 0; i < 4; i++){
+        for(let i2 = 0; i2 < 9; i2++){
+            let cell = document.createElement('div');
+            cell.className = 'cell';
+            cell.dataset.index = `c${i}-${i2}`;
+            cell.dataset.item = {name:''}
+            invC.bagD.appendChild(cell);
+            invC.bag[i].push('');
+        }
+    };
+}
+function inv_tekiou(){
+    //hot
+    invC.hotD.querySelectorAll('.cell').forEach(cell => {
+        let data = cell.dataset.item;
+
+    });
+
+    //bag
+    invC.bagD.querySelectorAll('.cell').forEach((cell, index) => {
+    });
+}
+
+function nearestCell(mouseX, mouseY) {
+    let cells = document.querySelectorAll('.bag .cell, .hot .cell');
+    let nearest = null;
+    let minDist = Infinity;
+    cells.forEach(cell => {
+        let rect = cell.getBoundingClientRect();
+        let cx = rect.left + rect.width / 2;
+        let cy = rect.top + rect.height / 2;
+        let dx = mouseX - cx;
+        let dy = mouseY - cy;
+        let dist = dx*dx + dy*dy; // sqrt不要、二乗距離で十分
+        if (dist < minDist) {
+            minDist = dist;
+            nearest = cell;
+        }
+    });
+    return nearest;
+}
+
+let dragItem = null;
+
+document.addEventListener('mousedown', e => {
+    if(e.target.classList.contains('item')) {
+        dragItem = e.target;
+        dragItem.style.position = 'absolute';
+        dragItem.style.pointerEvents = 'none';
+    }
+});
+
+document.addEventListener('mousemove', e => {
+    if (dragItem){
+        dragItem.style.left = e.pageX - dragItem.offsetWidth/2 + 'px';
+        dragItem.style.top  = e.pageY - dragItem.offsetHeight/2 + 'px';
+    }
+});
+
+document.addEventListener('mouseup', e => {
+    if (dragItem) {
+        let cell = nearestCell(e.pageX, e.pageY);
+        if (cell) {
+            cell.appendChild(dragItem);
+            dragItem.style.position = '';
+            dragItem.style.left = '';
+            dragItem.style.top = '';
+            dragItem.style.pointerEvents = '';
+        }
+        dragItem = null;
+    }
+});
+
+
+
+//#endregion イシイ //これ伝わる人いるんか
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    inv_make();
+})

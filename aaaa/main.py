@@ -15,17 +15,24 @@ from asyncio import sleep as delay
 import os"""
 
 csvdata={}
+cemicaldata=[]
 kakikae_list=[]
 
-with open('book1.csv',"r",encoding="utf-8_sig", newline='') as f:
+with open('book1.csv',"r",encoding="utf-8_sig", newline='G') as f:
     for fa in csv.reader(f):
-        try:
-            csvdata[fa[0]]=fa[1:8]+[float(fa[8])/100]+fa[9:]
-        except ValueError:
-            csvdata[fa[0]]=fa[1:]
+        csvdata[fa[0]]=fa[1:]#+[float(fa[8])/100]+fa[9:]
     del csvdata["name"]
     #わかんないなら説明しようか？  ありが当　ここのcsvdataてインベントリーアップデートでどんなことされてるの？
     #このデータはまあ辞書として読み込んでアイテムごとに使う感じになってるよ。　ありがとう　わかんなくなったらまたききます
+
+
+
+with open('cemical.csv',"r",encoding="utf-8_sig", newline='') as f:
+    for fa in csv.reader(f):
+        if fa[0]!="元":
+            cemicaldata.append([fa[0].split(";")]+[fa[1].split(";")]+[fa[2].split(";")]+[fa[3].split(";")]+[fa[4].split(";")]+[fa[5].split(";")])
+    
+
 
 # print(csvdata)
 # 一旦消させてもらいますね
@@ -472,7 +479,12 @@ async def inventry_update():    #print(await serch({"鉄":2,"アルミニウム"
                         inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=(index[1]*index[2])-save+xw,onndo_2=inventry2[name][3])
 
             inventry=copy.deepcopy(inventry2)
+
+            for cem in cemicaldata:
+                pass
             await delay(1/120)
+
+
     except asyncio.exceptions.CancelledError:
         print("inventry_system:mainloop Cancelling now...")
 

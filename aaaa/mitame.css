@@ -15,6 +15,13 @@ html{
     display: flex;
     flex-direction: column;
 }
+img{
+    /* 画像をドラッグできないようにするやつ */
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+}
 
 /*nicotext*/
 .nicotext{
@@ -265,7 +272,7 @@ textarea{
     height: 50px;
     background: radial-gradient(#f0f8ff,#eaf5ff,#def0ff,#cfe9ff,#b5dcff,#d4ffc3,#ddffd0,#e6ffdc,#eeffe7,#f6fff2,#fffaf3,#fff7eb,#fff3e2,#fff0d9,#ffeccf,#e9e4ff,#ece8ff,#f1edff,#f5f2ff,#f8f6ff)!important;
     border-radius: 50%;
-    z-index: 69;
+    z-index: 255;
     box-sizing: border-box;
 }
 #bigmashmaro .bodies{
@@ -285,4 +292,100 @@ textarea{
 }
 #bigmashmaro .bodies.tap{
     top: 0;
+}
+
+#inventory{
+    display: block;
+    width: 50%;
+    aspect-ratio: 9/4;
+    padding: 10px;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 100;
+}
+#inventory .opener{
+    display: block;
+    width: 50px;
+    height: 50px;
+    background: #b2b2b2;
+    border-radius: 50%;
+    position: fixed;
+    top: 0;
+    left: 70px;
+    overflow: hidden;
+    z-index: 255;
+    box-sizing: border-box;
+}
+#inventory .opener.tog{
+    background: #2b2b2b;
+}
+#inventory .opener img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    z-index: 200;
+}
+#inventory .area{
+    display: none;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #00000080;
+    z-index: 100;
+}
+#inventory .area.tog{
+    display: block;
+}
+#inventory .area .hot{
+    display: flex;
+    flex-direction: row;
+    gap: 1%;
+    width: 100%;
+    height: 20%;
+    padding: 1%;
+    box-sizing: border-box;
+}
+#inventory .area .bag{
+    display: flex;
+    flex-direction: column;
+    gap: 1%;
+    width: 100%;
+    height: 80%;
+    box-sizing: border-box;
+}
+#iventory .area .bag .row{
+    display: flex;
+    flex-direction: row;
+    gap: 1%;
+    width: 100%;
+}
+#inventory .area .cell{
+    display: block;
+    width: 10%;
+    aspect-ratio: 1;
+    background: #ffffffa0;
+    cursor: pointer;
+    z-index: 200;
+}
+#inventory .area .item{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 90%;
+    height: 90%;
+    background: #ffffff00;
+    cursor: pointer;
+    z-index: 200;
+}
+#inventory .area .item img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    z-index: 200;
 }
