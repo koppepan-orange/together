@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<title>Multicolor Tile Puzzle – minimal JS</title>
+<style>
+  canvas{image-rendering: pixelated;border:1px solid #444}
+  body{font-family:system-ui;margin:16px}
+  .hud{margin-top:8px}
+  .cell{width:32px;height:32px}
+</style>
+<canvas id="c" width="544" height="352"></canvas>
+<div class="hud">
+  <span id="smell">smell: none</span>
+  <span id="msg" style="margin-left:16px;color:#f06"></span>
+</div>
+<script>
+/* ====== tile defs ====== */
+const T = {
+  PINK:'pink', GREEN:'green', RED:'red', YELLOW:'yellow',
+  ORANGE:'orange', PURPLE:'purple', BLUE:'blue',
+  START:'start', GOAL:'goal'
+};
+const COLORS = {
+  [T.PINK]  :'#ffb6c1',
+  [T.GREEN] :'#77dd77',
+  [T.RED]   :'#e74c3c',
+  [T.YELLOW]:'#f1c40f',
+  [T.ORANGE]:'#f39c12',
+  [T.PURPLE]:'#9b59b6',
+  [T.BLUE]  :'#3498db',
+  [T.START] :'#2ecc71',
+  [T.GOAL]  :'#ffffff'
+};
+/* ====== sample map (17x11) ======
+S = start, G = goal
+*/
+const legend = {
+  '.':T.PINK,  '#':T.RED,   'Y':T.YELLOW, 'B':T.BLUE,
+  'O':T.ORANGE,'U':T.PURPLE,'G':T.GREEN,  'S':T.START, 'X':T.GOAL
+};
+const MAP_STR = [
+  "#################",
+  "#S...O..B..G...X#",
+  "#.###.###.###.###",
+  "#..U..B.Y.B..O..#",
+  "###.#####.#####.#",
+  "#..B..U..B..Y..#.",
+  "#.###.###.###.###",
+  "#..O..B..U..O..##",
+  "###.#####.#####.#",
+  "#....G....O.....#",
+  "#################",
+];
+// build grid
+const H = MAP_STR.length, W = MAP_STR[0].length;
+const grid = Array.from({length:H}, (_,y)=>
+  Array.from({length:W}, (_,x)=> legend[MAP_STR[y][x]]||T.PINK)
+);
+/* ====== state ====== */
+let player = findTile(T.START);
+let prevPos = {...player};
+let smell = 'none'; // 'none' | 'orange' | 'lemon'
+let sliding = false;
+/* ====== helpers ====== */
+function findTile(kind){
+  for(let y=0;y<H;y++) for(let x=0;x<W;x++) if(grid[y][x]===kind) return {x,y};
+  return {x:1,y:1};
+}
+function inBounds(x,y){ return x>=0 && y>=0 && x<W && y<H; }
+function tileAt(x,y){ return inBounds(x,y)? grid[y][x] : T.RED; }
+function isYellowAdjacent(x,y){
+  // orthogonal adjacency only
+  const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+  return dirs.some(([dx,dy])=> tileAt(x+dx,y+dy)===T.YELLOW );
+}
+function setMsg(s){ document.getElementById('msg').textContent=s; }
+function setSmellUI(){ document.getElementById('smell').textContent = `smell: ${smell}`; }
+/* ====== movement & rules ====== */
+const DIRS={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]};
+window.addEventListener('keydown', (e)=>{
+  if(!DIRS[e.key]) return;
+  e.preventDefault();
+  tryMove(...DIRS[e.key]);
+  draw();
+});
+function tryMove(dx,dy){
+  if(sliding){ return; } // ignore input while auto-sliding
+  step(dx,dy,true);
+}
+function step(dx,dy,fromInput){
+  prevPos = {...player};
+  const nx = player.x + dx, ny = player.y + dy;
+  const dest = tileAt(nx,ny);
+
+  // red = wall
+  if(dest===T.RED){ setMsg('壁。無理。'); return; }
+
+  // tentatively move
+  player.x = nx; player.y = ny; setMsg('');
+
+  // on enter effects
+  let bounced = false;
+
+  if(dest===T.YELLOW){
+    // push back; cannot pass
+    bounce();
+    bounced = true;
+  } else if(dest===T.BLUE){
+    // blue rules:
+    // 1) if adjacent to yellow -> behaves like yellow (bounce)
+    // 2) else if smell=orange -> behaves like yellow (piranha bites)
+    // 3) else -> acts like pink (swim)
+    if(isYellowAdjacent(nx,ny) || smell==='orange'){
+      bounce();
+      bounced = true;
+    }
+  } else if(dest===T.ORANGE){
+    smell='orange'; setSmellUI();
+  } else if(dest===T.PURPLE){
+    smell='lemon'; setSmellUI();
+    // forced straight slide in the same direction until non-purple
+    slideInDirection(dx,dy);
+    return;
+  } else if(dest===T.GREEN){
+    // no effect during run
+  } else if(dest===T.PINK){
+    // nothing
+  } else if(dest===T.GOAL){
+    setMsg('ゴール。やっと辿り着けたね、あんたでも。');
+  }
+
+  if(!bounced && dest!==T.PURPLE && fromInput){
+    // entering non-purple clears sliding
+    sliding=false;
+  }
+
+  function bounce(){
+    // return to previous tile
+    player.x = prevPos.x; player.y = prevPos.y;
+    setMsg('押し戻された。学習しなよ。');
+  }
+}
+function slideInDirection(dx,dy){
+  sliding = true;
+  // keep moving while next is purple; stop on first non-purple (but still process that tile)
+  while(true){
+    const nx = player.x + dx, ny = player.y + dy;
+    const t = tileAt(nx,ny);
+    if(t===T.RED) { // wall stops before hitting wall
+      sliding=false; break;
+    }
+    player.x = nx; player.y = ny;
+    if(t!==T.PURPLE){
+      // landed on non-purple; process its on-enter effects
+      step(0,0,false);
+      sliding=false;
+      break;
+    }
+    // keep lemon smell during slide
+    smell='lemon'; setSmellUI();
+  }
+}
+/* ====== draw ====== */
+const c = document.getElementById('c'); const ctx = c.getContext('2d');
+const CELL=32;
+function draw(){
+  ctx.clearRect(0,0,c.width,c.height);
+  for(let y=0;y<H;y++){
+    for(let x=0;x<W;x++){
+      const t = grid[y][x];
+      ctx.fillStyle = COLORS[t]||'#888';
+      ctx.fillRect(x*CELL,y*CELL,CELL,CELL);
+      // borders
+      ctx.strokeStyle='#222'; ctx.strokeRect(x*CELL+0.5,y*CELL+0.5,CELL-1,CELL-1);
+      // symbols for start/goal
+      if(t===T.START){ drawGlyph(x,y,'S'); }
+      if(t===T.GOAL){ drawGlyph(x,y,'★'); }
+      if(t===T.BLUE && isYellowAdjacent(x,y)){ // visual hint: hazard blue
+        ctx.globalAlpha=0.25; ctx.fillStyle='#000'; ctx.fillRect(x*CELL,y*CELL,CELL,CELL); ctx.globalAlpha=1;
+      }
+    }
+  }
+  // player
+  ctx.fillStyle = '#000';
+  ctx.beginPath();
+  ctx.arc(player.x*CELL+CELL/2, player.y*CELL+CELL/2, 10, 0, Math.PI*2);
+  ctx.fill();
+}
+function drawGlyph(x,y,ch){
+  ctx.fillStyle='#000'; ctx.font='16px monospace'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(ch, x*CELL+CELL/2, y*CELL+CELL/2);
+}
+setSmellUI(); draw();
+</script>

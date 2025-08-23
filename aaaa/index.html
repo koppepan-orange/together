@@ -18,14 +18,15 @@
   <div id="mainArea">
 
     <div id="inventory">
-      <div class="opener draggable">
-        <img src="assets/images/inventory.png"/>
-      </div>
-      <div class="area">
-        <div class="hot"></div>
-        <div class="bag"></div>
+      <div class="row">
+        <div class="opener">
+          <img src="assets/images/inventory.png"/>
+        </div>
+        <div class="area"></div>
       </div>
     </div>
+
+    <div id="items" class="draggable"></div>
 
     <div id="bigmashmaro">
       <textarea type="text" class="bodies"></textarea>
@@ -46,6 +47,9 @@
       </div>
       <textarea id="messageTextArea" rows="10" cols="50"></textarea>
     </div>
+
+    <canvas id="canvas"></canvas>
+    <div id="mapmake"></div>
 
   </div>
 
