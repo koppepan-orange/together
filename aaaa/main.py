@@ -332,7 +332,7 @@ def plass_command_box_button(a):
         canvas["command_box"].itemconfigure(f"command_box{cl}",image=grafic[f"command_box{cl}"])
         if cl != "chack" or cl != "delet":
             canvas["command_box_Entry"].insert(tk.END,cl)
-    root["command_box"].after(200,b) #1,つまり1000msまつってことよ
+    root["command_box"].after(200,b)
 def window_del(rootPPP,itembox=[]):
     def a():
         global root
@@ -376,25 +376,23 @@ def window_del(rootPPP,itembox=[]):
 async def change_yuuten(motono_yuuten:int,motono_kiatu:int,atono_kiatu:int,j_mol:int,m3_mol:int) -> int:
     return (motono_yuuten+((motono_yuuten+273.15)*m3_mol/j_mol)*(atono_kiatu-motono_kiatu)*1000000)
 
-async def hitbox(aaaaaa,bbbb,cccc,dens,width,hight): #if x or yが他のとかぶってたら移動をキャンセル　nextx=x+ax,nexty=y+ay object=(x=nextx,y=nexty)元の奴から座標変える
-    #bbbb=[["name",]...]　#気体密度,3,3/沸点　　←このywが何してるか教えてもらう
-    #aaaaaa=[x,y,ax,ay,item]
+async def hitbox(aaaaaa,bbbb,cccc,dens,width,hight): 
+    #bbbb=[["name",]...]　#気体密度,3,3/沸点　　←melt-yが何か調べる
+        #aaaaaa=[x,y,ax,ay,item]
     #cccc=name,融点 (℃),沸点 (℃),固体密度 (g/cm3) (20℃),液体密度,気体密度,融点気圧(Pa),沸点気圧(Pa),m3/mol,誘拐熱(J/mol),蒸発熱(J/mol),コメント
     #dens= 固体密度
     #問題点：　他のと接触判定がない。　移動範囲を指定してないので画面外まで動く。
 
-    #ここには固体しか入らないよ？
-
     """
-    if bbbb[1][3] <= 1:  #気体かどうか判定
-        aaaaaa[2] += -3  #itemboxの最下層まで動かす
-    else
-        if aaaaaa >= 0:
-            a = dens*(aaaaaa[4]**)
-            aaaaaa[1] += -(a)
-        if aaaaaa[3] >= 0:
-            a= dens*(aaaaaa[3]**2)
-            aaaaaa[1] += -(a) """
+    if dens == "":
+        dens = 1
+    if #液体に浮くかどうか
+    if aaaaaa[4] >= 0:
+        a = dens*(aaaaaa[4]**)
+        aaaaaa[2] += -(a)
+    if aaaaaa[3] >= 0:
+        a= dens*(aaaaaa[3]**2)
+        aaaaaa[1] += -(a) """
     pass
 
 async def change_taiseki(cm3:int,g_cm3_moto:int,g_cm3_ato:int):
@@ -418,7 +416,7 @@ async def inventry_update():    #print(await serch({"鉄":2,"アルミニウム"
     global inventry
     try:
         while True:
-            inventry2=copy.deepcopy(inventry) #囧_err: inventryっていう変数は存在しないぜ
+            inventry2=copy.deepcopy(inventry) #囧_err: inventryっていう変数は存在しないぜ　済
             for name,index in inventry.items():
                 melt_y=[]
                 yw=0
@@ -477,11 +475,57 @@ async def inventry_update():    #print(await serch({"鉄":2,"アルミニウム"
                         inventry2[name][3]-=(inventry2[name][6][key])*100/(csvdata[key][7])*(csvdata[key][9])*4.184*inventry2[name][1]*inventry2[name][2]
                         inventry2[name][6][key] = 0
                         inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=(index[1]*index[2])-save+xw,onndo_2=inventry2[name][3])
+                
+                for cem in cemicaldata:
+                    for aa in range(len(cem[2])):
+                        dicta={"℃+":[3,1]}
+                        if not (inventry2[name][dicta[cem[2][aa]][0]] >= dicta[cem[2][aa]][1]*cem[3][aa]):
+                            break
+                    else:
+                        for aaa in range(len(cem[0])):
+                            if not(inventry2[name][6][cem[0][aaa]] >= cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000):#気体
+                                break
+                            elif not(inventry2[name][5][cem[0][aaa]] >= cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000):#液体
+                                break
+                            else:
+                                popop=0
+                                for x in inventry[name][0]:
+                                    if x[4] == cem[0][aaa]:
+                                        popop+=1
+                                if not(popop >= cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000):
+                                    break
+                        else:
+                            for aaa in range(len(cem[0])):
+                                if inventry2[name][6][cem[0][aaa]] >= cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000:#気体
+                                    inventry2[name][6][cem[0][aaa]] -= cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000
+                                    continue
+                                elif inventry2[name][5][cem[0][aaa]] >= cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000:#液体
+                                    inventry2[name][5][cem[0][aaa]] -= cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000
+                                    continue
+                                else:
+                                    popop=int(cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000)
+                                    ap=len(inventry2[name][0])
+                                    for x in range(ap):
+                                        try:
+                                            if inventry2[name][0][x][4] == cem[0][aaa]:
+                                                popop-=1
+                                                del inventry2[name][0][x]
+                                            if popop <=0:
+                                                break
+                                        except Exception as e:
+                                            print(f"例外{e}")
+                                            pass
+                            
+                            for aaaa in range(len(cem[4])):
+                                if cem[4][aaaa]=="cal":
+                                    inventry2[name][3] += cem[5][aaaa]*inventry2[name][2]*inventry2[name][1]
+                                else:
+                                    inventry2[name][5][cem[4][aaaa]] += cem[5][aaa]*csvdata[cem[4][aaa]][7]/1000000
+                            
 
             inventry=copy.deepcopy(inventry2)
 
-            for cem in cemicaldata:
-                pass
+
             await delay(1/120)
 
 

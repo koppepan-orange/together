@@ -188,7 +188,7 @@ textarea{
 #commands{
     display: flex;
     flex-direction: column;
-    margin: 0 auto;
+    margin: 20px auto;
 }
 
 .floatdiv{
@@ -310,6 +310,7 @@ textarea{
     left: 5px;
     z-index: 100;
     box-sizing: border-box;
+    pointer-events: none;
 }
 #inventory .opener{
     display: block;
@@ -343,9 +344,11 @@ textarea{
     background: #00000000;
     z-index: 100;
     box-sizing: border-box;
+    pointer-events: none;
     clip-path: polygon(0% 0%, 100% 0%, 100% 20%, 0% 20%);
 }
 #inventory .area.tog{
+    pointer-events: auto;
     clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
 }
 #inventory .area .cell{
@@ -357,8 +360,10 @@ textarea{
     background: #0000002b;
     position: relative;
     z-index: 200;
+    pointer-events: none;
 }
 #inventory .area.tog .cell{
+    pointer-events: all;
     cursor: pointer;
 }
 #inventory .area .item{

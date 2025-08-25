@@ -429,30 +429,6 @@ soundsNames.forEach(num => {
     };
     sounds[num] = sound;
 }); 
-let imagesLoaded = 0;
-let images = {};
-let imageNames = {
-   'maps':['0', 'a', 'b'],
-    'systems':['select', 'error', 'error_nico'],
-    'players':[],
-    'objects':[],
-}
-let totalImages = Object.keys(imageNames).map(a => imageNames[a].length).reduce((a, b) => a + b);
-Object.keys(imageNames).forEach(belong => {
-    imageNames[belong].forEach(num => {
-        let img = new Image();
-        img.src = `assets/images/${belong}/${num}.png`;
-        img.onload = () => {
-            imagesLoaded++;
-            if(imagesLoaded == totalImages && soundsLoaded == totalsounds) start();
-        };
-        img.onerror = () => {
-            console.error(`Image (${belong}/${num}) failed to load.`);
-        };
-        if(!images[belong]) images[belong] = {};
-        images[belong][num] = img;
-   });
-});
 //#endregion
 
 var webSocket; //ウェブソケット
@@ -1145,7 +1121,36 @@ let canV = document.getElementById('canvas');
 let canC = {
     ctx: canV.getContext('2d'),
     mas: 10,
-    size: null
+    size: null,
+    objs:[
+        {
+            id: 0,
+            name: 'player',
+            type: 'players',
+            img: 'select',
+            x: 0,
+            y: 0,
+            sx: 0,
+            sy: 0,
+            yx: 0,
+            yy: 0,
+        }
+    ],
+    imgs:{},
+    get: (id) => {
+        if(!id) id = 0;
+        let res = canC.objs[id]
+
+        if(!res) return nicoText(`idが${id}のやつなんて存在しねぇよ`);
+        return res;
+    },
+    find: (name) => {
+        let ress = canC.objs.filter(obj => obj.name == name);
+
+        if(ress.length == 0) return nicoText('なんの成果も!!得られませんでした!!');
+        if(ress.length == 1) return ress[0];
+        return ress;
+    }
 }
 canV.width = window.innerWidth/2;
 canV.height = window.innerWidth/2;
@@ -1174,6 +1179,56 @@ function resizeCanvas(){
 }
 window.addEventListener('resize', resizeCanvas);
 
+
+let canI = {
+    imagesLoaded: 0,
+    imagesNames: {
+        'maps':['0', 'a', 'b'],
+        'systems':['select', 'error', 'error_nico'],
+        'players':['select'],
+        'objects':[],
+    },
+}
+canI.imagesTotal = Object.keys(canI.imagesNames).map(a => canI.imagesNames[a].length).reduce((a, b) => a + b);
+Object.keys(canI.imagesNames).forEach(type => {
+    canI.imagesNames[type].forEach(id => {
+        let img = new Image();
+        img.src = `assets/images/${type}/${id}.png`;
+        img.onload = () => {
+            canI.imagesLoaded++;
+            if(canI.imagesLoaded == canI.imagesTotal && soundsLoaded == totalsounds) start();
+        };
+        img.onerror = () => {
+            console.error(`Image (${type}/${id}) failed to load.`);
+        };
+        if(!canC.imgs[type]) canC.imgs[type] = {};
+        canC.imgs[type][id] = img;
+    });
+});
+
+
+
+function draw(){
+    //back
+    for(let y = 0; y < canC.mas; y++){
+        for(let x = 0; x < canC.mas; x++){
+            let img = canC.imgs['maps'][backmap[y][x]];
+            if(img) canC.ctx.drawImage(img, x*canC.size, y*canC.size, canC.size, canC.size);
+            else console.error(`assets/maps/${backmap[y][x]}.png is not found.`);
+            
+        }
+    }
+
+    //obj
+    //x,y 0~9等の、現在いる"マス"のこと。sx,syは、現在いる位置のこと。yx,yyは、今向かっている位置のこと。
+    for(let ob of canC.objs){
+        let type = ob.type;
+        let img = ob.img;
+
+        canC.ctx.drawImage(canC.imgs[type][img], ob.sx*canC.size, ob.sy*canC.size, canC.size, canC.size);
+    }
+}
+
 async function drawGrid(){
     canC.ctx.strokeStyle = '#555555';
     for(let i = 0; i <= canC.mas; i++){
@@ -1191,34 +1246,7 @@ async function drawGrid(){
 
 let backmap = [];
 let objmap = [];
-let movemap = [];
-let Objects = {
-    player: [
-        {
-            id: 'select',
-            name: 'player',
-            kind: 'systems', //画像指定用
-            cam: 'player', //識別用
-            me: 0, //仮。tekiou毎に変えてもいいかも
-            x: 0,
-            y: 0,
-            ox: 0,
-            oy: 0,
-            w: canC.size,
-            h: canC.size,
-            dir: 1,
-            sx: 0,
-            sy: 0,
-            spd: 20,
-            moving: 0,
-            ables: ['move', 'attack', 'beattack'],
-            beacten: 'none',
-            group: 1,
-        }
-    ],
-    enemies: [],
-    objects: [],
-};
+
 function mapMake(){
     for(let i = 0; i < canC.mas; i++){
         backmap[i] = [];
@@ -1251,201 +1279,54 @@ function mapMake(){
 }
 document.getElementById('mapmake').addEventListener('click', mapMake);
 
-function draw(){
-    for(let i = 0; i < canC.mas; i++){
-        if(!backmap[i]) continue;
 
-        for(let i2 = 0; i2 < canC.mas; i2++){
-            if(!backmap[i][i2]) continue;
-            canC.ctx.drawImage(images['maps'][backmap[i][i2]], i2*canC.size, i*canC.size, canC.size, canC.size);
-        }
-    }
-    drawGrid();
+function move(id, code, x, y){
+    let harbor = canC.mas*canC.size;
+    let ob = canC.objs[id];
+    let yosouX = x, yosouY = y;
 
-
-    Object.values(Objects).flat().forEach(ob => {
-        let src;
-
-        if(images[ob.kind]?.[ob.name]) src = images[ob.kind][ob.name];
-        else if(images[ob.kind]?.[ob.id]) src = images[ob.kind][ob.id];
-        else src = images['systems']['error'], console.error(`画像が見つからない: kind=${ob.kind}, name=${ob.name}, id=${ob.id}`);
-        
-
-        let youso = {
-            src: src,
-            x: ob.ox,
-            y: ob.oy,
-            w: ob.w,
-            h: ob.h,
-        }
-        
-        // console.log(ob.kind, ob.id)
-        // console.log(`${ob.name}(${ob.cam})「srcは${youso.src}。 座標は(${youso.x}, ${youso.y})、 大きさは${youso.w}x${youso.h}」`)
-        canC.ctx.drawImage(youso.src, youso.x, youso.y, youso.w, youso.h);
-    })
-}
-async function Pupdate(en = 0){
-    let p = get();
-    let mv = 1;
-    if((keys.w || keys.arrowup) && !p.moving){
-    console.log('動きます')
-        if(keys.shift) mv = p.y;
-        if(p.dir == 0) await move(p, 'add', 0, -mv);
-        else p.dir = 0;
-    }
-    if((keys.s || keys.arrowdown) && !p.moving){
-    console.log('動きます')
-        if(keys.shift) mv = (canC.mas - 1) - p.y;
-        if(p.dir == 180) await move(p, 'add', 0, mv);
-        else p.dir = 180;
-    };
-    if((keys.a || keys.arrowleft) && !p.moving){
-    console.log('動きます')
-        if(keys.shift) mv = p.x;
-        if(p.dir == 270) await move(p, 'add', -mv, 0);
-        else p.dir = 270;
-    };
-    if((keys.d || keys.arrowright) && !p.moving){
-    console.log('動きます')
-        if(keys.shift) mv = (canC.mas - 1) - p.x;
-        if(p.dir == 90) await move(p, 'add', mv, 0);
-        else p.dir = 90;
-    };
-    draw();
-}
-async function Eupdate(en = 0){
-    //#region 敵の動き
-    if(en){
-        let promises = [];
-        for(const e of get('enemies')){
-            if(!e.moving){
-                let a = random(-1, 1);
-                let which = random(0, 1); // 0:x, 1:y
-                let x = 0, y = 0;
-                if(which == 0) x = a;
-                if(which == 1) y = a;
-                promises.push(move(e, 'add', x, y));
-            }
-        }
-        await Promise.all(promises); // まとめて待つ
-    }
-    //#endregion
-}
-
-function get(cam = '指定なし', me = '指定なし'){
-    if(cam == '指定なし' && me == '指定なし') cam = 'player', me = 0; //超特別扱い
-    
-    let who;
-    if(me == '指定なし') who = Objects[cam];
-    else who = Objects[cam][me];
-
-    return who;
-}
-function able(who, type){
-    return who.ables.some(a => a == type);
-}
-function prop(who, type){
-    return who.prop && who.prop.some(a => a == type);
-}
-async function move(who, code, x, y, force = 0){
-    // let who = get(cam, me);
-
-    // console.log(`想定: x|${who.x.toString().padStart(2, '0')}, y|${who.y.toString().padStart(2, '0')} => x|${(who.x + x).toString().padStart(2, '0')}, y|${(who.y + y).toString().padStart(2, '0')}`)
-
-    if(who.x + x < 0 || 11 < who.x + x) x = 0;
-    if(who.y + y < 0 || 11 < who.y + y) y = 0;
-    
-    if(x == 0 && y == 0) return //console.log(`${who.name}「移動量が0ですわ〜〜！！」`);
-
-    if(!able(who, 'move') && !force) return //console.log(`${who.name}「動けないっっ...!!」`);
-
-    let addx, addy;
-    let ssx = who.sx, ssy = who.sy; //save sxの略
     if(code == 'add'){
-        who.sx += x*canC.size    ;
-        who.sy += y*canC.size    ;
-        addx = x*canC.size    /who.spd;
-        addy = y*canC.size    /who.spd;
+        yosouX = ob.sx + x, yosouY = ob.sy + y;
+        if(yosouX < 0 || yosouX >= harbor) return nicoText('xが一線越えてる');
+        if(yosouY < 0 || yosouY >= harbor) return nicoText('yが一線越えてる');
+
+        if(yosouX == ob.sx && yosouY == ob.sy) return nicoText('同じマスにいる');
+        gomove(id, yosouX, yosouY);
     }
     if(code == 'set'){
-        who.sx = x*canC.size    ;
-        who.sy = y*canC.size    ;
-        addx = Math.abs(who.x - x) / who.spd;
-        addy = Math.abs(who.y - y) / who.spd;
+        yosouX = x, yosouY = y;
+        if(yosouX < 0 || yosouX >= harbor) return nicoText('xが一線越えてる');
+        if(yosouY < 0 || yosouY >= harbor) return nicoText('yが一線越えてる');
+        gomove(id, yosouX, yosouY);
     }
-    if(code == 'drive'){
-        let rad = (who.dir - 90) * Math.PI / 180;
-        
-        y = 0; //これ無視した方がいいかも。使い所isない
-        let noise = random(-y, y);
+}
+async function gomove(id, fyx, fyy){
+    let mas = canC.mas;
+    let size = canC.size;
+    let ob = canC.objs[id];
 
-        let dx = x * canC.size     * Math.cos(rad) - noise * Math.sin(rad);
-        let dy = x * canC.size     * Math.sin(rad) + noise * Math.cos(rad);
+    ob.yx = fyx, ob.yy = fyy;
 
-        who.sx += dx;
-        who.sy += dy;
+    let go = [];
+    if(fyx != ob.sx) go.push({k:'sx', o:fyx});
+    if(fyy != ob.sy) go.push({k:'sy', o:fyy});
+    go = arrayShuffle(go);
 
-        addx = dx / who.spd;
-        addy = dy / who.spd;
+    for(let g of go){
+        let kaisu = 50;
+        let ikkai = g.o/kaisu;
+        for(let i = 0; i < kaisu; i++){
+            ob[g.k] += ikkai;
+            draw();
+            await delay(10);
+        }
+        await delay(500);
+        ob[g.k] = g.o;
     }
-
-    let list = Object.values(Objects).flat();
-    // console.log(`(${looped})${who.name}「${able(who, 'pass')}, ${list.some(t => over(who, t))}, ${list.some(t => able(t, 'bepass'))}」`);
-    if(list.some(t => over(who, t))){
-        list.forEach(t => {
-            if(over(who, t) && !able(t, 'bepass')){
-                // console.log(`(${looped})${who.name}[${who.x},${who.y}]「${t.name}[${t.x},${t.y}]とぶつかる〜〜〜〜！！」`)
-                // console.log(`(${looped})自分: ${who.name} x:${who.x} y:${who.y} sx:${who.sx} sy:${who.sy} w:${who.w} h:${who.h} dir:${who.dir} spd:${who.spd}`);
-                // console.log(`(${looped})相手: ${t.name}) x:${t.x} y:${t.y} sx:${t.sx} sy:${t.sy} w:${t.w} h:${t.h} dir:${t.dir} spd:${t.spd}`);
-            };
-        })
-    }
-    if(!able(who, 'pass') && list.some(t => over(who, t) && !able(t, 'bepass'))) return who.sx = ssx, who.sy = ssy, draw()//, console.log(`(${looped})${who.name}「この先に何かあるっぽい？」`);
-
-    // console.log(`(${looped})想定: x|${who.x.toString().padStart(2, '0')}, y|${who.y.toString().padStart(2, '0')} => x|${(who.x + x).toString().padStart(2, '0')}, y|${(who.y + y).toString().padStart(2, '0')} || 実行: x|${addx.toString().padStart(5, ' ')}, y|${addy.toString().padStart(5, ' ')} 計${who.spd}回反復`)
-
-    who.moving = 1;
-    for(let i = 0; i < who.spd; i++){
-        who.ox += addx;
-        who.oy += addy;
-        await delay(10);
-        draw();
-    }
-
-    who.x = Math.round(who.ox / canC.size    );
-    who.y = Math.round(who.oy / canC.size    );
-    who.ox = who.sx
-    who.oy = who.sy;
 
     draw();
-
-    who.moving = 0;
+    nicoText('移動完了ed')
 }
-const EPSILON = 0.01;
-function over(a, b) {
-    if (a.cam == b.cam && a.me == b.me) return false;
-
-    let sx1 = a.sx, sy1 = a.sy, ex1 = a.sx + a.w, ey1 = a.sy + a.h;
-    let sx2 = b.sx, sy2 = b.sy, ex2 = b.sx + b.w, ey2 = b.sy + b.h;
-
-    let overlapX = (sx1 < ex2 - EPSILON) && (ex1 > sx2 + EPSILON);
-    let overlapY = (sy1 < ey2 - EPSILON) && (ey1 > sy2 + EPSILON);
-
-    return overlapX && overlapY;
-}
-async function death(...arr){
-    let [who, tag, ...prop] = arr;
-    let hasp = (name) => {return prop.some(p => p == name)};
-
-    nicoText(`${tag.name}の消失`);
-
-    Objects[tag.cam].splice(tag.me, 1);
-
-    Objects[tag.cam].forEach((obj, i) => obj.me = i);
-
-    //if(Object.values(Objects[tag.cam]).length == 0) delete Objects[tag.cam];
-}
-
 
 
 //#endregion canvas
@@ -1471,7 +1352,5 @@ async function gameloop(){
     // console.log(`えー..${looped}めのループ...です`)
     // if(en) looped = 0;
 
-    Pupdate(en);
-    Eupdate(en);
     if(loop) requestAnimationFrame(gameloop);
 }
