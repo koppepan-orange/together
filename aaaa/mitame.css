@@ -300,9 +300,13 @@ textarea{
     top: 0;
 }
 
+:root{
+    --inv_rowG: 8px;
+    --inv_colG: 8px;
+}
 #inventory{
     display: block;
-    width: 45%;
+    width: 55%;
     aspect-ratio: 9/5;
     padding: 10px;
     position: fixed;
@@ -312,11 +316,14 @@ textarea{
     box-sizing: border-box;
     pointer-events: none;
 }
+#inventory .row{
+    gap: var(--inv_colG)
+}
 #inventory .opener{
     display: block;
-    width: calc((100% - 2% - 40px)/9);
-    height: calc((100% - 2% - 20px)/5);
-    aspect-ratio: 1/1;
+    width: calc((100% - 2% - var(--inv_colG)*8)/9);
+    height: calc((100% - 2% - var(--inv_rowG)*4)/5);
+    aspect-ratio: 1;
     background: #b2b2b2;
     overflow: hidden;
     z-index: 255;
@@ -336,11 +343,10 @@ textarea{
     display: grid;
     grid-template-columns: repeat(9, 1fr);
     grid-template-rows: repeat(5, 1fr);
-    row-gap: 5px;
-    column-gap: 5px;
+    row-gap: var(--inv_rowG);
+    column-gap: var(--inv_colG);
     width: 100%;
     height: 100%;
-    padding: 0 1% 1% 1%;
     background: #00000000;
     z-index: 100;
     box-sizing: border-box;
