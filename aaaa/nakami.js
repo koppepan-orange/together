@@ -1009,6 +1009,15 @@ function inv_get(index){
     if(index < 0) return console.error('そのインデックスは存在しません');
     if(index >= invC.areaD.children.length) return {name:'', num:0};
 }
+function inv_data(name = null){
+    let data = {};
+    for(let cell of invC.areaD.children){
+        if(!cell.dataset.item) continue;
+        data[cell.dataset.item] = +cell.dataset.num;
+    }
+    if(name) data = data[name];
+    return data
+}
 
 function inv_tekiou(){
     for(let cell of invC.areaD.children){
@@ -1119,6 +1128,10 @@ function inv_ock(cell){
     cell.appendChild(pickItem);
     cell.dataset.item = pickItem.dataset.item;
     cell.dataset.num = pickItem.dataset.num || 1;
+
+    let datas = inv_data();
+    console.log(datas)
+    sendpy(datas)
 }
 
 document.addEventListener('mousemove', e => {
@@ -1447,7 +1460,6 @@ function start(){
     mayImport()
     
     inv_make();
-    itemsMake();
     resizeCanvas();
 
     loop = 1;
