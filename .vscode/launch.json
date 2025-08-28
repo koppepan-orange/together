@@ -40,5 +40,11 @@
             "name": "2048のやつ",
             "file": "koppe/puz/index.html"
         },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "ボーイミーツガールなら男女",
+            "file": "koppe/dungeon/index.html"
+        }
     ],                                                                                                                                              
 }
