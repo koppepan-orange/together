@@ -11,6 +11,7 @@ import copy
 #from random import shuffle as arrayShuffle
 #from random import choice as arraySelect
 from asyncio import sleep as delay
+import json #囧これ追加しました！！お許しを
 """import socket
 import os"""
 
@@ -18,7 +19,7 @@ csvdata={}
 cemicaldata=[]
 kakikae_list=[]
 
-with open('book1.csv',"r",encoding="utf-8_sig", newline='G') as f:
+with open('book1.csv',"r",encoding="utf-8_sig", newline='\r\n') as f:
     for fa in csv.reader(f):
         csvdata[fa[0]]=fa[1:]#+[float(fa[8])/100]+fa[9:]
     del csvdata["name"]
@@ -73,15 +74,26 @@ def sendData(text):
     for name in socketname:
         asynceventroop.create_task(name.send(text))
 
-
+nextIs=""
 
 async def handler(websocket):
     global root
     global socketname
     global pic_item
+    global inventry
+    global nextIs
+
     try:
         async for message in websocket:
             print(message)
+
+            if nextIs!="":
+                if nextIs=='inventry':
+                    inventry = json.loads(message)
+                    print(inventry)
+                    nextIs=''
+                    pass
+
             if (len(socketname) > 1 )and(websocket not in socketname):
                 print("cheater's elegant arrive!!!!!!!!!!!")
                 #print(socketname)
@@ -205,6 +217,15 @@ async def handler(websocket):
             elif message[:16]=="create_inventry_":#f"create_inventry_{name}_{windth}_{higth}_{onndo}_{aturyoku}"
                 x=message[16:].split("_")
                 inventry[x[0]]=[[],x[1],x[2],x[3],x[4],{},{}]
+            elif message[:6]=="print,":
+                print(eval(message[6:]))
+            elif message[:4]=="none":
+                pass
+
+            elif message[:3]=="次は、" and message[-2:]=="です":
+                print("次は？")
+                nextIs = message[3:-2]
+            
             else:
                 await websocket.send("Are you a cheater?") #楽しくなるぞ～～！
             
@@ -421,7 +442,13 @@ async def inventry_update():    #print(await serch({"鉄":2,"アルミニウム"
                 melt_y=[]
                 yw=0
                 melt_yw={}
+                print("indexの中身:", index, type(index)) #class<int>だった
                 for a,b in serch(index[5],3,True):
+                    #←ここのindex[5]にてエラー発生。TypeError: 'int' object is not subscriptable　とのこと
+                    # 勝手に変えるのは悪いかなと思いちょっと戻したが、いろいろと探究edしたのでそれを乗せときます
+                    # index[5], index[2]をindex, indexにした後「serchはasyncやろ？ほなawait使わな」と。
+                    # 仕方がないのでserchくんにawaitを付与。すると「line423、zisyo.items()ゆうてますけどzisyoはintですぜ？」と。
+                    # こっからはわかんなかったのであとは託しますわね それと、このメモは5年後に爆発する
                     yw += b/index[2]
                     melt_y += [[a,b,yw]] 
                     melt_yw[a]=[b,yw]

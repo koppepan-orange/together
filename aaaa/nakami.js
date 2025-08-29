@@ -434,7 +434,11 @@ soundsNames.forEach(num => {
 var webSocket; //ウェブソケット
 var messageTextArea = document.getElementById("messageTextArea"); // HTML内のテキスト出力エリア
 let message = document.getElementById("textMessage");
-let sendBtn = document.querySelector('#commands .send')
+let sendBtn = document.querySelector('#commands .send');
+
+sendBtn.addEventListener('click', () => {
+    sendpyTx(message.value);
+})
 
 // サーバとの通信を接続する関数
 function connect(){
@@ -472,16 +476,16 @@ function connect(){
 async function Senvonbary_Gyosatsu(){
     nicoText('血気術..千本針魚殺！！');
     await delay(1000);
-    nicoText('<8≣≣≣≣ミ');
-    // for(let i = 0; i < 23; i++){
-    //     nicoText('<8≣≣ミ'); //魚
-    //     nicoText('<8≣≣ミ');
-    //     nicoText('<8≣≣ミ');
-    //     nicoText('<8≣≣ミ');
-    //     nicoText('<8≣≣ミ');
-    //     nicoText('<8≣≣≣≣ミ');
-    //     await delay(50);
-    // }
+    nicoText('行くぜお前らー！！');
+    for(let i = 0; i < 23; i++){
+        nicoText('<8≣≣ミ'); //魚
+        nicoText('<8≣≣ミ');
+        nicoText('<8≣≣ミ');
+        nicoText('<8≣≣ミ');
+        nicoText('<8≣≣ミ');
+        nicoText('<8≣≣≣≣ミ');
+        await delay(50);
+    }
     //↑かわいい
 }
 
@@ -490,7 +494,13 @@ function logadd(text){
     messageTextArea.value += `${text}\n`; // ${random(1000,2900)}-${random(1,12)}-${random(1,31)} ${random(0,23)}:${random(0,59)}:${random(0,59)} INFO
     messageTextArea.scrollTop = messageTextArea.scrollHeight;
 };
-function sendpy(text){
+
+function sendpy(content){
+    let json = JSON.stringify(content);
+    logadd(`Send => ${json}}`);
+    webSocket.send(json);
+};
+function sendpyTx(text){
     if(IranMikans[text]) return 0;
     logadd(`Send => ${text}`);
     webSocket.send(text);
@@ -669,7 +679,7 @@ async function enter(line){
             }
             break;
         };
-addlog
+
         case '乱数生成':{
             let [, min, max] = line.map(Number);
             let num = random(min, max);
@@ -932,7 +942,7 @@ bigmmC.kitekeyD.addEventListener('click', () =>{
     bigmmC.bodyD.value = '';
     if(gen == '') return;
     
-    mesSend(gen)
+    read(gen)
 })
 //#endregion bigmashmaro
 
@@ -966,7 +976,7 @@ function inv_open(code = null){
     if(code == 1) invC.openD.classList.add('tog'), invC.areaD.classList.add('tog');
     if(code == 0) invC.openD.classList.remove('tog'), invC.areaD.classList.remove('tog');
 }
-invC.openD.addEventListener('click', inv_open);
+invC.openD.addEventListener('click', connect);
 document.addEventListener('keydown', (e) => {if(e.key == 'e') inv_open()});
 
 function inv_make(){
@@ -1086,8 +1096,8 @@ document.addEventListener('click', e => {
             let motopickItem = pickItem;
             let mwid = motopickItem.offsetWidth, mhei = motopickItem.offsetHeight;
             pickItem = pickItem2Ref;
-            pickItem.width = mwid;
-            pickItem.height = mhei;
+            pickItem.style.width = mwid;
+            pickItem.style.height = mhei;
             inv_pick(cell2, e.pageX, e.pageY);
 
             inv_tekiou();
@@ -1131,6 +1141,7 @@ function inv_ock(cell){
 
     let datas = inv_data();
     console.log(datas)
+    sendpyTx('次は、inventryです')
     sendpy(datas)
 }
 
@@ -1311,6 +1322,8 @@ function mapMake(){
     }
     //#endregion
     
+    sendpyTx('none,------------------mapmaked-------------------')
+
     drawGrid();
 
     draw();
@@ -1416,10 +1429,13 @@ async function pmoved(){
     }
 
     for(let ob3 of kasane){
+        if(ob3.name == 0) continue;
+
         let name = ob3.name;
         let data = Objects.find(o => o.name == name);
         if(!data) console.error(`エラー！${name}のdataがねーぜ！！`)
-        if(!data.dest) continue;
+        if(!hask(data, 'dest')) continue;
+        if(!data.dest)
         
         if(!hask(data, 'sozai')) continue;
 
