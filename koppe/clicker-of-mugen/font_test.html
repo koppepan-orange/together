@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        @font-face {font-family: comicsans;src: url('assets/fonts/comicsans.ttf');}
+        @font-face {font-family: hangyaku;src: url('assets/fonts/Hangyaku.ttf');}
+        @font-face {font-family: kurundeco;src: url('assets/fonts/kurundeco.otf');}
+        @font-face {font-family: starrysky;src: url('assets/fonts/starrysky.otf');}
+        @font-face {font-family: kurobara;src: url('assets/fonts/kurobara.ttf');}
+        @font-face {font-family: marukoius;src: url('assets/fonts/marukoius.ttf');}
+        body{
+            background-color: #F0F8FF;
+        }
+        #text{
+            display: block;
+            width: 100vw;
+            height: 600px;
+            background-color: #EAF5FF;
+            border: 2px solid #CFE9FF;
+            font-family: comicsans;
+        }
+    </style>
+</head>
+<body>
+    <select id="change">
+        <option value="comicsans">comicsans</option>
+        <option value="hangyaku">hangyaku</option>
+        <option value="kurundeco">kurundeco</option>
+        <option value="starrysky">starrysky</option>
+        <option value="kurobara">kurobara</option>
+        <option value="marukoius">marukoius</option>
+    </select>
+    <br>
+    <div id="text" contenteditable>
+        place of the cake for cake by cake
+    </div>
+    <script>
+        let changeDiv = document.getElementById('change');
+        let textDiv = document.getElementById('text')
+        changeDiv.addEventListener('change',() => {
+            let name = changeDiv.value;
+            textDiv.style.fontFamily = name;
+        })
+    </script>
+</body>
+</html>

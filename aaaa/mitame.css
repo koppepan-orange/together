@@ -1,0 +1,432 @@
+@font-face{src:url("assets/fonts/hangyaku.ttf");font-family: hangyaku; }
+@font-face{src:url('assets/fonts/kurobara.ttf');font-family: kurobara;}
+@font-face{src:url('assets/fonts/marukoius.ttf');font-family: marukoius;}
+@font-face{src:url('assets/fonts/starrysky.otf');font-family: starrysky;}
+@font-face{src:url('assets/fonts/kurundeco.otf');font-family: kurundeco;}
+html{
+    margin: -8px;
+    overflow: hidden;
+}
+.row{
+    display: flex;
+    flex-direction: row;
+}
+.column{
+    display: flex;
+    flex-direction: column;
+}
+img{
+    /* 画像をドラッグできないようにするやつ */
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+}
+
+/*nicotext*/
+.nicotext{
+    position: fixed;
+    top: 0;
+    right: 0;
+    background-color: #f0f8ff80;
+    color: #000000;
+    font-size: 20px;
+    transition: right 2.0s linear;
+    white-space: nowrap;
+    pointer-events: none;
+}
+/*logとtext*/
+#log{
+    display: none;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 320px;
+    height: 200px;
+    border: 1px solid #ffffff;
+    background-color: rgba(0,0,0,0);
+    position: fixed;
+    bottom: 150px;
+    right: -300px;
+    color: #fefefe;
+    overflow-y: hidden;
+    transition: right 0.3s;
+    z-index: 254;
+}
+#log .opener{
+    width: 20px;
+    height: 100%;
+    background-color: rgba(0,0,0,0.9);
+    color: #fefefe;
+    text-align: center;
+    cursor: pointer;
+    z-index: 254;
+}
+#log .log{
+    width: 300px;
+    height: 100%;
+    max-height: 200px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    background-color: rgba(0,0,0,0.8);
+    color: #fefefe;
+    text-align: left;
+    font-size: 14px;
+    transition: right 0.3s;
+    z-index: 253;
+}
+#text{
+    display: none;
+    background: rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 1.2em;
+    position: fixed;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000;
+
+    white-space: nowrap;
+    overflow: hidden;
+    width: fit-content; /* 文字の長さに応じた幅 */
+    animation: fadeIn 0.5s ease forwards;
+}
+@keyframes fadeIn {
+    0%{
+        opacity: 0;
+    }
+    100%{
+        opacity: 1;
+    }
+}
+.color-red{
+    color: #ff1919;
+}
+.color-pink{
+    color: #ff56e9;
+}
+.color-blue{
+    color: #1919ff;
+}
+
+/* description */
+#movableDescription{
+    display: none;
+    position: fixed;
+    pointer-events: none;
+    background-color: #363636e2;
+    color: #f0f8ff;
+    text-align: left;
+    padding: 5px 10px;
+    border-radius: 5px;
+    z-index: 256;
+}
+
+水色 #f0f8ff, #eaf5ff, #def0ff, #cfe9ff, #b5dcff
+紫色 #f8f6ff, #f5f2ff, #f1edff, #ece8ff, #e9e4ff
+橙色 #fffaf3, #fff7eb, #fff3e2, #fff0d9, #ffeccf
+緑色 #f6fff2, #eeffe7, #e6ffdc, #ddffd0, #d4ffc3
+
+#dummy{
+    color: #cfe9ff;
+    /* 上の謎の4つの文章によって、なんか最初のやつ無効化されるっぽい */
+    /* 謎に */
+}
+
+.hidden{
+    opacity: 0;
+    pointer-events: none;
+}
+
+textarea{
+    /* font-family: concolas; */
+    font-family: kurobara;
+    /* font-family: marukoius */
+    /* font-family: kurundeco; */
+}
+
+#mainArea{
+    width: calc(100vw - 80px);
+    height: calc(100vh - 80px);
+    /* height: 100vh; */
+    padding: 40px;
+    background: none;
+    user-select:none;
+    font-family: hangyaku;
+}
+
+#rainbt{
+    position: fixed;
+    bottom: 0;
+    left: 10px;
+    width: 50px;
+    height: 50px;
+    background: radial-gradient(#f0f8ff,#f6fff2,#fffaf3,#f8f6ff)!important;
+    border-radius: 50%;
+    z-index: 255;
+    box-sizing: border-box;
+}
+#back.rainback{
+    width: 400%;
+    height: 100%; /* 適当 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+.rainback{
+    background: linear-gradient(to right, #f0f8ff,#eaf5ff,#def0ff,#cfe9ff,#b5dcff,#d4ffc3,#ddffd0,#e6ffdc,#eeffe7,#f6fff2,#fffaf3,#fff7eb,#fff3e2,#fff0d9,#ffeccf,#e9e4ff,#ece8ff,#f1edff,#f5f2ff,#f8f6ff);
+    background-size: 400% 100%;
+    animation: slideBG 5s linear infinite;
+}
+@keyframes slideBG {
+    0%   { background-position: 0 0; }
+    100% { background-position: -400% 0; }
+}
+
+#commands{
+    display: flex;
+    flex-direction: column;
+    margin: 20px auto;
+}
+
+.floatdiv{
+    display: flex;
+    flex-direction: column;
+    width: 120px;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    border-radius: 5px;
+    z-index: 47;
+}
+.floatdiv .focus{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 50px;
+    background-color: #ffcfec;
+    transition: width 0.5s ease;
+    z-index: 50;
+}
+.floatdiv .list{
+    display: flex;
+    flex-direction: column;
+    /* align-items: center;
+    justify-content: center; */
+    width: 100%;
+    max-height: 300px;
+    background-color: #b5dcff;
+    opacity: 0;
+    overflow-y: scroll;
+    transition: height 0.3s ease-out;
+    z-index: 49;
+}
+.floatdiv .list .item{
+    border-top: 1px #ceffcf;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 20px;
+    padding: 5px;
+    min-height: 20px;
+    max-height: 20px;
+}
+.floatdiv .desc{
+    width: 100%;
+    background-color: #ffc400;
+    font-size: 20px;
+    position: absolute;
+    top: 50px;
+    left: 0;
+    transition: left 0.5s ease;
+    opacity: 0;
+    z-index: 48;
+}
+
+#bigmashmaro{
+    z-index: 69;
+}
+#bigmashmaro .kitekey{
+    display: block;
+    width: 60px;
+    height: 70px;
+    background: #def0ff;
+    border-radius: 0 0 5px 5px;
+    position: fixed;
+    top: 0;
+    right: 10%;
+    transition: top 0.5s ease;
+    z-index: 69;
+}
+#bigmashmaro .kitekey .column{
+    width: 80%;
+    height: 80%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 69;
+}
+#bigmashmaro .kitekey .theta{
+    width: 100%;
+    height: 50%; 
+    background: #90ccff;
+    clip-path: polygon(0% 0%, 50% 50%, 100% 0%, 100% 50%, 50% 100%, 0% 50%);
+    box-sizing: border-box;
+    z-index: 69;
+}
+#bigmashmaro .kitekey.tap{
+    top: 80%;   
+}
+#bigmashmaro .bodies{
+    width: 50%;
+    height: 80%;
+    background: #e4f2ff;
+    border: 10px solid #def0ff;
+    border-radius: 0 0 0 5px;
+    border-top: none;
+    font-size: 20px;
+    position: fixed;
+    top: -80%;
+    right: 10%;
+    transition: top 0.5s ease;
+    box-sizing: border-box;
+    z-index: 69;
+}
+#bigmashmaro .bodies.tap{
+    top: 0;
+}
+
+:root{
+    --inv_rowG: 8px;
+    --inv_colG: 8px;
+}
+#inventory{
+    display: block;
+    width: 55%;
+    aspect-ratio: 9/5;
+    padding: 10px;
+    position: fixed;
+    top: 5px;
+    left: 5px;
+    z-index: 100;
+    box-sizing: border-box;
+    pointer-events: none;
+}
+#inventory .row{
+    gap: var(--inv_colG)
+}
+#inventory .opener{
+    display: block;
+    width: calc((100% - 2% - var(--inv_colG)*8)/9);
+    height: calc((100% - 2% - var(--inv_rowG)*4)/5);
+    aspect-ratio: 1;
+    background: #b2b2b2;
+    overflow: hidden;
+    z-index: 255;
+    box-sizing: border-box;
+}
+#inventory .opener.tog{
+    background: #2b2b2b;
+}
+#inventory .opener img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    z-index: 200;
+}
+#inventory .area{
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    row-gap: var(--inv_rowG);
+    column-gap: var(--inv_colG);
+    width: 100%;
+    height: 100%;
+    background: #00000000;
+    z-index: 100;
+    box-sizing: border-box;
+    pointer-events: none;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 20%, 0% 20%);
+}
+#inventory .area.tog{
+    pointer-events: auto;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+}
+#inventory .area .cell{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 1;
+    background: #0000002b;
+    position: relative;
+    z-index: 200;
+    pointer-events: none;
+}
+#inventory .area.tog .cell{
+    pointer-events: all;
+    cursor: pointer;
+}
+#inventory .area .item{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 90%;
+    height: 90%;
+    background: #ffffff00;
+    cursor: pointer;
+    position: relative;
+    z-index: 200;
+}
+#inventory .area img.item{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 200;
+}
+#inventory .area .cell .num{
+    color: #ffffff;
+    font-size: 12px;
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    z-index: 201;
+}
+
+#items{
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    position: fixed;
+    top: 70px;
+    right: 20px;
+}
+#items .ite{
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+#canvas{
+    display: block;
+    margin: 50px auto;
+    background: #ffffff;
+    border: 2px solid #000000;
+}
+#mapmake{
+    width: 100px;
+    height: 70px;
+    background: #d4ffc3;
+    position: fixed;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    cursor: pointer;
+}

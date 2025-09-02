@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>論理ゲートバトル</title>
+</head>
+<body>
+<h1>論理演算バトル</h1>
+<p>あなたとCPUが論理ゲートを使って戦います！</p>
+<p>入力は毎ターンランダムで生成されます。</p>
+<p>出力が1なら攻撃成功、0ならミス。</p>
+
+<div>
+  <button onclick="battle('and')">AND</button>
+  <button onclick="battle('or')">OR</button>
+  <button onclick="battle('xor')">XOR</button>
+  <button onclick="battle('nand')">NAND</button>
+  <button onclick="battle('nor')">NOR</button>
+  <button onclick="battle('xnor')">XNOR</button>
+</div>
+
+<h3>HP</h3>
+<p>あなた: <span id="playerHP">10</span> | CPU: <span id="cpuHP">10</span></p>
+
+<div class="log" id="log"></div>
+
+<script>
+</script>
+</body>
+</html>

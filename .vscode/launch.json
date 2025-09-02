@@ -1,0 +1,50 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "from now on",
+            "file": "${file}"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "debugのあれ",
+            "file": "aaaa/index.html"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "arcana",
+            "file": "koppe/arcana/index.html"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Spiegel_von_Nacht_Schloss",
+            "file": "koppe/Spiegel_von_Nacht_Schloss/index.html"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "clicker-of-mugen",
+            "file": "koppe/clicker-of-mugen/index.html"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "2048のやつ",
+            "file": "koppe/puz/index.html"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "ボーイミーツガールなら男女",
+            "file": "koppe/dungeon/index.html"
+        }
+    ],                                                                                                                                              
+}

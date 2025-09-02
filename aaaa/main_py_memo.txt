@@ -1,0 +1,38 @@
+温度や圧力を変更するときに液体と気体は体積が変化するので combined_gas_law で体積を変更
+搬出や搬入の時に温度と圧力変更されるしアイテムデータと一緒に温度と圧力のデータも送ったほうがいいかも？
+固体が1だから固体のサイズ倍にしないといけない
+
+name,融点 (℃),沸点 (℃),固体密度 (g/cm3) (20℃),液体密度,気体密度,融点気圧(Pa),沸点気圧(Pa),m3/mol,誘拐熱(J/mol),蒸発熱(J/mol),コメント
+
+inventry2[name][3]+or-=(1orinventry2[name][5][tag]orinventry2[name][6][tag])*100/(csvdata[key][7])*(csvdata[key][8]orcsvdata[key][9])*4.184*inventry2[name][1]*inventry2[name][2]
+
+1000000万円ください？♡
+
+name:{[[[x,y,ax,ay,item]..],width,hight,℃,Pa,{item:mutch,..}<-melt_item,{item:mutch,..}<-are_item]}
+
+"コッペパン":{
+    [
+        [
+            [
+                x,
+                y,
+                ax,
+                ay,
+                item
+            ]
+            ..
+        ],
+        width,
+        hight,
+        ℃,
+        Pa,
+        {
+            item:mutch,
+            ..
+        }, //<= melt_item
+        {
+            item:mutch,
+            ..
+        }
+    ]
+}

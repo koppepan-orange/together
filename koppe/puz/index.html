@@ -1,0 +1,65 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>数字パズル～</title>
+    <link rel="stylesheet" href="mitame.css">
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4TV12FBHNW"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-4TV12FBHNW');
+    </script>
+    
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>数字パズル～</h1>
+            <div class="score-container">
+                <div class="score-box">
+                    <span class="score-title">SCORE</span>
+                    <span id="score">0</span>
+                </div>
+                <div class="score-box">
+                    <span class="score-title">MAX</span>
+                    <div id="max-bird-display" class="bird-tile" data-level="0">
+                        <img src="img/img00000.png" alt="Max Bird">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div id="game-board">
+                </div>
+            <div id="game-over-screen" class="hidden">
+                <div class="message-box">
+                    <h2>GAME OVER</h2>
+                    <p>最終スコア: <span id="final-score">0</span></p>
+                    <button id="restart-button">Twitterでシェア</button>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <button id="reset-button-footer">リセット</button>
+            <p class="instructions">
+                <strong>遊び方:</strong><br>
+                キーボードの矢印キーまたは画面をスワイプして生徒を動かします。<br>
+                同じ生徒を重ねて大きく（？）していこう！<br>
+                （※全部で14段階あります）
+            </p>
+        </footer>
+    </div>
+
+    <script src="nakami.js"></script>
+</body>
+</html>

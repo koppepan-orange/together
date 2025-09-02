@@ -1,0 +1,216 @@
+:root {
+    --board-size: min(90vw, 480px);
+    --grid-gap: 10px;
+    --cell-size: calc((var(--board-size) - var(--grid-gap) * 5) / 4);
+    --bg-color: #E0F7FA; /* Light Cyan for a refreshing background */
+    --board-bg: #B2EBF2; /* Light Sky Blue for the board */
+    --cell-bg: #FDFEFE; /* Very light, almost white for cells to ensure clear separation from board background */
+    --font-color: #263238; /* Dark Slate Gray for readability */
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--font-color);
+    display: flex;
+    justify-content: center;
+    /* align-items: center; */
+    /* min-height: 100dvh; */
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.container {
+    width: 100%;
+    max-width: 500px;
+    padding: 10px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+header {
+    width: var(--board-size);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: clamp(15px, 5vw, 30px);
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.score-container {
+    display: flex;
+    gap: 10px;
+}
+
+.score-box {
+    background-color: var(--board-bg);
+    padding: 8px 12px;
+    border-radius: 5px;
+    text-align: center;
+    color: white;
+}
+
+.score-title {
+    font-size: 12px;
+    font-weight: bold;
+    display: block;
+    color: #F0F8FF; /* Alice Blue for score title */
+}
+
+#score {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+#max-bird-display {
+    width: 40px;
+    height: 40px;
+    margin-top: 4px;
+    position: relative;
+}
+#max-bird-display img {
+    border-radius: 5px;
+}
+
+main {
+    position: relative;
+}
+
+#game-board {
+    width: var(--board-size);
+    height: var(--board-size);
+    background-color: var(--board-bg);
+    border-radius: 6px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: var(--grid-gap);
+    padding: var(--grid-gap);
+    box-sizing: border-box;
+    position: relative;
+}
+
+.grid-cell {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    background-color: var(--cell-bg);
+    border-radius: 3px;
+}
+
+.bird-tile {
+    position: absolute;
+    width: var(--cell-size);
+    height: var(--cell-size);
+    border-radius: 3px;
+    transition: top 0.2s ease-in-out, left 0.2s ease-in-out; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.bird-tile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation-duration: 0.2s;
+    animation-timing-function: ease;
+}
+
+.tile-new img {
+    animation-name: appear;
+}
+
+.tile-merged img {
+    animation-name: merge;
+}
+
+@keyframes appear {
+    from {
+        transform: scale(0);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+@keyframes merge {
+    from {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+#game-over-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    border-radius: 6px;
+    z-index: 100;
+}
+
+#game-over-screen.hidden {
+    display: none;
+}
+
+.message-box {
+    background: var(--bg-color);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+h2 {
+    font-size: 32px;
+    color: var(--font-color);
+    margin: 0 0 10px;
+}
+
+#restart-button, #reset-button-footer {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background-color: #00BCD4; /* Cyan for buttons */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#restart-button:hover, #reset-button-footer:hover {
+    background-color: #26C6DA; /* Lighter Cyan on hover */
+}
+
+footer {
+    margin-top: 20px;
+    text-align: center;
+    width: var(--board-size);
+}
+
+.instructions {
+    margin-top: 20px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #607D8B; /* Blue Grey for instructions */
+}

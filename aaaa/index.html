@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>debug-room!!</title>
+  <link rel="stylesheet" href="mitame.css"/>
+</head>
+<body>
+  <div id="movableDescription"></div>
+  <div id="text"></div>
+  <div id="log">
+    <div class="opener"></div>
+    <div class="log"></div>
+  </div>
+  
+  <div id="back"></div>
+
+  <div id="mainArea">
+
+    <div id="inventory">
+      <div class="row">
+        <div class="opener">
+          <img src="assets/images/inventory.png"/>
+        </div>
+        <div class="area"></div>
+      </div>
+    </div>
+
+    <div id="items" class="draggable"></div>
+
+    <div id="bigmashmaro">
+      <textarea type="text" class="bodies"></textarea>
+      <div class="kitekey">
+        <div class="column">
+          <div class="theta"></div>      
+          <div class="theta"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="rainbt" class="draggable"></div>
+    
+    <div id="commands">
+      <div class="row">
+        <input id="textMessage" type="text">
+        <button class="send">Send</button>
+      </div>
+      <textarea id="messageTextArea" rows="10" cols="50"></textarea>
+    </div>
+
+    <canvas id="canvas"></canvas>
+    <div id="mapmake"></div>
+
+  </div>
+
+
+  <script src="nakami.js" defer></script>
+  <script src="data.js" defer></script>
+</body>
+</html>

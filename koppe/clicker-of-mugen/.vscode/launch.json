@@ -1,0 +1,28 @@
+{
+    "configurations": [
+      {
+        "type": "chrome",
+        "request": "launch",
+        "name": "Launch HTML File",
+        "file": "${workspaceFolder}/${input:htmlFile}"
+      },
+      {
+        "type": "chrome",
+        "request": "launch",
+        "name": "clicker of mugen",
+        "file": "hontai.html"
+      }
+    ],
+    "inputs": [
+      {
+        "type": "pickString",
+        "id": "htmlFile",
+        "description": "Select the HTML file to launch",
+        "options": [
+          "hontai.html",
+          "test.html",
+          "tesla.html"
+        ]
+      }
+    ]
+  }
