@@ -625,11 +625,14 @@ def motion(e,name):
 
 def click(e,name):
     global ock
-    if ock[0]=="":
-        pass
-    else:
+    if ock[0]!="":
         sendData("helasu")
         inventry[name][0]+=[[e.x,e.y,0,0,ock[0]]]
+
+def click(e,name):
+    global ock
+    if ock[0]=="":
+        
 
 def delete_inventry_GUI(name):
     window_del("inventry_root_"+str(name))()
@@ -669,7 +672,7 @@ async def open_inventry(name:str):
         canvas["inventry_root_"+str(name)].place(x = 0,y = 0)
         root["inventry_root_"+str(name)].bind("<Motion>",lambda e,name=name:motion(e,name))
         root["inventry_root_"+str(name)].bind("<ButtonRelease-1>",lambda e,name=name:click(e,name))
-        root["inventry_root_"+str(name)].bind("<ButtonPress-1>",lambda e,name=name:click(e,name))
+        root["inventry_root_"+str(name)].bind("<ButtonPress-1>",lambda e,name=name:click2(e,name))
         root["inventry_root_"+str(name)].protocol("WM_DELETE_WINDOW",lambda name=name:delete_inventry_GUI(name))
         flag["inventry_name"]=[str(name)]
         #print(root)
