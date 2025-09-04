@@ -605,6 +605,65 @@ function dun_back(){
 
     draw()
 }
+
+let Rooms = [
+    [
+        [1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1]
+    ],
+    [
+        [1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,1],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [1,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,1],
+        [1,1,1,0,0,0,1,1]
+    ],
+    [
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1],
+        [1,1,0,0,0,1,1,1],
+        [1,1,0,0,0,0,0,0],
+        [1,1,0,0,0,0,0,0],
+        [1,1,0,0,0,1,1,1],
+        [1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1]
+    ],
+    [
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,1,1,0,0,0],
+        [0,0,1,1,1,1,0,0],
+        [0,0,1,1,1,1,0,0],
+        [0,0,0,1,1,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0]
+    ]
+]// さっきの調整関数群（コピペして使え）
+
+function generateDungeon(Rooms){
+    // 4x4 のランダム部屋選択
+    let grid = [];
+    for(let r=0;r<4;r++){
+      let row=[];
+      for(let c=0;c<4;c++){
+        // 深いコピーしないと調整で元のRoomsが壊れる
+        let base = Rooms[Math.floor(Math.random()*Rooms.length)];
+        let clone = base.map(arr=>arr.slice());
+        row.push(clone);
+      }
+      grid.push(row);
+    }
+    return stitchRooms(grid);
+  }
 function dun_wall(){
     let arr = mapSouan
         .replace(/\n/g, "") // ← ここで改行を全部消す
@@ -638,6 +697,65 @@ function dun_wall(){
 
     draw();
 }
+function adjustHoriz(left, right){
+    for(let y=0; y<8; y++){
+        const L = left[y][7], R = right[y][0];
+        if(L===0 && R===1){
+            const passable =
+             (right[y][1]===0) ||
+             (y>0 && right[y-1][0]===0) ||
+             (y<7 && right[y+1][0]===0);
+            if(passable) right[y][0]=0;
+            else left[y][7]=1;
+        }
+        if(L===1 && R===0){
+            const passable = 
+             (left[y][6]===0) ||
+             (y>0 && left[y-1][7]===0) || 
+             (y<7 && left[y+1][7]===0);
+            if(passable) left[y][7]=0;
+            else right[y][0]=1;
+        }
+    }
+}
+function adjustVert(top, bottom){
+    for(let x=0; x<8; x++){
+        const T = top[7][x], B = bottom[0][x];
+        if(T===0 && B===1){
+            const passable = (bottom[1][x]===0) ||
+                (x>0 && bottom[0][x-1]===0) ||
+                (x<7 && bottom[0][x+1]===0);
+            if(passable) bottom[0][x]=0;
+            else top[7][x]=1;
+        }
+        if(T===1 && B===0){
+        const passable = (top[6][x]===0) ||
+            (x>0 && top[7][x-1]===0) ||
+            (x<7 && top[7][x+1]===0);
+            if(passable) top[7][x]=0;
+            else bottom[0][x]=1;
+        }
+    }
+}
+function stitchRooms(rooms){
+    for(let r=0;r<4;r++)for(let c=0;c<3;c++) adjustHoriz(rooms[r][c], rooms[r][c+1]);
+    for(let r=0;r<3;r++)for(let c=0;c<4;c++) adjustVert(rooms[r][c], rooms[r+1][c]);
+  
+    const out = Array.from({length:32},()=>Array(32).fill(1));
+    for(let rr=0; rr<4; rr++){
+        for(let cc=0; cc<4; cc++){
+            const room = rooms[rr][cc];
+            for(let y=0;y<8;y++){
+                for(let x=0;x<8;x++){
+                    out[rr*8+y][cc*8+x] = room[y][x];
+                }
+            }
+        }
+    }
+    return out;
+}
+ 
+// 4x4 部屋を作って結合
 
 
 //#region player
