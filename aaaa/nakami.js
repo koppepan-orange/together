@@ -465,28 +465,10 @@ function connect(){
         let mes = message.data;
         read(mes);
         nicoText(mes);
+        logadd(`Receive => ${mes}`);
         
-        if(mes == 'Are you a cheater?'){
-            Senvonbary_Gyosatsu();
-            Senvonbary_Gyosatsu();
-        }
+        if(mes == 'helasu') inv_pick_decr();
     };
-}
-
-async function Senvonbary_Gyosatsu(){
-    nicoText('血気術..千本針魚殺！！');
-    await delay(1000);
-    nicoText('行くぜお前らー！！');
-    for(let i = 0; i < 23; i++){
-        nicoText('<8≣≣ミ'); //魚
-        nicoText('<8≣≣ミ');
-        nicoText('<8≣≣ミ');
-        nicoText('<8≣≣ミ');
-        nicoText('<8≣≣ミ');
-        nicoText('<8≣≣≣≣ミ');
-        await delay(50);
-    }
-    //↑かわいい
 }
 
 function logadd(text){
@@ -757,7 +739,7 @@ function revision(moto){
 //#endregion
 
 
-
+/*
 //#region may
 let mayList = document.getElementById('mayList');
 let maylists = {
@@ -927,6 +909,7 @@ async function mayImport(){
 // });
 
 //#endregion may
+*/
 
 //#region ビッグマシュマロ（唐突）
 let bigmmD = document.getElementById('bigmashmaro');
@@ -977,7 +960,6 @@ function inv_open(code = null){
     if(code == 0) invC.openD.classList.remove('tog'), invC.areaD.classList.remove('tog');
 }
 invC.openD.addEventListener('click', connect);
-document.addEventListener('keydown', (e) => {if(e.key == 'e') inv_open()});
 
 function inv_make(){
     for(let i = 0; i < 5; i++){
@@ -990,9 +972,10 @@ function inv_make(){
     };
 }
 function get(item){
-    if(!item) return nicoText('アイテム名を指定してください');
+    if(!item) return nicoText('アイテム名を指定してください');4
+    let data = Items.find(o => o.name == item);
 
-    let target = [...invC.areaD.querySelectorAll('.cell')].find(c => c.dataset.item == item && +c.dataset.num < 99);
+    let target = [...invC.areaD.querySelectorAll('.cell')].find(c => c.dataset.item == data.jpnm && +c.dataset.num < 99);
     
     if(!target){
         target = [...invC.areaD.querySelectorAll('.cell')].find(c => !c.dataset.item);
@@ -1000,13 +983,13 @@ function get(item){
 
         let img = document.createElement('img');
         img.className = 'item';
-        img.src = `assets/images/items/${item}.png`;
+        img.src = `assets/images/items/${data.jpnm}.png`;
         img.draggable = false;
-        img.dataset.item = item;
+        img.dataset.item = data.jpnm;
 
         target.innerHTML = '';
         target.appendChild(img);
-        target.dataset.item = item;
+        target.dataset.item = data.jpnm;
         target.dataset.num = 1;
     }else{
         target.dataset.num = (+target.dataset.num + 1).toString();
@@ -1130,6 +1113,11 @@ function inv_pick(cell, px, py){
     pickItem.style.opacity = 1;
     document.body.appendChild(pickItem);
     pickItem.style.pointerEvents = 'none';
+
+    let name = pickItem.dataset.item
+    let num = pickItem.dataset.num || 1;
+    
+    sendpyTx(`item_pick_${name}_${num}`);
 }
 function inv_ock(cell){
     pickItem.style = '';
@@ -1141,12 +1129,13 @@ function inv_ock(cell){
    
     let name = pickItem.dataset.item
     let num = pickItem.dataset.num || 1;
-    // let index = cell.dataset.index.replace('c', '').padStart(2, '0')
-    // let indexa = index.split('');
-    // let y = +indexa[0], x = +indexa[1];
     
     sendpyTx(`item_ock_${name}_${num}`);
-    
+}
+
+function inv_pick_decr(){
+    pickItem.dataset.num -= 1;
+    if(pickItem.dataset.num == 0) pickItem.remove(), pickItem = null;
 }
 
 document.addEventListener('mousemove', e => {
@@ -1466,7 +1455,7 @@ async function pmoved(){
         let data = Objects.find(o => o.name == name);
         if(!data) console.error(`エラー！${name}のdataがねーぜ！！`)
         if(!hask(data, 'dest')) continue;
-        if(!data.dest)
+        if(!data.dest) continue;
         
         if(!hask(data, 'sozai')) continue;
 
@@ -1476,7 +1465,7 @@ async function pmoved(){
             
             let item = so.name;
             await get(item);
-            await delay(100);
+            await delay(10);
         }
         
         ob3.name = 0;
@@ -1504,7 +1493,6 @@ canV.addEventListener('click', e => {
 
 function start(){
     connect();
-    mayImport()
     
     inv_make();
     resizeCanvas();
@@ -1526,5 +1514,12 @@ async function gameloop(){
 }
 document.addEventListener('keydown', (e) => {
     if(e.key == 'Escape') loop = 0;
+
+
+    //これ以降はinput内では機能しない
+    if (document.activeElement == message) return;
+    if(document.activeElement == bigmmC.bodyD) return;
+
     if(e.key == 'o') objmake();
+    if(e.key == 'e') inv_open();
 })

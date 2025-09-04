@@ -86,7 +86,7 @@ nextIs=""
 ock=["",]
 
 async def handler(websocket):
-    global rootw
+    global root
     global socketname
     global pic_item
     global inventry
@@ -104,17 +104,11 @@ async def handler(websocket):
                 await websocket.send("Are you a cheater?")
                 await websocket.close()
                 break
-            for a in socketname:
-                if websocket!=a:
-                    
-                    try:
-                        await a.send(str(message))
-                    except Exception as e:
-                        print(e)
-                        print("cliant_disconect")
-                        socketname.remove(websocket)
-            if websocket not in socketname:
+            elif websocket not in socketname:
+                print("cliant_conect")
                 socketname.append(websocket)
+            #if websocket not in socketname:
+                
             if message == "chack":
                 await websocket.send("now conecting 8001:localhost with python")
             elif message == "endgame":
@@ -223,7 +217,7 @@ async def handler(websocket):
                 inventry[str(x[0])][6][x[1]]+=x[2]
             elif message[:16]=="create_inventry_":#f"create_invryentry_{name}_{windth}_{higth}_{onndo}_{aturyoku}"
                 x=message[16:].split("_")
-                inventry[x[0]]=[[],x[1],float(x[2]),float(x[3]),float(x[4]),{},{}]
+                inventry[x[0]]=[[],float(x[1]),float(x[2]),float(x[3]),float(x[4]),{},{}]
             elif message[:14]=="open_inventry_":#f"open_inventry_{name}"
                 await open_inventry(message[14:])
 
@@ -629,10 +623,18 @@ def click(e,name):
         sendData("helasu")
         inventry[name][0]+=[[e.x,e.y,0,0,ock[0]]]
 
-def click(e,name):
+
+def click2(e,name):
     global ock
     if ock[0]=="":
-        
+        cccc=""
+        for a in range(len(inventry[name][0])):
+            if abs(inventry[name][0][a][0]-e.x)<=25 and abs(inventry[name][0][a][1]-e.y)<=25:
+                cccc=a
+                break
+        if cccc != "":
+            sendData("pick_"+inventry[name][0][cccc][4])
+            del inventry[name][0][cccc][4]
 
 def delete_inventry_GUI(name):
     window_del("inventry_root_"+str(name))()

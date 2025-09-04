@@ -477,58 +477,75 @@ let dunFl = document.querySelector('#dungeon .floor');
 let duncan = document.querySelector('#dungeon .floor .canvas'); //canvas
 let dunctx = duncan.getContext('2d');
 let dunC = {
+    zen: 32,
     mas: 15,
     size: null,
+    cam: {
+        sx: 0,
+        sy: 0,
+    },
     objs: [],
     back: [],
     wall: [],
 };
 dunC.load = () => {
-    for(let y = 0; y < dunC.mas; y++){
+    for(let y = 0; y < dunC.zen; y++){
         dunC.back[y] = [];
         dunC.wall[y] = [];
-        for(let x = 0; x < dunC.mas; x++){
+        for(let x = 0; x < dunC.zen; x++){
             dunC.back[y][x] = 'error';
             dunC.wall[y][x] = 0;
         }
     }
 }
 function resizeCanvas() {
-    let wid = window.innerWidth/2;
-    dunFl.width = wid;
-    dunFl.height = wid;
+    let wid = window.innerWidth / 2;
     duncan.width = wid;
     duncan.height = wid;
+    dunFl.style.width = wid + 'px';
+    dunFl.style.height = wid + 'px';
     dunC.size = wid / dunC.mas;
 }
 
 function draw() {
-    console.log('描くよ！')
-    dunctx.clearRect(0, 0, dunC.size * dunC.mas, dunC.size * dunC.mas);
+    let cam = dunC.cam;
+    dunctx.clearRect(0, 0, duncan.width, duncan.height);
 
-    for(let y = 0; y < dunC.mas; y++){
-        for(let x = 0; x < dunC.mas; x++){
+    let startX = Math.floor(cam.sx / dunC.size);
+    let startY = Math.floor(cam.sy / dunC.size);
+    let endX = Math.ceil((cam.sx + duncan.width) / dunC.size);
+    let endY = Math.ceil((cam.sy + duncan.height) / dunC.size);
+
+    startX = Math.max(0, startX);
+    startY = Math.max(0, startY);
+    endX = Math.min(dunC.zen - 1, endX);
+    endY = Math.min(dunC.zen - 1, endY);
+
+    for(let y = startY; y <= endY; y++){
+        for(let x = startX; x <= endX; x++){
             let code = dunC.back[y][x];
-            let img = images['maps'][code]; 
-            // if(img && img != 'error') dunctx.drawImage(img, x*dunC.size, y*dunC.size, dunC.size, dunC.size);
-            // else dunctx.drawImage(images['systems']['error'], x*dunC.size, y*dunC.size, dunC.size, dunC.size);
-            if(img && img != 'error') dunctx.drawImage(img, x*dunC.size, y*dunC.size, dunC.size, dunC.size);
-            else dunctx.drawImage(images['systems']['error'], x*dunC.size, y*dunC.size, dunC.size, dunC.size);
+            let img = images['maps'][code];
+            let px = x * dunC.size - cam.sx;
+            let py = y * dunC.size - cam.sy;
+            if(img) dunctx.drawImage(img, px, py, dunC.size, dunC.size);
+            else dunctx.drawImage(images['systems']['error'], px, py, dunC.size, dunC.size);
 
-            //wall
+            // wall
             let imgn = dunC.wall[y][x];
             img = images['maps'][imgn];
-            if(img) dunctx.drawImage(img, x*dunC.size, y*dunC.size, dunC.size, dunC.size);
-            else dunctx.drawImage(images['systems']['error'], x*dunC.size, y*dunC.size, dunC.size, dunC.size);
+            if(img) dunctx.drawImage(img, px, py, dunC.size, dunC.size);
+            else dunctx.drawImage(images['systems']['error'], px, py, dunC.size, dunC.size);
         }
     }
 
-
-    
     dunC.objs.forEach(obj => {
-        dunctx.drawImage(obj.img, obj.x * dunC.size, obj.y * dunC.size, dunC.size, dunC.size);
+        if(obj.name == 'player') return obj.sx = dunC.cam.sx, obj.sy = dunC.cam.sy, dunctx.drawImage(obj.img, obj.sx, obj.sy, dunC.size, dunC.size);
+        let ox = obj.sx - cam.sx;
+        let oy = obj.sy - cam.sy;
+        dunctx.drawImage(obj.img, ox, oy, dunC.size, dunC.size);
     });
 }
+
 
 let mapSouan = `
 111111111111111111111111111111111111111111,
@@ -574,37 +591,34 @@ function chooseWeighted(weights){
     }
     return weights.length - 1;
 }
+// --- 1) dun_back の先頭タイル選択を修正 (arraySelect を使わない)
 function dun_back(){
+    console.log('床つくるよ～ん');
     let tiles = ['a','b','c'];
-    let mas = dunC.mas;
-    //back作り
-    for (let i = 0; i < mas; i++) {
+    let zen = dunC.zen;
+    for (let i = 0; i < zen; i++){
         dunC.back[i] = [];
-        for (let j = 0; j < mas; j++) {
-            if(i == 0 && j == 0){
-                dunC.back[i][j] = tiles[Math.floor(Math.random() * tiles.length)];
-            }else{
-                // 重みを初期化（全種類1からスタート＝最低限の確率確保）
+        for (let j = 0; j < zen; j++){
+            if(i === 0 && j === 0){
+                // ランダム初期タイル（arraySelect の代替）
+                dunC.back[i][j] = tiles[Math.floor(Math.random()*tiles.length)];
+            } else {
                 let weights = new Array(tiles.length).fill(1);
-    
-                if(j > 0){ //左
+                if(j > 0){
                     let left = tiles.indexOf(dunC.back[i][j - 1]);
-                    weights[left] += 5;
+                    if(left >= 0) weights[left] += 5;
                 }
-    
-                if(i > 0){ //上
+                if(i > 0){
                     let up = tiles.indexOf(dunC.back[i - 1][j]);
-                    weights[up] += 5;
+                    if(up >= 0) weights[up] += 5;
                 }
-    
                 let choice = chooseWeighted(weights);
                 dunC.back[i][j] = tiles[choice];
             }
         }
     }
-
-    draw()
 }
+
 
 let Rooms = [
     [
@@ -649,14 +663,14 @@ let Rooms = [
     ]
 ]// さっきの調整関数群（コピペして使え）
 
-function generateDungeon(Rooms){
+function dun_wall(){
     // 4x4 のランダム部屋選択
     let grid = [];
     for(let r=0;r<4;r++){
       let row=[];
       for(let c=0;c<4;c++){
         // 深いコピーしないと調整で元のRoomsが壊れる
-        let base = Rooms[Math.floor(Math.random()*Rooms.length)];
+        let base = arraySelect(Rooms);
         let clone = base.map(arr=>arr.slice());
         row.push(clone);
       }
@@ -664,7 +678,7 @@ function generateDungeon(Rooms){
     }
     return stitchRooms(grid);
   }
-function dun_wall(){
+function lololololololdun_wall(){
     let arr = mapSouan
         .replace(/\n/g, "") // ← ここで改行を全部消す
         .split(",")
@@ -754,7 +768,7 @@ function stitchRooms(rooms){
     }
     return out;
 }
- 
+
 // 4x4 部屋を作って結合
 
 
@@ -771,46 +785,67 @@ document.addEventListener('keyup', e => {
    keys[key] = false;
 });
 
+// --- 2) dun_p_make を grid 座標管理にしておく（sx/sy を直接使わない）
 function dun_p_make(){
     let ob = {
         id: dunC.objs.length,
         side: 'player',
         name: 'player',
-        x: 7,
+        x: 7, // グリッド座標
         y: 7,
+        moving: 0,
         able: ['move'],
         img: images['enemies']['蒼白の粘液'],
-    }
+    };
     dunC.objs.push(ob);
 }
 
+
 async function dun_p_tekiou(){
     let p = dunC.objs.find(o => o.name == 'player');
-    let kaisu = 20;
+    let cam = dunC.cam;
+    let kaisu = 5;
+    let tyomateyo = 0;
     if((keys.w || keys.arrowup) && !p.moving){
         p.moving = 1;
+        let ippo = dunC.size/kaisu;
         for(let i = 0; i < kaisu; i++){
-            p.y -= 1;
-            await delay(1000 / kaisu);
+            cam.sy -= ippo;
+            draw();
+            await delay(5);
         }
-    }else if((keys.a || keys.arrowleft) && !p.moving){
-        p.moving = 1;
-        for(let i = 0; i < kaisu; i++){
-            p.x -= 1;
-            await delay(1000 / kaisu);
-        }
+        await delay(tyomateyo)
+        p.moving = 0;
     }else if((keys.s || keys.arrowdown) && !p.moving){
         p.moving = 1;
+        let ippo = dunC.size/kaisu;
         for(let i = 0; i < kaisu; i++){
-            p.y += 1;
-            await delay(1000 / kaisu);
+            cam.sy += ippo;
+            draw();
+            await delay(5);
         }
+        await delay(tyomateyo)
+        p.moving = 0;
+    }else if((keys.a || keys.arrowleft) && !p.moving){
+        p.moving = 1;
+        let ippo = dunC.size/kaisu;
+        for(let i = 0; i < kaisu; i++){
+            cam.sx -= ippo;
+            draw()
+            await delay(5);
+        } 
+        await delay(tyomateyo)
+        p.moving = 0;
     }else if((keys.d || keys.arrowright) && !p.moving){
         p.moving = 1;
+        let ippo = dunC.size/kaisu;
         for(let i = 0; i < kaisu; i++){
-            p.x += 1;
-            await delay(1000 / kaisu);
+            cam.sx += ippo;
+            draw();
+            await delay(5);
         }
+        await delay(tyomateyo)
+        p.moving = 0;
     }
 }
 

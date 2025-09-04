@@ -83,14 +83,14 @@ let Items = [
     },
 
     {
-        name:'石炭',
+        name:'coal',
         jpnm:'石炭',
         kind:'natural fuel'
     },
 
 
     {
-        name:'コバルト', //x
+        name:'cobalt', //x
         jpnm:'コバルト',
         kind:'natural metal magnetic'
     },
@@ -166,7 +166,7 @@ let Objects = [
         desc:'石。\n黒色の鉱石が出てくるぞい。',
         sozai:[
             {name:'stone', p:100, amo:[1,3]},
-            {name:'石炭', p:75, amo:[2,4]},
+            {name:'coal', p:75, amo:[2,4]},
         ]
     },
     {
@@ -176,9 +176,9 @@ let Objects = [
         desc:'石。\n灰色の鉱石が出てくるぞい。',
         sozai:[
             {name:'stone', p:100, amo:[1,3]},
-            {name:'アルミニウム', p:40, amo:[3,6]},
-            {name:'チタニウム', p:40, amo:[3,6]},
-            {name:'鉄', p:65, amo:[4,5]},
+            {name:'alminium', p:40, amo:[3,6]},
+            {name:'titanium', p:40, amo:[3,6]},
+            {name:'iron', p:65, amo:[4,5]},
         ]
     },
     {
@@ -197,7 +197,7 @@ let Objects = [
         desc:'石。\n赤色の鉱石が出てくるぞい。',
         sozai:[
             {name:'stone', p:100, amo:[1,3]},
-            {name:'ルビー', p:25, amo:[1,3]},
+            {name:'ruby', p:25, amo:[1,3]},
         ]
     },
     {
@@ -207,7 +207,7 @@ let Objects = [
         desc:'石。\n黄色の鉱石が出てくるぞい。',
         sozai:[
             {name:'stone', p:100, amo:[1,3]},
-            {name:'金', p:50, amo:[3,6]},
+            {name:'gold', p:50, amo:[3,6]},
         ]
     },
     {
@@ -216,7 +216,7 @@ let Objects = [
         desc:'石。\n茶色の鉱石が出てくるぞい。',
         sozai:[
             {name:'stone', p:100, amo:[1,3]},
-            {name:'銅', p:80, amo:[5,9]},
+            {name:'copper', p:80, amo:[5,9]},
         ]
     },
     {
@@ -226,7 +226,7 @@ let Objects = [
         desc:'石。\n鉄色の鉱石が出てくるぞい。',
         sozai:[
             {name:'stone', p:100, amo:[1,3]},
-            {name:'ウラン', p:30, amo:[2,5]},
+            {name:'uran', p:30, amo:[2,5]},
         ]
     },
     {
@@ -236,8 +236,8 @@ let Objects = [
         desc:'石。\n水色の鉱石が出てくるぞい。',
         sozai:[
             {name:'stone', p:100, amo:[1,3]},
-            {name:'ツカレタノデヤメルニウム', p:40, amo:[4,7]},
-            {name:'ラリマール', p:25, amo:[2,4]},
+            {name:'tsukaretanodeyamerunium', p:40, amo:[4,7]},
+            {name:'larimar', p:25, amo:[2,4]},
         ]
     },
 ]
