@@ -208,7 +208,7 @@ function hoshoku(color) {
     return `#${compR}${compG}${compB}`;
 }
 //#endregion
-//#region log&text
+//#region log&text  
 let textDiv = document.querySelector('#text');
 let autoDelay = 1;
 let skipText = false; // スキップフラグ
@@ -539,48 +539,13 @@ function draw() {
     }
 
     dunC.objs.forEach(obj => {
-        if(obj.name == 'player') return obj.sx = dunC.cam.sx, obj.sy = dunC.cam.sy, dunctx.drawImage(obj.img, obj.sx, obj.sy, dunC.size, dunC.size);
+        if(obj.name == 'player') obj.sx = dunC.size*7 + cam.sx, obj.sy = dunC.size*7 + cam.sy;
+
         let ox = obj.sx - cam.sx;
         let oy = obj.sy - cam.sy;
         dunctx.drawImage(obj.img, ox, oy, dunC.size, dunC.size);
     });
 }
-
-
-let mapSouan = `
-111111111111111111111111111111111111111111,
-100010000000001000000000000000000000000001,
-100010000000001000000000000000000000000001,
-100010000000001000000000000000000000000001,
-100000000000001000000000000000000000000001,
-100000000000001000000000000000000000000001,
-100000000000001000011111111111111111111111,
-100010000000001000010000000000000000000001,
-100010000000001000010000000000000000000001,
-100010000000001000010000000000000000000001,
-100010000000001000010000000000000000000001,
-100010000000001000010000000000000000000001,
-100011111111111000011111111111110000000001,
-100000000000000000000000000000000000000001,
-100000000000000000000000000000000000000001,
-100000000000000000000000000000000000000001,
-111111111111111111111111000111111111111111,
-100000000000000000000001000010000000000001,
-100000000000000000000001000010000000000001,
-100000000000000000000001000010000000000001,
-100000000000000000000001000010000000000001,
-100000000000000000000001000010000000000001,
-100000000000000000000001000011111000000001,
-100000000000000000000000000000000000000001,
-100000000000000000000000000000000000000001,
-100000000000000000000000000000000000000001,
-100000000000000000000001000000000000000001,
-100000000000000000000001000000000000000001,
-100000000000000000000001000000000000000001,
-100000000000000000000001000000000000000001,
-100000000000000000000001000000000000000001,
-111111111111111111111111111111111111111111`;
-
 
 function chooseWeighted(weights){
     let total = weights.reduce((a, b) => a + b, 0);
@@ -677,7 +642,7 @@ function dun_wall(){
       grid.push(row);
     }
     return stitchRooms(grid);
-  }
+}
 function lololololololdun_wall(){
     let arr = mapSouan
         .replace(/\n/g, "") // ← ここで改行を全部消す
@@ -711,6 +676,9 @@ function lololololololdun_wall(){
 
     draw();
 }
+
+//↓この処理、自分でもっかいやってみて。
+//多分0に触れてる1が全部0になってる
 function adjustHoriz(left, right){
     for(let y=0; y<8; y++){
         const L = left[y][7], R = right[y][0];
@@ -736,16 +704,19 @@ function adjustVert(top, bottom){
     for(let x=0; x<8; x++){
         const T = top[7][x], B = bottom[0][x];
         if(T===0 && B===1){
-            const passable = (bottom[1][x]===0) ||
-                (x>0 && bottom[0][x-1]===0) ||
-                (x<7 && bottom[0][x+1]===0);
+            const passable =
+             (bottom[1][x]===0) ||
+             (x>0 && bottom[0][x-1]===0) ||
+             (x<7 && bottom[0][x+1]===0);
             if(passable) bottom[0][x]=0;
             else top[7][x]=1;
         }
+
         if(T===1 && B===0){
-        const passable = (top[6][x]===0) ||
-            (x>0 && top[7][x-1]===0) ||
-            (x<7 && top[7][x+1]===0);
+            const passable =
+             (top[6][x]===0) ||
+             (x>0 && top[7][x-1]===0) ||
+             (x<7 && top[7][x+1]===0);
             if(passable) top[7][x]=0;
             else bottom[0][x]=1;
         }
@@ -766,6 +737,24 @@ function stitchRooms(rooms){
             }
         }
     }
+
+    for(let y = 0; y < dunC.zen; y++){
+        for(let x = 0; x < dunC.zen; x++){
+            let wa = dunC.wall[y][x];
+            if(wa == 0) continue;
+
+            let hure = [1,1,1,1];
+            if(0 < y && dunC.wall[y-1][x] == 0) hure[0] = 0;
+            if(y < dunC.zen-1 && dunC.wall[y+1][x] == 0) hure[2] = 0;
+            if(x > 0 && dunC.wall[y][x-1] == 0) hure[3] = 0;
+            if(x < dunC.zen-1 && dunC.wall[y][x+1] == 0) hure[1] = 0;
+            let atai = hure.join('');
+
+            let imgn = `w${atai}`;
+            dunC.wall[y][x] = imgn;
+        }
+    }
+    
     return out;
 }
 
