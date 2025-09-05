@@ -1,1 +1,1 @@
-start powershell Compress-Archive -Path .\ -DestinationPath .\Backup -Force&powershell Start-Process "chrome.exe" "https://app.slack.com/client/"
+powershell Compress-Archive -Path .\ -DestinationPath .\Backup -Force&start powershell Start-Process "chrome.exe" "https://app.slack.com/client/"

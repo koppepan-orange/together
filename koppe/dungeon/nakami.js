@@ -722,9 +722,11 @@ function adjustVert(top, bottom){
         }
     }
 }
+
 function stitchRooms(rooms){
-    for(let r=0;r<4;r++)for(let c=0;c<3;c++) adjustHoriz(rooms[r][c], rooms[r][c+1]);
-    for(let r=0;r<3;r++)for(let c=0;c<4;c++) adjustVert(rooms[r][c], rooms[r+1][c]);
+    console.log(rooms)
+    for(let r=0;r<4;r++)for(let c=0;c<3;c++) adjustHoriz(rooms[r][c], rooms[r][c+1]); //横
+    for(let r=0;r<3;r++)for(let c=0;c<4;c++) adjustVert(rooms[r][c], rooms[r+1][c]); //縦
   
     const out = Array.from({length:32},()=>Array(32).fill(1));
     for(let rr=0; rr<4; rr++){
@@ -774,7 +776,6 @@ document.addEventListener('keyup', e => {
    keys[key] = false;
 });
 
-// --- 2) dun_p_make を grid 座標管理にしておく（sx/sy を直接使わない）
 function dun_p_make(){
     let ob = {
         id: dunC.objs.length,

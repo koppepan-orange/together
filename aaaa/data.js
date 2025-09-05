@@ -68,7 +68,7 @@ let Items = [
     },
     {
         name:'titanium',
-        jpnm:'チタン',
+        jpnm:'チタニウム',
         kind:'natural metal'
     },
     {
