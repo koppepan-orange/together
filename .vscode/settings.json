@@ -1,4 +1,10 @@
 {
     "python.analysis.autoImportCompletions": true,
-    "python.analysis.typeCheckingMode": "basic"
+    "python.analysis.typeCheckingMode": "basic",
+    "workbench.colorTheme": "miku",
+    "editor.aiStats.enabled": true,
+    "editor.autoClosingBrackets": "languageDefined",
+    "editor.autoClosingComments": "languageDefined",
+    "editor.dragAndDrop": true,
+    "editor.emptySelectionClipboard": false
 }
