@@ -16,7 +16,6 @@ import os"""
 csvdata={}
 cemicaldata=[]
 kakikae_list=[]
-motion_data={}
 #csvname = []
 
 with open('book1.csv',"r",encoding="utf-8_sig", newline='\r\n') as f:
@@ -74,14 +73,18 @@ def arrayGacha(array, probables):
             return item
         r -= prob
 
-def probability(num):
-    return random.uniform(0, 100) <= num
+def probably(num, code = 0):
+    res = random.uniform(0, 100) <= num;
+    if code!=0:
+        sendjs(str(res))
+    return res
 
-def sendData(text):
+def sendjs(text):
     for name in socketname:
         asynceventroop.create_task(name.send(text))
 
 nextIs=""
+kontext={}
 
 ock=["",]
 
@@ -206,6 +209,9 @@ async def handler(websocket):
             elif message[:10]=="item_pick_":
                 x=message[10:].split("_")
                 ock=[x[0],x[1]]
+            elif message[:5]=="heat_":#f"heat_{name}_{add_heat}"
+                x=message[5:].split("_")
+                inventry[x[0]][3]+=x[1]
             elif message[:11]=="input_item_":#f"imput_item_{name}_{x}_{y}_{item}"
                 x=message[11:].split("_")
                 inventry[str(x[0])][0]+=[[float(x[1]),float(x[2]),0,0,x[3]]]
@@ -218,10 +224,11 @@ async def handler(websocket):
             elif message[:16]=="create_inventry_":#f"create_invryentry_{name}_{windth}_{higth}_{onndo}_{aturyoku}"
                 x=message[16:].split("_")
                 inventry[x[0]]=[[],float(x[1]),float(x[2]),float(x[3]),float(x[4]),{},{}]
-            elif message[:14]=="open_inventry_":#f"open_inventry_{name}"
+            elif message[:14]=="open_inventry_" and message[14:] not in flag["inventry_name"]:#f"open_inventry_{name}"
                 await open_inventry(message[14:])
 
             #囧
+            
             elif message[:8]=="printTx,":
                 print(message[8:])
             
@@ -231,10 +238,41 @@ async def handler(websocket):
             elif message[:3]=="次は、" and message[-2:]=="です":
                 print("次は？") # 次は、${nextIS}です
                 nextIs = message[3:-2]
+                
+            elif message[:8]=="execute_":
+                kmes = message[8:]
+                if kmes.startswith("print"): # print,mes
+                    mu, mes = kmes.split(",")
+                    print(mes)
+                    return
+                
+                if kmes.startswith("変数"):
+                    mu, name, val1, val2 = kmes.split(",")
+                    if val2!="":
+                        kontext[name] = val1
+                    else:
+                        match val1:
+                            case "=":   kontext[name] =  val2
+                            case "+==": kontext[name] += val2
+                            case "+=":  kontext[name] += int(val2)
+                            case "-=":  kontext[name] -= int(val2)
+                            case "*=":  kontext[name] *= int(val2)
+                            case "/=":  kontext[name] /= int(val2)
+                            case _:     kontext[name] =  val1
+                    return
+                
+                if kmes.startswith("乱数生成"): #乱数生成,min,max
+                    mu, min, max = kmes.split(",")
+                    res = random.randint(int(min), int(max))
+                    kontext["乱数"] = res
+                    return
+                
+                
+                    
+                    
+                    
             #囧
 
-            elif message[:4]=="none":
-                pass
 
             
             else:
@@ -313,7 +351,7 @@ def plass_itembox_chack(tag,canvasname,rootname):
         itembox_item[tag]=oo
         pic_item="item_box"
     finally:
-        sendData("pick"+str(pic_item))
+        sendjs("pick"+str(pic_item))
     #elif pic_item in itembox_item.keys():
     #    if itembox_item[tag]!="":
     #        img["assets/images/item_box.png"]=tk.PhotoImage(file="assets/images/item_box.png", master=root[rootname])
@@ -325,8 +363,8 @@ def plass_itembox_chack(tag,canvasname,rootname):
 def red_button(e):
     global asynceventroop
     #def a():
-    sendData("logadd,「red_button」")
-    sendData("soundPlay,doom")
+    sendjs("logadd,「red_button」")
+    sendjs("soundPlay,doom")
     img=tk.PhotoImage(file="assets/images/red_buttn_on.png", master=root["red_button"])
     canvas["red_button"].itemconfigure("red_button",image=img)
     canvas["red_button"].image = img
@@ -352,20 +390,20 @@ def plass_command_box_delet():
 
 
 def plass_command_box_chack():
-    #sendData("logadd,pressed")
+    #sendjs("logadd,pressed")
     val = canvas["command_box_Entry"].get()
     print(f"chack-{val}")
-    sendData(f"logadd,入力 => {val}")#←おくれ！
+    sendjs(f"logadd,入力 => {val}")#←おくれ！
     canvas["command_box_Entry"].delete(0,tk.END)
     plass_command_box_button("chack")
     
 
 def plass_command_box_button(a):
     cl = str(a)
-    # sendData("logadd,command_box_pressed")
+    # sendjs("logadd,command_box_pressed")
     
     imgData = f"assets/images/{cl}_on.png"
-    if cl == "chack" and probability(3):
+    if cl == "chack" and probably(3): #random.randint(1,100)<=3:
         imgData = f"assets/images/{cl}_on_blue.png"
     
     
@@ -422,33 +460,39 @@ def window_del(rootPPP,itembox=[]):
 async def change_yuuten(motono_yuuten:int,motono_kiatu:int,atono_kiatu:int,j_mol:int,m3_mol:int) -> int:
     return (motono_yuuten+((motono_yuuten+273.15)*m3_mol/j_mol)*(atono_kiatu-motono_kiatu)*1000000)
 
-indens = [] #バック内のitemのdensリスト
-filld = {}# key=x 値=y
+filled = {} # x= , y= , dens
+num = 0
 async def hitbox(aaaaaa,bbbb,dens,width,hight,name): 
-    nom=0
-    gravity = False
-    indens.append(dens)
-    #bbbb=[["name",]...]　#気体密度,3,3/沸点　　←melt-yが何か調べる
-    #aaaaaa=[[x,y,ax,ay,item]..],width,hight,℃,Pa,{item:mutch,..}<-melt_item,{item:mutch,..}<-are_item
+    global inventry2
+    global num
+    gravity = True
+    now = [aaaaaa[0]//10,aaaaaa[1]//10,dens]
+    #bbbb=[["name",]...]　#気体密度,3,3/沸点　　←melt-yがわからん
+    #aaaaaa=[x,y,ax,ay,item]
     #cccc=name,融点 (℃),沸点 (℃),固体密度 (g/cm3) (20℃),液体密度,気体密度,融点気圧(Pa),沸点気圧(Pa),m3/mol,誘拐熱(J/mol),蒸発熱(J/mol),コメント
     #dens= 固体密度     itemの座標は中心で書かれている
-    #問題点：　他のと接触判定がない。→５pxずつ分けて　ｘの番号とｙの番号がおんなじになったとこはいけないようにする　移動範囲を指定してないので画面外まで動く。
+    #問題点：　他のと接触判定がない。たぶんできた　移動範囲を指定してないので画面外まで動く。jsに任せる
 
-    for i in indens:#下の物との密度計算して落ちるか決める
-        if dens >= i:
-            gravity = True
-            pass
-        pass
+    #if gravity == True:  #これだと一番重いやつしか動かん
+    if now not in filled and gravity == True:
+        if aaaaaa[3] >= 0:
+                goy = dens*(aaaaaa[3]**2)*4.8
+                aaaaaa[1] += -(goy)
+        if aaaaaa[2] >= 0:
+                gox = dens*(aaaaaa[2]**2)*4.8
+                aaaaaa[0] += -(gox) 
+        now = [aaaaaa[0]//10,aaaaaa[1]//10,dens]
+        if now in filled:
+            gravity = False
+            aaaaaa[1] += goy
+            aaaaaa[0] += gox
+            inventry2[name][0][0][1] = aaaaaa[1]
+            inventry2[name][0][0][0] = aaaaaa[0]
+        else:
+            filled[num] = [now] #10で割ったりして5pxごとに区切る x,yを使う
+            num += 1
 
-    #if gravity == True:                #これだと一番重いやつしか動かん
-    if aaaaaa[3] >= 0:
-            a = dens*(aaaaaa[3]**2)
-            aaaaaa[1] += -(a)
-    if aaaaaa[2] >= 0:
-            a= dens*(aaaaaa[2]**2)
-            aaaaaa[0] += -(a) 
-    filld[nom] =[aaaaaa[0],aaaaaa[1]] #5で割ったりして５ｐｘごとに区切る
-    nom += 1
+    
 
 async def change_taiseki(cm3:int,g_cm3_moto:int,g_cm3_ato:int):
     return (g_cm3_moto*cm3)/g_cm3_ato
@@ -476,7 +520,7 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                 write=False
                 if name in flag["inventry_name"]:
                     write=True
-                    canvas["inventry_root_"+str(name)].delete('all')
+                    canvas["inventry_root_"+str(name)].delete('item')
                 melt_y=[]
                 yw=0
                 melt_yw={}
@@ -486,19 +530,19 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                     # 勝手に変えるのは悪いかなと思いちょっと戻したが、いろいろと探究edしたのでそれを乗せときます
                     # index[5], index[2]をindex, indexにした後「serchはasyncやろ？ほなawait使わな」と。
                     # 仕方がないのでserchくんにawaitを付与。すると「line423、zisyo.items()ゆうてますけどzisyoはintですぜ？」と。
-                    # こっからはわかんなかったのであとは託しますわね それと、このメモは5年後に爆発します
+                    # こっからはわかんなかったのであとは託しますわね それと、このメモは5年後に爆発します☆彡
                     yw += b/index[2]
                     melt_y += [[a,b,yw]] 
                     melt_yw[a]=[b,yw]
                     if write:
                         for k in range(int((index[1]-yw)/50),int((index[1]-(yw-(b/index[2]))))/50):
                             for kk in range(int(index[2]/50)):
-                                canvas["inventry_root_"+str(name)].create_image(kk*50,k*50, image=img["assets/images/items/melt_"+str(a)+".png"])
+                                canvas["inventry_root_"+str(name)].create_image(kk*50,k*50, image=img[str(name)+"assets/images/items/melt_"+str(a)+".png"],tag="item")
                 for a,b in index[6]:
                     for k in range(int(yw/50)):
                         for kk in range(int(index[2]/50)):
 
-                            areid=canvas["inventry_root_"+str(name)].create_image(kk*50,k*50, image=img["assets/images/items/are_"+str(a)+".png"])
+                            areid=canvas["inventry_root_"+str(name)].create_image(kk*50,k*50, image=img[str(name)+"assets/images/items/are_"+str(a)+".png"],tag="item")
                             canvas["inventry_root_"+str(name)].lower(areid)
 
                         #canvas["inventry_root_"+str(name)].create_image(0,0, image=img[i[4]])
@@ -515,15 +559,8 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                         inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]+zzzzzz-50,onndo_2=inventry2[name][3])
                     else:
                         if write:
-                            canvas["inventry_root_"+str(name)].create_image(i[0], i[1], image=img["assets/images/items/"+str(i[4])+".png"])
+                            canvas["inventry_root_"+str(name)].create_image(i[0], i[1], image=img[str(name)+"assets/images/items/"+str(i[4])+".png"],tag="item")
                         await hitbox(aaaaaa=i,bbbb=melt_y,dens=inventry2[name][3],width=inventry2[name][1],hight=inventry2[name][2],name=name)
-                        #↓惜しいけど違うんだよな
-                        # コッペ => AIさん 「このあたりのコードの概要をコメントに書き連ねて、説明して」
-                        # このループでは、inventryの各アイテムについて、溶けるかどうかを判定
-                        # もし溶けるならば、hitboxを使用して移動させる
-                        # hitboxを使用することで、実際に移動するまでの時間を計算できる
-                        # よって、inventryの各アイテムのx座標を、hitboxのx座標に
-                        # inventryの各アイテムのy座標を、hitboxのy座標にして、hitboxのx座標、y座標を更新する
 
 
                 for key,i in index[5].items():
@@ -615,12 +652,18 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
 
 
 def motion(e,name):
-    motion_data["inventry_root_"+str(name)]=e
+    global ock
+    global img
+    #print("move")
+    if ock[0]!="":
+        #print(img[str(name)+"assets/images/items/"+str(ock[0])+".png"])
+        canvas["inventry_root_"+str(name)].delete('have')
+        canvas["inventry_root_"+str(name)].create_image(e.x,e.y, image=img[str(name)+"assets/images/items/"+str(ock[0])+".png"],tag="have")
 
 def click(e,name):
     global ock
     if ock[0]!="":
-        sendData("helasu")
+        sendjs("helasu")
         inventry[name][0]+=[[e.x,e.y,0,0,ock[0]]]
 
 
@@ -633,7 +676,7 @@ def click2(e,name):
                 cccc=a
                 break
         if cccc != "":
-            sendData("pick_"+inventry[name][0][cccc][4])
+            sendjs("pick_"+inventry[name][0][cccc][4])
             del inventry[name][0][cccc][4]
 
 def delete_inventry_GUI(name):
@@ -641,42 +684,51 @@ def delete_inventry_GUI(name):
     #print(canvas)
     #print(root)
     #print(motion_data)
+    a=[]
     flag["inventry_name"].remove(name)
-    del motion_data["inventry_root_"+str(name)]
+    for name2,index in img.items():
+        if str(name)+"assets/images/items/"==name2[:20+len(str(name))]:
+            a.append(name2)
+    for ax in a:
+        del img[ax]
+            
 
 #def inventry_GUI_update(name):
 #    canvas["inventry_root_"+str(name)].delete('all')
 #    for inventry[name]
 
-async def aaaaaaaaaaaaa():
-    for axzxz in os.listdir("./assets/images/items"):
-        try:
-            imggg=Image.open(f"./assets/images/items/{axzxz}")
-            imggg = imggg.resize((50, 50))
-            img["assets/images/items/"+str(axzxz)]=ImageTk.PhotoImage(imggg)
-        except Exception as e:
-            print(e)
-            pass
+
+
+def out(e,name):
+    canvas["inventry_root_"+str(name)].delete('have')
+
 
 async def open_inventry(name:str):
+    global img
     try:
         await delay(0)
         #print((name,type(name)))
         root["inventry_root_"+str(name)]=tk.Tk()
-        if flag["inventry_load"]:
-            flag["inventry_load"]=False
-            await aaaaaaaaaaaaa()
+        for axzxz in os.listdir("./assets/images/items"):
+            try:
+                imggg=Image.open(f"./assets/images/items/{axzxz}")
+                
+                imggg = imggg.resize((50, 50))
+                img[str(name)+"assets/images/items/"+str(axzxz)]=ImageTk.PhotoImage(imggg,master=root["inventry_root_"+str(name)])
+            except Exception as e:
+                print(e)
         root["inventry_root_"+str(name)].geometry(f"{str(int(inventry[name][1]))}x{str(int(inventry[name][2]))}+100+100")
         root["inventry_root_"+str(name)].attributes("-toolwindow",True)
         root["inventry_root_"+str(name)].attributes("-topmost", True)
         root["inventry_root_"+str(name)].resizable(False, False)
         canvas["inventry_root_"+str(name)] = tk.Canvas(master=root["inventry_root_"+str(name)],bg = "white", width = inventry[name][1],height = inventry[name][2])
         canvas["inventry_root_"+str(name)].place(x = 0,y = 0)
+        root["inventry_root_"+str(name)].bind("<Leave>",lambda e,name=name:out(e,name))
         root["inventry_root_"+str(name)].bind("<Motion>",lambda e,name=name:motion(e,name))
         root["inventry_root_"+str(name)].bind("<ButtonRelease-1>",lambda e,name=name:click(e,name))
         root["inventry_root_"+str(name)].bind("<ButtonPress-1>",lambda e,name=name:click2(e,name))
         root["inventry_root_"+str(name)].protocol("WM_DELETE_WINDOW",lambda name=name:delete_inventry_GUI(name))
-        flag["inventry_name"]=[str(name)]
+        flag["inventry_name"]+=[str(name)]
         #print(root)
         #root["inventry_root_"+str(name)].after(1,inventry_GUI_update,name)
     except asyncio.exceptions.CancelledError:

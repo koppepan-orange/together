@@ -6,9 +6,9 @@ name,融点 (℃),沸点 (℃),固体密度 (g/cm3) (20℃),液体密度,気体�
 
 inventry2[name][3]+or-=(1orinventry2[name][5][tag]orinventry2[name][6][tag])*100/(csvdata[key][7])*(csvdata[key][8]orcsvdata[key][9])*4.184*inventry2[name][1]*inventry2[name][2]
 
-1000000万円ください？♡
+1000000万円ください？♡ ←仕事してください
 
-name:{[[[x,y,ax,ay,item]..],width,hight,℃,Pa,{item:mutch,..}<-melt_item,{item:mutch,..}<-are_item]}
+  name:{[[[x,y,ax,ay,item]..],width,hight,℃,Pa,{item:mutch,..}<-melt_item,{item:mutch,..}<-are_item]}
 
 "コッペパン":{
     [

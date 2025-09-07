@@ -45,6 +45,12 @@
             "request": "launch",
             "name": "ボーイミーツガールなら男女",
             "file": "koppe/dungeon/index.html"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "2Dで！ あそぼう！！",
+            "file": "koppe/simpleTwo/index.html"
         }
     ],                                                                                                                                              
 }

@@ -329,14 +329,14 @@ async function addtext(raw){
         type();
     });
 }
-document.addEventListener('keydown', (event) => {
-    if(event.key === 'z' || event.key === 'Enter'){
+document.addEventListener('keydown', (e) => {
+    if(e.key === 'z' || e.key === 'Enter'){
         skipText = true;
     }
 });
 
-document.addEventListener('keyup', (event) => {
-    if(event.key === 'z' || event.key === 'Enter'){
+document.addEventListener('keyup', (e) => {
+    if(e.key === 'z' || e.key === 'Enter'){
         skipText = false;
     }
 });
@@ -457,7 +457,6 @@ function connect(){
     // エラー発生時の処理
     webSocket.onerror = function(message){
         logadd("errrrrrrrrrrrrrrrrrrr");
-        Senvonbary_Gyosatsu();
     };
 
     // 受け取ったとき
@@ -494,64 +493,63 @@ function disconnect(){
 }
 
 //#region reads
-let executions = {}
-async function execute(arr){
-   let [functionName, ...args] = arr;
-   await executions[functionName](...args);
-}
-
-async function loadScriptFile(path){
-   const res = await fetch(path);
-   if (!res.ok) throw new Error('読み込み失敗');
-   const text = await res.text();
-   return text.split('\n').map(line => line.trim()).filter(Boolean); // 空行は除く
-}
+let allScripts = {};
 async function loadScriptFile(src){
-   const url = `assets/txts/${src}.txt`;
-   const res = await fetch(url);
+    const url = `assets/txts/${src}.txt`;
+    console.log(url);
+    const res = await fetch(url);
 
-   const text = await res.text();
-   const lines = text.split(/\r?\n/);
+    const text = await res.text();
+    const lines = text.split(/\r?\n/);
 
-   let currentSection = null;
-   let sections = {};
+    let currentSection = null;
+    let sections = {};
 
-   for(let line of lines){
-      line = line.trim();
-      if(line == '' || line.startsWith('//')) continue;
+    for(let line of lines){
+        line = line.trim();
+        if(line == '' || line.startsWith('//')) continue;
 
-      if(line.startsWith('@')){
-         currentSection = line.slice(1).trim();
-         sections[currentSection] = [];
-         continue;
-      }
+        if(line.startsWith('@')){
+            currentSection = line.slice(1).trim();
+            sections[currentSection] = [];
+            continue;
+        }
 
-      if(currentSection){
-         sections[currentSection].push(line);
-      }
-   }
+        if(currentSection){
+            sections[currentSection].push(line);
+        }
+    }
 
-   allScripts[src] = sections
+    allScripts[src] = sections
 
-   return sections;
+    return sections;
 }
 
 
 const context = {};
 let readed = [];
+let nowread = '';
+async function execute(src, event){
+    let section = allScripts[src][event];
+    if(!section) await loadScriptFile(src), execute(src, event);
 
-async function read(gen){
+    nowread = [src, event];
+    await read(section, 'arrayed');
+}
+async function read(gen, type = 'organic'){
     // logadd(`原材料: ${gen}`)
-    readed.push(gen);
+    if(type == 'organic') readed.push(gen);
+    if(type == 'arrayed') readed.push(gen.join('\n'));
 
-    let bunkatsu = gen.split('\n'); // "\n" で分割
+    let bunkatsu = gen;
+    if(type == 'organic') bunkatsu = gen.split('\n'); // "\n" で分割
 
     const stack = []; // 制御構文のネスト追跡
     let skip = false; // 現在この行を無視すべきか？
 
     // continueされた == その行は飛ばされた, 処理が終了した
     for(let moto of bunkatsu){
-        // console.log(stack)
+        console.log(stack)
 
         let raw = moto.trim().split(','); // "," で分割
         if(raw.length == 0) continue;
@@ -583,16 +581,16 @@ async function read(gen){
         }
         // console.log('↑↑↑↑↑')
 
-        console.log(line)
-
         let cmd = line[0]
 
         if(cmd == 'if'){
             let [, left, operator, right] = line;
             let condition = false;
             switch(operator){
-                case '==': condition = +left == +right; break;
-                case '!=': condition = +left != +right; break;
+                case '==': condition =  left ==  right; break;
+                case '===':condition = +left == +right; break;
+                case '!=': condition =  left !=  right; break;
+                case '!==':condition = +left != +right; break;
                 case '<':  condition = +left <  +right; break;
                 case '>':  condition = +left >  +right; break;
                 case '<=': condition = +left <= +right; break;
@@ -630,9 +628,20 @@ async function read(gen){
 }
 async function enter(line){
     switch(line[0]){
+        case '終了':{
+            return 'break';
+        }
+
+        case 'イベント実行':{
+            let [, name] = line;
+            let src = nowread[0];
+            execute(src, name);
+            break;
+        }
+
         case 'log':{
             let [, text] = line;
-            logadd(text);
+            logadd(text); //python用
             break;
         }
 
@@ -655,7 +664,7 @@ async function enter(line){
                     case '*=': context[name] *= +value2; break;
                     case '/=': context[name] /= +value2; break;
                 }
-                console.log(`=> ${context[name]}`);
+                console.log(`            => ${context[name]}`);
             }else{
                 context[name] = value;
             }
@@ -665,7 +674,7 @@ async function enter(line){
         case '乱数生成':{
             let [, min, max] = line.map(Number);
             let num = random(min, max);
-            console.log(`乱数生成:: ${min} ~ ${max} => ${num}`);
+            console.log(`乱数生成:: ${min}～${max} => ${num}`);
             context['乱数'] = num;
             break;
         };
@@ -691,6 +700,7 @@ async function enter(line){
         case 'セリフ':{
             let [, text] = line;
             await addtext(`${context['話者']}「${text}」`);
+            console.log(`セリフ:: ${context['話者']}「${text}」`)
             break;
         };
         
@@ -890,8 +900,8 @@ async function mayImport(){
         document.querySelector(`.floatdiv.draggable.${moto} .list`).style.height = `0px`;
     }
 }
-// document.addEventListener('mouseenter', event => {
-//     let e = event.target;
+// document.addEventListener('mouseenter', e => {
+//     let e = e.target;
 //     if(!e) return 0;
 //     if(!e.classList.contains('floatdiv')) return 0;
 //     let list = e.querySelector('.list');
@@ -899,8 +909,8 @@ async function mayImport(){
 //     list.style.height = 'auto';
 // });
 
-// document.addEventListener('mouseleave', event => {
-//     let e = event.target;
+// document.addEventListener('mouseleave', e => {
+//     let e = e.target;
 //     if(!e) return 0;
 //     if(!e.classList.contains('floatdiv')) return 0;
 //     let list = e.querySelector('.list');
@@ -911,13 +921,13 @@ async function mayImport(){
 //#endregion may
 */
 
-//#region ビッグマシュマロ（唐突）
+//#region ビッグマシュマロ?（唐突）
 let bigmmD = document.getElementById('bigmashmaro');
 let bigmmC = {
     kitekeyD: bigmmD.querySelector('.kitekey'),
     bodyD:bigmmD.querySelector('.bodies'),
 }
-bigmmC.kitekeyD.addEventListener('click', () =>{
+bigmmC.kitekeyD.addEventListener('click', async function(){
     bigmmC.kitekeyD.classList.toggle('tap');
     bigmmC.bodyD.classList.toggle('tap');
 
@@ -925,7 +935,17 @@ bigmmC.kitekeyD.addEventListener('click', () =>{
     bigmmC.bodyD.value = '';
     if(gen == '') return;
     
-    read(gen)
+    if(gen.startsWith('execute,')){
+        [, wanchan, wanchan2] = gen.split(',');
+        if(allScripts[wanchan]) await read(allScripts[wanchan][wanchan2], 'arrayed');
+        else read(gen)
+    }
+
+    if(gen.startsWith('loadfile,')){
+        [, src, event] = gen.split(',');
+        await loadScriptFile(src);
+        read(allScripts[src][event], 'arrayed')
+    };
 })
 //#endregion bigmashmaro
 
@@ -1342,7 +1362,7 @@ function mapMake(){
     }
     //#endregion
     
-    sendpyTx('none,------------------mapmaked-------------------')
+    sendpyTx('printTx,------------------mapmaked-------------------')
 
     drawGrid();
 
