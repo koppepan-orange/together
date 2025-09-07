@@ -56,8 +56,8 @@ function arrayGacha(array,probability){
         random -= probability[i];
     }
 };
-function hask(obj, key){
-   let res = obj.hasOwnProperty(key);
+function hask(ob, key){
+   let res = ob.hasOwnProperty(key);
    res = res ? 1 : 0;
    return res;
 }
@@ -70,13 +70,13 @@ function copy(moto) {
         return arr;
     }
     else if(moto != null && typeof moto == 'object'){
-        let obj = {};
+        let ob = {};
         for (let key in moto) {
             if (moto.hasOwnProperty(key)) {
-            obj[key] = copy(moto[key]);
+            ob[key] = copy(moto[key]);
             }
         }
-        return obj;
+        return ob;
     }
     else {
         return moto;
@@ -414,7 +414,7 @@ document.addEventListener('mousedown', e => {
 let imageNamesL = 0;
 let images = {};
 let imageNames = {
-    'players': ['select','溶け込む人'],
+    'players': ['slime','peace-witch_','peace-witch_oncat','ghost'],
     'enemies': ['シーフード','フルメカシーフード','キャンディ','キャンディ亜種','チンアナゴ','フルメカチンアナゴ'],
     'systems': ['x','error']
 };
@@ -452,7 +452,6 @@ Object.keys(imageNames).forEach(belong=>{
     });
 });
 
-
 let soundsLoaded = 0;
 let sounds = {};
 let soundsNames = [];
@@ -471,6 +470,7 @@ soundsNames.forEach(num => {
 }); 
 //#endregion 画像&?の読み込み
 
+//#region canvas
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 let mas = 24;
@@ -482,17 +482,31 @@ function resizeCanvas() {
     canvas.height = window.innerHeight;
     size = wid / mas;
 
-    let ground = tiles.find(a => a.id == 0);
+    let ground = tiles.find(a => a.id == 2);
     ground.width = wid;
     ground.x = 0;
     ground.y = canvas.height - 40;
+    let upperS = tiles.find(a => a.id == 0);
+    upperS.height = 40;
+    upperS.x = 0;
+    upperS.y = -40;
+    let rightS = tiles.find(a => a.id == 3);
+    rightS.height = canvas.height;
+    rightS.x = canvas.width;
+    rightS.y = 0;
+    let leftS = tiles.find(a => a.id == 1);
+    leftS.height = canvas.height;
+    leftS.x = -40;
+    leftS.y = 0;
     
     for(let tl of tiles){
         tl.y = ground.y - tl.height;
     }
 }
 window.addEventListener('resize', resizeCanvas);
+// #endregion canvas
 
+//#region keys
 const keys = {};
 document.addEventListener('keydown', e => {
     let key = e.key.toLowerCase();
@@ -504,13 +518,62 @@ document.addEventListener('keyup', e => {
     if(e.key == ' ') key = 'space';
     keys[key] = 0;
 });
+// #endregion keys
 
+//#region tiles
+const tiles = [
+    {id:0, x:0, y:-40, width:canvas.width, height:40, color:'#000', attribute:['undest']},
+    {id:1, x:-40, y:0, width:40, height:canvas.height, color:'#000', attribute:['undest']},
+    {id:2, x:0, y:canvas.height-40, width:canvas.width, height:40, color:'#000', attribute:['undest']},
+    {id:3, x:canvas.width, y:0, width:40, height:canvas.height, color:'#000', attribute:['undest']},
+    {id:4, x:200, y:320, width:60, height:40, color:'#add8e6', attribute:[]},
+    {id:5, x:400, y:280, width:60, height:80, color:'#add8e6', attribute:[]},
+];
+function attrAdd(tl, name){
+    if(tl.attribute.includes(name)) return 0;
+    tl.attribute.push(name);
+    return 1;
+}
+function attrRem(tl, name){
+    if(!tl.attribute.includes(name)) return 0;
+    tl.attribute.splice(tl.attribute.indexOf(name), 1);
+    return 1;
+}
+// #endregion tiles
+
+function draw() {
+    ctx.fillStyle = '#888';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    tiles.forEach(tl => {
+        ctx.fillStyle = tl.color;
+        ctx.fillRect(tl.x, tl.y, tl.width, tl.height);
+    });
+
+    // ctx.fillStyle = player.color;
+    // ctx.fillRect(player.x, player.y, player.width, player.height);
+    objs.forEach(ob => {
+        if(hask(ob, 'img')){
+            let [be, nm] = ob.img.split('/');
+            let img = images[be][nm];
+            ctx.drawImage(img, ob.x, ob.y, ob.width, ob.height);
+            return;
+        }
+        else{
+            if(!ob.color) console.log('色なし'), ob.color = '#bb00ff';
+            ctx.fillStyle = ob.color;
+            ctx.fillRect(ob.x, ob.y, ob.width, ob.height);
+        }
+    })
+}
+
+// #region objs
 let objs = [
     {
         id: 0,
         name: 'player',
         type: 'player',
-        img: 'players/select',
+        img: 'players/slime',
         x: 50,
         y: 300,
         width: 40,
@@ -522,29 +585,51 @@ let objs = [
         jumP: -10,
         gravity: 0.5,
         grounded: 0,
+        props:[],
+        have:[],
     }
 ]
 
+function propAdd(ob, name){
+    if(ob.props.includes(name)) return 0;
+    ob.props.push(name);
+    return 1;
+}
+function propRem(ob, name){
+    if(!ob.props.includes(name)) return 0;
+    ob.props.splice(ob.props.indexOf(name), 1);
+    return 1;
+}
+// #endregion objs
 
-const tiles = [
-    {id:0, x:0, y:360, width:canvas.width, height:40, color:'#000', attribute:[]},
-    {id:1, x:200, y:320, width:60, height:40, color:'#add8e6', attribute:[]},
-    {id:2, x:400, y:280, width:60, height:80, color:'#add8e6', attribute:[]},
-];
-
+// #region player
 function update() {
     let player = objs.find(a => a.name == 'player');
+    let has = (name) => player.have.includes(name);
     let hasa = (tl, name) => tl.attribute.includes(name);
+    let hasp = (ob, name) => ob.props.includes(name);
     
     player.dx = 0;
-    if(keys['a']) player.dx = -player.spd;
-    if(keys['d']) player.dx = player.spd;
-    if(keys['w'] && player.grounded){
+    let spd = player.spd;
+    if(keys.a){
+        if(keys.space && has('dashTabi')) spd *= 10;
+        player.dx = -spd;
+    }
+    if(keys.d){
+        if(keys.space && has('dashTabi')) spd *= 10;
+        player.dx = spd;
+    }
+    if(keys.w && player.grounded){
         player.dy = player.jumP;
         player.grounded = 0;
     }
-    if(keys['s'] && !player.grounded) player.dy += 1; // 急降下
+    if(keys.q && keys.e && has('jetPack')){
+        player.dy = player.jumP*0.6;
+        player.grounded = 0;
+    }
+    if(keys.s && !player.grounded) player.dy += 1; // 急降下
 
+    if(player)
     player.dy += player.gravity;
     player.x += player.dx;
     player.y += player.dy;
@@ -558,88 +643,130 @@ function update() {
     }
 
     // 障害物との衝突
-    tiles.forEach(obs => {
+    for(let tl of tiles){
+        if(hasp(player, 'ghost')) continue;
+
         if(
-            player.x < obs.x + obs.width &&
-            player.x + player.width > obs.x &&
-            player.y < obs.y + obs.height &&
-            player.y + player.height > obs.y
+            player.x < tl.x + tl.width &&
+            player.x + player.width > tl.x &&
+            player.y < tl.y + tl.height &&
+            player.y + player.height > tl.y
         ){
             // 上から着地
-            if(player.dy > 0 && player.y + player.height - player.dy <= obs.y){
-                player.y = obs.y - player.height;
+            if(player.dy > 0 && player.y + player.height - player.dy <= tl.y){
+                player.y = tl.y - player.height;
                 player.dy = 0;
                 player.grounded = 1;
             }
 
             // 下から頭ぶつけ
-       else if(player.dy < 0 && player.y >= obs.y + obs.height - player.dy && !hasa(obs, 'pane')){
-                player.y = obs.y + obs.height;
+       else if(player.dy < 0 && player.y >= tl.y + tl.height - player.dy && !hasa(tl, 'pane')){
+                player.y = tl.y + tl.height;
                 player.dy = 0;
             }
 
             // 横からぶつかり
-       else if(player.dx > 0 && !hasa(obs, 'pane')){
-                player.x = obs.x - player.width;
+       else if(player.dx > 0 && !hasa(tl, 'pane')){
+                player.x = tl.x - player.width;
             }
-       else if(player.dx < 0 && !hasa(obs, 'pane')){
-                player.x = obs.x + obs.width;
+       else if(player.dx < 0 && !hasa(tl, 'pane')){
+                player.x = tl.x + tl.width;
             }
         }
-    });
+    };
 
 }
-
-
-function draw() {
-    ctx.fillStyle = '#888';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    tiles.forEach(obs => {
-        ctx.fillStyle = obs.color;
-        ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
-    });
-
-    // ctx.fillStyle = player.color;
-    // ctx.fillRect(player.x, player.y, player.width, player.height);
-    objs.forEach(obj => {
-        if(hask(obj, 'img')){
-            let [be, nm] = obj.img.split('/');
-            let img = images[be][nm];
-            ctx.drawImage(img, obj.x, obj.y, obj.width, obj.height);
-            return;
-        }
-        else{
-            if(!obj.color) console.log('色なし'), obj.color = '#bb00ff';
-            ctx.fillStyle = obj.color;
-            ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
-        }
-    })
-}
-
-document.addEventListener("keydown", (e) => {
+document.addEventListener("keydown", async  function(e){
     let player = objs.find(a => a.name == 'player');
-    if(e.key == " "){
+    let has = (name) => player.have.includes(name);
+    if(keys.v && has('cloudPowder')){
         let newAshiba = {
+            id: tiles.length,
             x: (player.x - 10),
             y: (player.y + 40), 
             width: 60,
             height: 5,
-            color: '#add8e6',
+            color: '#ffffffd0',
             attribute:["pane"]
         };
         tiles.push(newAshiba);
 
         setTimeout(() => {
-            // newAshibaをobstaclesから削除
             const index = tiles.indexOf(newAshiba);
             if (index > -1) {
                 tiles.splice(index, 1);
             }
         }, 3000);
     }
+    if(keys.shift && has('shadowRing')){
+        propAdd(player, 'ghost');
+        player.img = 'players/ghost';
+        while(keys.shift){
+            await delay(10);
+        }
+        propRem(player, 'ghost');
+        player.img = 'players/slime';
+    }
 });
 
+function haveAdd(name){
+    let player = objs.find(a => a.name == 'player');
+    if(player.have.includes(name)) return 0;
+    player.have.push(name);
+    return 1;
+}
+function haveRem(name){
+    let player = objs.find(a => a.name == 'player');
+    if(!player.have.includes(name)) return 0;
+    player.have.splice(player.have.indexOf(name), 1);
+    return 1;
+}
+// #endregion player
+
+// #region debug
+let debD = document.getElementById('debug');
+let debC = {
+    btsD: debD.querySelector('.buttons'),
+    mtlD: debD.querySelector('.tile'),
+    mobD: debD.querySelector('.obj'),
+    tog: 0
+}
+document.addEventListener('keydown', e => {
+    if(e.key == 'g') debD.classList.toggle('tog'), debC.tog = !debC.tog;
+})
+
+let name = 'これが出ていると言うことは、エラーということです！'
+debC.btsL = [
+    {
+        id: 'equip',
+        name:'装備着装',
+        func: function(){
+            let player = objs.find(a => a.name == 'player');
+            let arr = ['pickaxe','cloudPowder','jetPack','dashTabi','shadowRing'];
+            //初めてthisをまともに使えたかも...
+            if(this.name == '装備着装'){
+                arr.forEach(name => haveAdd(name));
+                this.name = '装備解除';
+            }
+            else if(this.name == '装備解除'){
+                arr.forEach(name => haveRem(name));
+                this.name = '装備着装';
+            }
+            debC.btsD.querySelector('.bt.equip').textContent = this.name;
+        }
+    },
+]
+debC.btsL.forEach(b => {
+    let bt = document.createElement('button');
+    bt.className = `bt ${b.id}`;
+    bt.textContent = b.name;
+    bt.addEventListener('click', () => {b.func()});
+    debC.btsD.appendChild(bt);
+})
+// #endregion debug
+
+
+// それから...
 function start(){
     resizeCanvas();
     gameloop();
