@@ -619,7 +619,7 @@ function update() {
         if(keys.space && has('dashTabi')) spd *= 10;
         player.dx = spd;
     }
-    if(keys.w && player.grounded){
+    if(keys.w && (player.grounded || hasp(player, 'ghost'))){
         player.dy = player.jumP;
         player.grounded = 0;
     }
@@ -629,7 +629,6 @@ function update() {
     }
     if(keys.s && !player.grounded) player.dy += 1; // 急降下
 
-    if(player)
     player.dy += player.gravity;
     player.x += player.dx;
     player.y += player.dy;
@@ -679,7 +678,8 @@ function update() {
 document.addEventListener("keydown", async  function(e){
     let player = objs.find(a => a.name == 'player');
     let has = (name) => player.have.includes(name);
-    if(keys.v && has('cloudPowder')){
+    if(e.key == 'r') debC.btsL.find(a => a.id == 'respawn').func();
+    if(e.key == 'v' && has('cloudPowder')){
         let newAshiba = {
             id: tiles.length,
             x: (player.x - 10),
@@ -701,10 +701,12 @@ document.addEventListener("keydown", async  function(e){
     if(keys.shift && has('shadowRing')){
         propAdd(player, 'ghost');
         player.img = 'players/ghost';
+        player.jumP *= 9/10
         while(keys.shift){
             await delay(10);
         }
         propRem(player, 'ghost');
+        player.jumP *= 10/9
         player.img = 'players/slime';
     }
 });
@@ -726,6 +728,7 @@ function haveRem(name){
 // #region debug
 let debD = document.getElementById('debug');
 let debC = {
+    disD: debD.querySelector('.display'),
     btsD: debD.querySelector('.buttons'),
     mtlD: debD.querySelector('.tile'),
     mobD: debD.querySelector('.obj'),
@@ -735,8 +738,26 @@ document.addEventListener('keydown', e => {
     if(e.key == 'g') debD.classList.toggle('tog'), debC.tog = !debC.tog;
 })
 
-let name = 'これが出ていると言うことは、エラーということです！'
+function deb_tekiou(){
+    let player = objs.find(a => a.name == 'player');
+    debC.disD.querySelector('.pos').textContent = `x:${player.x.toFixed(0)}, y:${player.y.toFixed(0)}`;
+    debC.disD.querySelector('.spd').textContent = `dx:${player.dx.toFixed(0)}, dy:${player.dy.toFixed(0)}`;
+    debC.disD.querySelector('.grd').textContent = `grounded:${player.grounded}`;
+    debC.disD.querySelector('.prop').textContent = `prop:[${player.props}]`;
+    debC.disD.querySelector('.have').textContent = `have:[${player.have}]`;
+}
+
 debC.btsL = [
+    {
+        id: 'respawn',
+        name:'リスポーン',
+        func: function(){
+            nicoText('respawnded!!')
+            let player = objs.find(a => a.name == 'player');
+            player.dx = 0, player.dy = 0;
+            player.x = 50, player.y = 810;
+        }
+    },
     {
         id: 'equip',
         name:'装備着装',
@@ -746,10 +767,13 @@ debC.btsL = [
             //初めてthisをまともに使えたかも...
             if(this.name == '装備着装'){
                 arr.forEach(name => haveAdd(name));
+                nicoText('かぼちゃ、着装！');
+                nicoText('じゃぎ～ん')
                 this.name = '装備解除';
             }
             else if(this.name == '装備解除'){
                 arr.forEach(name => haveRem(name));
+                nicoText('装甲、損傷...')
                 this.name = '装備着装';
             }
             debC.btsD.querySelector('.bt.equip').textContent = this.name;
@@ -777,6 +801,7 @@ let looped = 0;
 function gameloop() {
     update();
     draw();
+    if(debC.tog) deb_tekiou();
 
     if(loop) requestAnimationFrame(gameloop);
 }

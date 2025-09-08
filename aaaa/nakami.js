@@ -492,6 +492,30 @@ function disconnect(){
     webSocket.close();
 }
 
+
+function cocGacha(num = 1){
+    let zen = []
+    for(let i = 0; i < num; i++){
+        let list = [
+            Friends.filter(a => a.rare == 3),
+            Friends.filter(a => a.rare == 2),
+            Friends.filter(a => a.rare == 1),
+        ];
+        let sl = 0;
+        let r = random(0,99);
+        let s = 0;
+        if(r < 3) sl = list[0], s = 3;
+        if(3 <= r&& r < 20) sl = list[1] , s = 2;
+        if(20 <= r) sl = list[2] , s = 1;
+        
+        let item = arraySelect(sl);
+        let n = `${item.name}(${item.ruby}) [☆${s}]`;
+        zen.push(n);
+    }
+    
+    return zen
+}
+
 //#region reads
 let allScripts = {};
 async function loadScriptFile(src){
@@ -748,7 +772,7 @@ function revision(moto){
 }
 //#endregion
 
-
+//may
 /*
 //#region may
 let mayList = document.getElementById('mayList');
@@ -921,7 +945,7 @@ async function mayImport(){
 //#endregion may
 */
 
-//#region ビッグマシュマロ?（唐突）
+//#region ビッグマシュマロ（唐突）
 let bigmmD = document.getElementById('bigmashmaro');
 let bigmmC = {
     kitekeyD: bigmmD.querySelector('.kitekey'),
@@ -955,14 +979,17 @@ let rainC = {
     tapend: 0
 }
 rainB.addEventListener('click', () => {
-    let f = 0;
-    if(rainC.tapend) f = 1, rainC.tapend = 0;
-                else f = 0, rainC.tapend = 1;
+    // let f = 0;
+    // if(rainC.tapend) f = 1, rainC.tapend = 0;
+    //             else f = 0, rainC.tapend = 1;
 
-    document.querySelectorAll('*').forEach(el => {
-        if(f) el.classList.remove('rainback');
-        if(!f) el.classList.add('rainback');
-    });
+    // document.querySelectorAll('*').forEach(el => {
+    //     if(f) el.classList.remove('rainback');
+    //     if(!f) el.classList.add('rainback');
+    // });
+
+    let list = cocGacha();
+    for(a of list) sendpyTx(`printTx,${a}`)
 });
 //#endregion rainbow
 
@@ -1160,17 +1187,22 @@ function inv_pick_decr(){
 
 document.addEventListener('mousemove', e => {
     if(pickItem){
+        pickItem.style.display = 'none';
         pickItem.style.left = e.pageX - pickItem.offsetWidth/2 + 'px';
         pickItem.style.top  = e.pageY - pickItem.offsetHeight/2 + 'px';
         inv_tekiou();
+
+
     }
 });
+window.addEventListener('mouseleave', () => {
+    if(pickItem) pickItem.style.display = 'none';  
+})
 
 
 
 
 //#endregion イシイ
-
 
 //#region canvas
 let canV = document.getElementById('canvas');
