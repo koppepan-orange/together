@@ -483,7 +483,8 @@ function sendpy(content){
 };
 function sendpyTx(text){
     if(IranMikans[text]) return 0;
-    logadd(`Send => ${text}`);
+    
+    logadd(`Send => ${text.replace(/pr  intTx,/g, () => '').replace(/print,/g, () => '')}`);
     webSocket.send(text);
 };
 
@@ -493,27 +494,31 @@ function disconnect(){
 }
 
 
-function cocGacha(num = 1){
-    let zen = []
-    for(let i = 0; i < num; i++){
-        let list = [
-            Friends.filter(a => a.rare == 3),
-            Friends.filter(a => a.rare == 2),
-            Friends.filter(a => a.rare == 1),
-        ];
-        let sl = 0;
-        let r = random(0,99);
-        let s = 0;
-        if(r < 3) sl = list[0], s = 3;
-        if(3 <= r&& r < 20) sl = list[1] , s = 2;
-        if(20 <= r) sl = list[2] , s = 1;
-        
-        let item = arraySelect(sl);
-        let n = `${item.name}(${item.ruby}) [☆${s}]`;
-        zen.push(n);
+
+function cocGacha(code = 0){
+    let list = [
+        Friends.filter(a => a.rare == 1),
+        Friends.filter(a => a.rare == 2),
+        Friends.filter(a => a.rare == 3),
+    ];
+    let sl = 0;
+    let s = 0;
+    let r = random(0,99);
+    if(r < 3) s = 3;
+    if(3 <= r&& r < 20) s = 2;
+    if(20 <= r) s = 1;
+    
+    if(code) s = code;
+
+    sl = list[s-1];
+    
+    let item = arraySelect(sl);
+    let n = `${item.name}(${item.ruby}) [☆ ${s}]`;
+    if(s == 3){
+        n = `ミミミミミミミミミ   ${n}   ミミミミミミミミミ`;
     }
     
-    return zen
+    return n
 }
 
 //#region reads
@@ -988,8 +993,8 @@ rainB.addEventListener('click', () => {
     //     if(!f) el.classList.add('rainback');
     // });
 
-    let list = cocGacha();
-    for(a of list) sendpyTx(`printTx,${a}`)
+    let item = cocGacha();
+    sendpyTx(`printTx,${item}`);
 });
 //#endregion rainbow
 
