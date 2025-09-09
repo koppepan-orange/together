@@ -1,0 +1,34 @@
+
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: sans-serif;
+}
+#toolbar {
+    background: #eee;
+    padding: 5px;
+}
+#grid {
+    flex: 1;
+    position: relative;
+    background: #ccc;
+    overflow: hidden;
+}
+.item {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: white;
+    border: 1px solid #888;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    user-select: none;
+}
+.item.selected {
+    border: 2px solid blue;
+}
