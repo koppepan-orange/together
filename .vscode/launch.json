@@ -51,6 +51,12 @@
             "request": "launch",
             "name": "2Dで！ あそぼう！！",
             "file": "koppe/simpleTwo/index.html"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "暇な時によくやる遊び-inGame!",
+            "file": "koppe/boaringMac/index.html"
         }
     ],                                                                                                                                              
 }

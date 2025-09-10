@@ -19,3 +19,9 @@ pip install -r requirements.txt
 ベスティアリのカニ、ベスティガニ（辞書の英訳はベスティアリ）
 ツカレタノデヤメルニウム、水色ってことにするね（勝手）
 #https://discord.com/channels/1393190645086289940/1401180971470163969/1411929514149281794
+
+create_inventry_koppe_300_300_20_101325
+open_inventry_koppe
+printTx,------------------mapmaked-------------------
+js get()
+item_pick_石_2

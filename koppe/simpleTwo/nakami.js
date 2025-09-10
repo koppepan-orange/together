@@ -522,10 +522,10 @@ document.addEventListener('keyup', e => {
 
 //#region tiles
 const tiles = [
-    {id:0, x:0, y:-40, width:canvas.width, height:40, color:'#000', attribute:['undest']},
-    {id:1, x:-40, y:0, width:40, height:canvas.height, color:'#000', attribute:['undest']},
-    {id:2, x:0, y:canvas.height-40, width:canvas.width, height:40, color:'#000', attribute:['undest']},
-    {id:3, x:canvas.width, y:0, width:40, height:canvas.height, color:'#000', attribute:['undest']},
+    {id:0, x:0, y:-40, width:canvas.width, height:40, color:'#000', attribute:['undest', 'base']},
+    {id:1, x:-40, y:0, width:40, height:canvas.height, color:'#000', attribute:['undest', 'base']},
+    {id:2, x:0, y:canvas.height-40, width:canvas.width, height:40, color:'#000', attribute:['undest', 'base']},
+    {id:3, x:canvas.width, y:0, width:40, height:canvas.height, color:'#000', attribute:['undest', 'base']},
     {id:4, x:200, y:320, width:60, height:40, color:'#add8e6', attribute:[]},
     {id:5, x:400, y:280, width:60, height:80, color:'#add8e6', attribute:[]},
 ];
@@ -612,11 +612,11 @@ function update() {
     player.dx = 0;
     let spd = player.spd;
     if(keys.a){
-        if(keys.space && has('dashTabi')) spd *= 10;
+        if(keys.space && has('dashTabi') && player.dashIng != 1) spd *= 10, player.dashIng = -1;
         player.dx = -spd;
     }
     if(keys.d){
-        if(keys.space && has('dashTabi')) spd *= 10;
+        if(keys.space && has('dashTabi') && player.dashIng != -1) spd *= 10, player.dashIng = 1;
         player.dx = spd;
     }
     if(keys.w && (player.grounded || hasp(player, 'ghost'))){
@@ -628,6 +628,9 @@ function update() {
         player.grounded = 0;
     }
     if(keys.s && !player.grounded) player.dy += 1; // 急降下
+
+    if(!keys.a && !keys.d) player.dashIng = 0;
+    
 
     player.dy += player.gravity;
     player.x += player.dx;
@@ -643,7 +646,6 @@ function update() {
 
     // 障害物との衝突
     for(let tl of tiles){
-        if(hasp(player, 'ghost')) continue;
 
         if(
             player.x < tl.x + tl.width &&
@@ -653,6 +655,7 @@ function update() {
         ){
             // 上から着地
             if(player.dy > 0 && player.y + player.height - player.dy <= tl.y){
+                if(!hasa(tl, 'base') && hasp(player, 'ghost')) continue;
                 player.y = tl.y - player.height;
                 player.dy = 0;
                 player.grounded = 1;
@@ -660,15 +663,18 @@ function update() {
 
             // 下から頭ぶつけ
        else if(player.dy < 0 && player.y >= tl.y + tl.height - player.dy && !hasa(tl, 'pane')){
+                if(!hasa(tl, 'base') && hasp(player, 'ghost')) continue;
                 player.y = tl.y + tl.height;
                 player.dy = 0;
             }
 
             // 横からぶつかり
        else if(player.dx > 0 && !hasa(tl, 'pane')){
+                if(!hasa(tl, 'base') && hasp(player, 'ghost')) continue;
                 player.x = tl.x - player.width;
             }
        else if(player.dx < 0 && !hasa(tl, 'pane')){
+                if(!hasa(tl, 'base') && hasp(player, 'ghost')) continue;
                 player.x = tl.x + tl.width;
             }
         }
@@ -678,6 +684,7 @@ function update() {
 document.addEventListener("keydown", async  function(e){
     let player = objs.find(a => a.name == 'player');
     let has = (name) => player.have.includes(name);
+    let hasp = (ob, name) => ob.props.includes(name);
     if(e.key == 'r') debC.btsL.find(a => a.id == 'respawn').func();
     if(e.key == 'v' && has('cloudPowder')){
         let newAshiba = {
@@ -698,13 +705,11 @@ document.addEventListener("keydown", async  function(e){
             }
         }, 3000);
     }
-    if(keys.shift && has('shadowRing')){
+    if(keys.shift && has('shadowRing') && !hasp(player, 'ghost')){
         propAdd(player, 'ghost');
         player.img = 'players/ghost';
         player.jumP *= 9/10
-        while(keys.shift){
-            await delay(10);
-        }
+        while(keys.shift) await delay(10);
         propRem(player, 'ghost');
         player.jumP *= 10/9
         player.img = 'players/slime';
@@ -742,6 +747,8 @@ function deb_tekiou(){
     let player = objs.find(a => a.name == 'player');
     debC.disD.querySelector('.pos').textContent = `x:${player.x.toFixed(0)}, y:${player.y.toFixed(0)}`;
     debC.disD.querySelector('.spd').textContent = `dx:${player.dx.toFixed(0)}, dy:${player.dy.toFixed(0)}`;
+    debC.disD.querySelector('.jump').textContent = `jumP:${player.jumP}`;
+    debC.disD.querySelector('.dash').textContent = `dash?:${player.dashIng ?? 0}`;
     debC.disD.querySelector('.grd').textContent = `grounded:${player.grounded}`;
     debC.disD.querySelector('.prop').textContent = `prop:[${player.props}]`;
     debC.disD.querySelector('.have').textContent = `have:[${player.have}]`;

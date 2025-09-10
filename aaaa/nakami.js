@@ -955,10 +955,12 @@ let bigmmD = document.getElementById('bigmashmaro');
 let bigmmC = {
     kitekeyD: bigmmD.querySelector('.kitekey'),
     bodyD:bigmmD.querySelector('.bodies'),
+    subD:bigmmD.querySelector('.sub')
 }
 bigmmC.kitekeyD.addEventListener('click', async function(){
     bigmmC.kitekeyD.classList.toggle('tap');
     bigmmC.bodyD.classList.toggle('tap');
+    bigmmC.subD.classList.toggle('tap');
 
     let gen = bigmmC.bodyD.value.trim('');
     bigmmC.bodyD.value = '';
@@ -976,6 +978,35 @@ bigmmC.kitekeyD.addEventListener('click', async function(){
         read(allScripts[src][event], 'arrayed')
     };
 })
+bigmmC.actL = [
+    {
+        name:'make inv',
+        disp:'makeInv',
+        func: async function(){
+            sendpyTx('printTx,脳2に接続しています....')
+            sendpyTx('create_inventry_koppe_300_300_20_101325');
+            sendpyTx('open_inventry_koppe');
+            sendpyTx('print,inventry');
+            mapMake();
+            get('stone');
+            get('stone');
+            get('water');
+            get('water');
+            sendpyTx('printTx,接続..切断....');
+        }
+    }
+];
+for(let s of bigmmC.actL){
+    let sD = document.createElement('div');
+    sD.className = 's';
+    sD.textContent = s.disp;
+    sD.addEventListener('click', async function(){
+        s.func();
+    });
+    bigmmC.subD.appendChild(sD);
+}
+
+
 //#endregion bigmashmaro
 
 //#region rainbow

@@ -11,6 +11,11 @@ let IranMikans = {
 
 let Items = [
     {
+        name:'water',
+        jpnm:'水',
+        kind:'natural liquid',
+    },
+    {
         name:'mebra_log', //amber、琥珀。砂漠の
         jpnm:'メブラの丸太',
         kind:'natural mebra tree log',
@@ -255,19 +260,25 @@ let Friends = [
         rare:3
     },
     {
-        ruby:'うたかた ありあ',
-        name:'泡沫アリア',
-        rare:2,
-    },
-    {
         ruby:'めめんと らめんと',
         name:'メメント・ラメント',
+        rare:3
+    },
+    {
+        ruby:'ごーどん そーじぃ',
+        name:'ゴードン・ソージィ',
         rare:3
     },
     {
         ruby:'おやすみ にーく',
         name:'小安見ニーク',
         rare:3,
+    },
+
+    {
+        ruby:'うたかた ありあ',
+        name:'泡沫アリア',
+        rare:2,
     },
     {
         ruby:'めんど がりや',
@@ -279,9 +290,10 @@ let Friends = [
         name:'伊辣キキ',
         rare: 2,
     },
+        
     {
         ruby:'いきる かしか',
-        name:'息留 河鹿',
+        name:'息留河鹿',
         rare: 1
     },
     {
@@ -295,13 +307,72 @@ let Friends = [
         rare:1
     },
     {
-        ruby:'くすた わいお',
-        name:'久須田 和伊男',
-        rare:1,
+        ruby:'あくせん くとぅ',
+        name:'アクセン・クトゥ',
+        rare:1
     },
     {
-        ruby:'ごーどん そーじぃ',
-        name:'ゴードン・ソージィ',
+        ruby:'せざる おーえん',
+        name:'瀬笊オーエン',
+        rare:1
+    },
+    {
+        ruby:'あかじ ざいせい',
+        name:'丹路宰聖',
+        rare:2
+    },
+    {
+        ruby:'すいほう にきす',
+        name:'水泡ニキス',
+        rare:1
+    },
+    {
+        ruby:'なきものにす',
+        name:'亡気者ニス',
+        rare:1
+    },
+    
+    
+    {
+        ruby:'からより はもか',
+        name:'空寄葉豆',
+        rare:2
+    },
+    {
+        ruby:'ときば のぎたち',
+        name:'時場禾立',
         rare:3
-    }
+    },
+
+    {
+        ruby:'やらねばな らん',
+        name:'萢音花蘭',
+        rare:1
+    },
+    {
+        ruby:'なさねばな らん',
+        name:'奈紗音薔薇蘭',
+        rare:1
+    },
+    {
+        ruby:'きんにく にくお',
+        name:'筋肉肉男',
+        rare:1
+    },
+    {
+        ruby:'まんしん そうい',
+        name:'満身創痍',
+        rare:1
+    },
+
+
+    //あとはパクリを
+    {
+        ruby:'にやにやきょうじゅ',
+        name:'ニヤニヤ教授',
+        rare:3
+    },
+
+
+
 ]
