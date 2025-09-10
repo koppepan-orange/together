@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>meibo_ableDownload</title>
+</head>
+<body>
+    <div id="log">
+        <div class="opener"></div>
+        <div class="log"></div>
+    </div>
+    <div id="text"></div>
+    <div id="movableDescription"></div>
+    
+    <div id="upper">
+        <div class="import">import</div>
+        <div class="save">save</div> <!-- もし${name}.jsonが存在するならば...ってあれ？ 毎回importさせる仕組みだったら"上書き"なんてできなくね？ ....vscodeみたいにフォルダごと開かせて、ワークベンチ式にする...?いやできるのか？htmlに -->
+        <input class="name" type="text" placeholder="name"/>
+    </div>
+
+    <div id="bodies">
+
+    </div>
+
+    <script src="data.js"></script>
+    <script src="nakami.js" defer></script>
+</body>
+</html>

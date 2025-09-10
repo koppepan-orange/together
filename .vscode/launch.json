@@ -57,6 +57,12 @@
             "request": "launch",
             "name": "暇な時によくやる遊び-inGame!",
             "file": "koppe/boaringMac/index.html"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "meiboを作ろう！",
+            "file": "koppe/meibo/index.html"
         }
     ],                                                                                                                                              
 }
