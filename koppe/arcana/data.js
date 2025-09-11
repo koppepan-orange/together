@@ -1,4 +1,4 @@
-let arcanas = [
+let Arcanas = [
     {
         name: "The Fool",
         draed: 0,

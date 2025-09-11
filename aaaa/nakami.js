@@ -436,7 +436,7 @@ var messageTextArea = document.getElementById("messageTextArea"); // HTML内の�
 let message = document.getElementById("textMessage");
 let sendBtn = document.querySelector('#commands .send');
 
-sendBtn.addEventListener('click', () => {
+sendBtn.addEventListener('click', () => {   
     sendpyTx(message.value);
 })
 
@@ -452,6 +452,7 @@ function connect(){
     // 接続、切断...
     webSocket.onclose = function(message){
         logadd("Server Disconnected！！");
+        error();
     };
 
     // エラー発生時の処理
@@ -471,9 +472,9 @@ function connect(){
 }
 
 function logadd(text){
-    if(text.includes('endgame')) window.open('about:blank', '_self').close();
     messageTextArea.value += `${text}\n`; // ${random(1000,2900)}-${random(1,12)}-${random(1,31)} ${random(0,23)}:${random(0,59)}:${random(0,59)} INFO
     messageTextArea.scrollTop = messageTextArea.scrollHeight;
+    if(text.includes('endgame')) window.open('about:blank', '_self').close();
 };
 
 function sendpy(content){
@@ -984,7 +985,7 @@ bigmmC.actL = [
         disp:'makeInv',
         func: async function(){
             sendpyTx('printTx,脳2に接続しています....')
-            sendpyTx('create_inventry_koppe_300_300_20_101325');
+            sendpyTx('create_inventry_koppe_30_300_20_101325');
             sendpyTx('open_inventry_koppe');
             sendpyTx('print,inventry');
             mapMake();
@@ -1218,7 +1219,11 @@ function inv_ock(cell){
 
 function inv_pick_decr(){
     pickItem.dataset.num -= 1;
-    if(pickItem.dataset.num == 0) pickItem.remove(), pickItem = null;
+    if(pickItem.dataset.num == 0){
+        pickItem.remove();
+        pickItem = null;
+        sendpyTx('item_shositu');
+    }
 }
 
 document.addEventListener('mousemove', e => {
@@ -1577,6 +1582,25 @@ canV.addEventListener('click', e => {
 
 
 //#endregion canvas
+
+//#region arcana
+let arcanaD = document.getElementById("arcana");
+let arcanaC = {
+    drawD: arcanaD.querySelector(".draw"),
+    placeD: arcanaD.querySelector(".place")
+}
+
+function cardDraw(){
+    let arr = Arcanas.filter(a => a.able);
+    if(arr.length == 0) return addtext('引けるカードがないっすよ〜？');
+    let card = arraySelect(arr);
+
+    let cardD = document.createElement("div");
+    cardD.className = "card";
+    cardD.style.backgroundImage = `url(assets/images/arcanas/${card.img})`;
+    arcanaC.placeD.appendChild(cardD);
+}
+//#endregion arcana
 
 
 function start(){

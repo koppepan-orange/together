@@ -210,6 +210,8 @@ async def handler(websocket):
             elif message[:10]=="item_pick_":
                 x=message[10:].split("_")
                 ock=[x[0],x[1]]
+            elif message[:12]=="item_shositu":
+                ock = ["",0]
             elif message[:5]=="heat_":#f"heat_{name}_{add_heat}"
                 x=message[5:].split("_")
                 inventry[x[0]][3]+=x[1]
@@ -461,11 +463,11 @@ def window_del(rootPPP,itembox=[]):
 async def change_yuuten(motono_yuuten:int,motono_kiatu:int,atono_kiatu:int,j_mol:int,m3_mol:int) -> int:
     #return (motono_yuuten+((motono_yuuten+273.15)*m3_mol/j_mol)*(atono_kiatu-motono_kiatu)*1000000)
     try:
-        print((1/((1/(motono_yuuten+273.15))-((8.314*math.log((motono_kiatu/atono_kiatu)))/j_mol)))-273.15)
+        #print((1/((1/(motono_yuuten+273.15))-((8.314*math.log((motono_kiatu/atono_kiatu)))/j_mol)))-273.15)
         return ((1/(1/(motono_yuuten+273.15))-((8.314*math.log((motono_kiatu/atono_kiatu)))/j_mol)))-273.15
         #return ((motono_yuuten+273.15)*math.exp(((atono_kiatu-motono_kiatu)*j_mol)/m3_mol))-273.15
     except OverflowError: 
-        print((motono_yuuten,motono_kiatu,atono_kiatu,j_mol,m3_mol))
+        #print((motono_yuuten,motono_kiatu,atono_kiatu,j_mol,m3_mol))
         return float("inf")
         #return float("inf")
 filled = {} # [x= , y= , dens]
@@ -531,6 +533,7 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                     canvas["inventry_root_"+str(name)].delete('item')
                 melt_y=[]
                 yw=0
+                byw=0
                 melt_yw={}
                 #print("indexの中身:", index, type(index)) #class<int>だった
                 for a,b in serch(index[5],3,True):
@@ -539,6 +542,7 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                     # index[5], index[2]をindex, indexにした後「serchはasyncやろ？ほなawait使わな」と。
                     # 仕方がないのでserchくんにawaitを付与。すると「line423、zisyo.items()ゆうてますけどzisyoはintですぜ？」と。
                     # こっからはわかんなかったのであとは託しますわね それと、このメモは5年後に爆発します☆彡
+                    byw=yw
                     yw += b/index[2]
                     melt_y += [[a,b,yw]] 
                     melt_yw[a]=[b,yw]
@@ -546,17 +550,20 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                         #for k in range(int((index[1]-yw)/50),int((index[1]-(yw-(b/index[2])))/50)):
                         #    for kk in range(int(index[2]/50)):
                         #        await asyncio.sleep(1/120)
-                        #print(((index[1]-yw),(index[1]-(yw-(b/index[2])))))
-                        #print(yw)
-                        canvas["inventry_root_"+str(name)].create_image(int(index[2]/2),int(index[1]+yw/2), image=ImageTk.PhotoImage(imgg[str(name)+"assets/images/items/melt_"+str(a)+".png"].crop((0,0,int(index[2]),yw)),master=root["inventry_root_"+str(name)]),tag="item")
-                for a,b in index[6]:
-                    for k in range(int(yw/50)):
-                        for kk in range(int(index[2]/50)):
-                            await asyncio.sleep(1/120)
-                            areid=canvas["inventry_root_"+str(name)].create_image(kk*50,k*50, image=img[str(name)+"assets/images/items/are_"+str(a)+".png"],tag="item")
-                            canvas["inventry_root_"+str(name)].lower(areid)
+                        #print((int(index[1]/2),int(index[2]-(yw/2))))
+                        print((index[1],yw,byw))
+                        print(int(index[1]/2),int(index[2]-((yw-byw)/2)))
+                        #print(root["inventry_root_"+str(name)])
+                        print(imgg[str(name)+"assets/images/items/melt_"+str(a)+".png"].crop((0,0,index[1],yw-byw)))
+                        img[str(name)+"assets/images/items/melt_"+str(a)+".png"]=ImageTk.PhotoImage(imgg[str(name)+"assets/images/items/melt_"+str(a)+".png"].crop((0,0,index[1],yw-byw)),master=root["inventry_root_"+str(name)])
+                        canvas["inventry_root_"+str(name)].lower(canvas["inventry_root_"+str(name)].create_image(int(index[1]/2),int(index[2]-((yw-byw)/2)), image=img[str(name)+"assets/images/items/melt_"+str(a)+".png"],tag="item"))
+                if write:
+                    for a,b in index[6].items():
+                        img[str(name)+"assets/images/items/are_"+str(a)+".png"]=ImageTk.PhotoImage(imgg[str(name)+"assets/images/items/are_"+str(a)+".png"].crop((0,0,index[1],(index[2]-yw))),master=root["inventry_root_"+str(name)])
+                        areid=canvas["inventry_root_"+str(name)].create_image(int(index[1]/2),int((index[2]-yw)/2), image=img[str(name)+"assets/images/items/are_"+str(a)+".png"],tag="item")
+                        canvas["inventry_root_"+str(name)].lower(areid)
 
-                        #canvas["inventry_root_"+str(name)].create_image(0,0, image=img[i[4]])
+                    #canvas["inventry_root_"+str(name)].create_image(0,0, image=img[i[4]])
                 count=0
                 delet_list=[]
                 for i in index[0]:
@@ -580,8 +587,8 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                             canvas["inventry_root_"+str(name)].create_image(i[0], i[1], image=img[str(name)+"assets/images/items/"+str(i[4])+".png"],tag="item")
                         #await hitbox(aaaaaa=i,bbbb=melt_y,dens=inventry2[name][3],name=name) #width=inventry2[name][1],hight=inventry2[name][2],
                     count+=1
-                    for a in delet_list:
-                        del inventry2[name][0][a]
+                    for xxxxa in delet_list:
+                        del inventry2[name][0][xxxxa]
 
                 for key,i in index[5].items():
                     if await change_yuuten(csvdata[key][0],csvdata[key][5],inventry2[name][4],csvdata[key][8],csvdata[key][7]) > inventry2[name][3]:

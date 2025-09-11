@@ -63,6 +63,13 @@
             "request": "launch",
             "name": "meiboを作ろう！",
             "file": "koppe/meibo/index.html"
-        }
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "じゃんけんしようぜ！俺グョー出す！！",
+            "file": "koppe/jungkeng/index.html"
+        },
+
     ],                                                                                                                                              
 }

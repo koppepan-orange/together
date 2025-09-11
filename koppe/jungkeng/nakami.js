@@ -28,8 +28,8 @@ function arraySelect(array){
 };
 function arrayShuffle(array) {
     for(let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
+    const i2 = Math.floor(Math.random() * (i + 1));
+    [array[i], array[i2]] = [array[i2], array[i]];
     }
     return array;
 };
@@ -228,14 +228,6 @@ function colorcheck(rawtext) {
     return text;
 }
 
-// ↓一瞬これにしようとしてた
-// if(textShowing){
-//     queueAddtext.push(text);
-//     while(textShowing){
-//         await delay(10);
-//     }
-// };
-
 let queueAddtext = [];
 let loopAddtext = 0;
 async function waitforAddtext(){
@@ -329,14 +321,14 @@ async function addtext(raw){
         type();
     });
 }
-document.addEventListener('keydown', (event) => {
-    if(event.key === 'z' || event.key === 'Enter'){
+document.addEventListener('keydown', (e) => {
+    if(e.key === 'z' || e.key === 'Enter'){
         skipText = true;
     }
 });
 
-document.addEventListener('keyup', (event) => {
-    if(event.key === 'z' || event.key === 'Enter'){
+document.addEventListener('keyup', (e) => {
+    if(e.key === 'z' || e.key === 'Enter'){
         skipText = false;
     }
 });
@@ -387,10 +379,11 @@ document.addEventListener('mouseout', (e) => {
     }
 });
 //#endregion
-//#region drag
+//#region draggable
 document.addEventListener('mousedown', e => {
     // const descTarget = e.target.closest('[data-description]');
     let div = e.target;
+    
     if(!div.classList.contains('draggable')) return;
     offsetX = e.clientX - div.getBoundingClientRect().left;
     offsetY = e.clientY - div.getBoundingClientRect().top;
@@ -408,25 +401,147 @@ document.addEventListener('mousedown', e => {
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
 });
-//#endregion
+//#endregion 
 
-let arcanaD = document.getElementById("arcana");
-let arcanaC = {
-    drawD: arcanaD.querySelector(".draw"),
-    placeD: arcanaD.querySelector(".place")
+
+//#region filebase-login
+const firebaseConfig = {
+    apiKey: "AIzaSyBN5V_E6PzwlJn7IwVsluKIWNIyathhxj0",
+    authDomain: "koppepan-orange.firebaseapp.com",
+    databaseURL: "https://koppepan-orange-default-rtdb.firebaseio.com",
+    projectId: "koppepan-orange",
+    storageBucket: "koppepan-orange.appspot.com",
+    messagingSenderId: "730150198097",
+    appId: "1:730150198097:web:076a074a3d406053155170",
+    measurementId: "G-MYKJWD203Z"
+};
+firebase.initializeApp(firebaseConfig);
+var database = firebase.database();
+let username = 'no name';
+let userRef = null;
+
+let lgiD = document.getElementById('login');
+let lgiC = {
+    usernameI: lgiD.querySelector('.username'),
+    passwordI: lgiD.querySelector('.password'),
+    senD: lgiD.querySelector('.send'),
+    
+    xX: lgiD.querySelector('.x'),
+    xF: () => {
+        console.log('x')
+        lgiC.usernameI.value = '';
+        lgiC.passwordI.value = '';
+        lgiD.classList.remove('tog');
+    },
+
+    summonD: document.getElementById('logSummon'),
+    summon: () => {
+        console.log('summon')
+        lgiD.classList.add('tog');
+    },
+
+    logoutD: document.getElementById('logout'),
+    logout: () => {
+        console.log('logout')
+        nicoText("ログアウトしました");
+        username = 'no name';
+        removeLocalStorage("username");
+    
+        logUsername.value = '';
+        logPassword.value = '';
+    }
 }
-arcanaC.drawD.addEventListener("click", () => {
-    cardDraw();
+lgiC.logoutD.addEventListener('click', lgiC.logout);
+lgiC.xX.addEventListener('click', lgiC.xF);
+lgiC.summonD.addEventListener('click', lgiC.summon);
+
+async function login(){
+    setLocalStorage("banned", 0)
+    userRef = database.ref(`users/${username}`);
+    nickname = username;
+
+    nicoText('ログイン中...')
+    lgiD.classList.remove('tog');
+    await delay(500);
+
+    nicoText('ログイン完了！');
+    nicoText(`ようこそ、${nickname}さん！`);
+
+    userRef.update({
+        status: 'online'
+    });
+
+    updateUI();
+    waiD.classList.add('tog');
+}
+
+lgiC.senD.addEventListener('click', () => {
+    let kusername = lgiC.usernameI.value;
+    let kpassword = lgiC.passwordI.value;
+
+    let kuserRef = database.ref(`users/${kusername}`);
+    kuserRef.once('value', function(snapshot){
+        if(snapshot.exists()){
+            if(snapshot.val().password == kpassword){
+                username = kusername;
+                setLocalStorage("username", username)
+                login();
+            }
+        }else{
+            username = kusername
+            let userRef = database.ref(`users/${username}`);
+            userRef.update({
+                password:kpassword,
+                banned: 0,
+                blocked: [],
+            })
+            nicoText('ようこそ');
+            setLocalStorage("username", username)
+            login();
+        }
+    })
 })
 
-
-function cardDraw(){
-    let arr = Arcanas.filter(a => a.able);
-    if(arr.length == 0) return addtext('引けるカードがないっすよ〜？');
-    let card = arraySelect(arr);
-
-    let cardD = document.createElement("div");
-    cardD.className = "card";
-    cardD.style.backgroundImage = `url(assets/images/Arcanas/${card.img})`;
-    arcanaC.placeD.appendChild(cardD);
+function autoLogin(){
+    username = getLocalStorage("username");
+    if(username){
+        console.log("自動ログインしました");
+        login();
+    }else{
+        console.log("ログインしてください");
+        username = 'no name';
+    }
 }
+
+window.addEventListener('beforeunload', () => {
+    if(!userRef) return;
+    userRef.once('value').then(function(snapshot) {
+        userRef.update({
+            status: 'offline'
+        });
+    })
+});
+//#endregion filebase-login
+
+function updateUI(){
+    if(!userRef) return;
+    
+}
+
+//#region wait
+let waiD = document.getElementById('wait');
+let waiC = {
+    dispD: document.getElementById('disp'),
+    joinD: document.getElementById('join'),
+}
+waiC.joinF = () => {
+    // firebaseのjungkengに${username}を追加
+    let jungkengWR = database.ref('jungkeng/wait');
+    jungkengR.push(username);
+}
+waiC.tekiouF = () => {
+    // firebaseのjungkengのuserの数を。
+
+    waiC.dispD.textContent = num;
+}
+//#endregion wait

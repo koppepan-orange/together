@@ -128,10 +128,30 @@ img{
 橙色 #fffaf3, #fff7eb, #fff3e2, #fff0d9, #ffeccf
 緑色 #f6fff2, #eeffe7, #e6ffdc, #ddffd0, #d4ffc3
 
-#dummy{
-    color: #cfe9ff;
-    /* 上の謎の4つの文章によって、なんか最初のやつ無効化されるっぽい */
-    /* 謎に */
+#template{
+    /* 順番だけ */
+    margin-top: 5px;
+    margin-left: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 100px;
+    height: 100px;
+    /* aspect-ratio: 1/1; */
+    padding: 5px;
+    background-color: #f0f8ff;
+    border: 1px solid #000000;
+    color: #000000;
+    font-size: 12px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    animation: fadeIn 0.5s ease forwards;
+    z-index: 999;
+    margin-right: 5px;
+    margin-bottom: 5px;
 }
 
 .hidden{
@@ -458,4 +478,44 @@ textarea{
     right: 20px;
     transform: translateY(-50%);
     cursor: pointer;
+}
+
+#arcana{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 400px;
+    max-height: 80%;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #eaf5ff80;
+}
+#arcana .draw{
+    display: block;
+    width: 100px;
+    height: 60px;
+    background: #b5dcff
+}
+#arcana .draw:hover{
+    cursor: pointer;
+    filter: brightness(1.2);
+}
+#arcana .place{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
+    height: 100px;
+    overflow-x: auto;
+}
+#arcana .place .card{
+    height: 100%;
+    aspect-ratio: 2/3;
+    background-size: cover;
+    background-position: center;
+    border: 2px solid #000000;
+    box-sizing: border-box;
 }
