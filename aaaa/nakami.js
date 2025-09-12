@@ -985,7 +985,7 @@ bigmmC.actL = [
         disp:'makeInv',
         func: async function(){
             sendpyTx('printTx,脳2に接続しています....')
-            sendpyTx('create_inventry_koppe_30_300_20_101325');
+            sendpyTx('create_inventry_koppe_400_400_20_101325');
             sendpyTx('open_inventry_koppe');
             sendpyTx('print,inventry');
             mapMake();
