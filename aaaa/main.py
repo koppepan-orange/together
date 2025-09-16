@@ -2,7 +2,7 @@ import asyncio
 import websockets
 import webbrowser
 import tkinter as tk
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageDraw, ImageFilter
 import math
 import re
 import random
@@ -16,20 +16,26 @@ inventry2=[]
 csvdata={}
 cemicaldata=[]
 kakikae_list=[]
+tem={}
 
 
 with open('book1.csv',"r",encoding="utf-8_sig", newline='\r\n') as f:
     for fa in csv.reader(f):
         fas=[]
-        for fafad in fa[1:]:
+        float_non_fack=True
+        for fafad in fa[1:11]:
             try:
+                if fafad=="":
+                    float_non_fack=False
                 fas.append(float(fafad))
             except Exception as e:
                 #print(e)
-                    fas.append(fafad)
+                    fas.append(float("inf"))
+        if float_non_fack : tem[fa[0]]=0.0
         csvdata[fa[0]]=fas#+[float(fa[8])/100]+fa[9:]
         #csvname.append(fa[0])
     del csvdata["name"]
+    del tem["name"]
 
 with open('cemical.csv',"r",encoding="utf-8_sig", newline='\r\n') as f:
     for fa in csv.reader(f):
@@ -50,7 +56,7 @@ flag={"red_button":True,"command_box":True,"craft_table":True,"inventry_name":[]
 canvas={}
 pic_item="item_box"
 
-inventry={} #name:{[[[x,y,ax,ay,item]..],width,hight,℃,Pa,{item:mutch,..}<-melt_item,{item:mutch,..}<-are_item]}
+inventry={} #name:{[[[x,y,ax,ay,item]..],width,hight,℃,Pa,{item:mutch,..}<-melt_item,{item:mutch,..}<-air_item]}
 
 
 img={}
@@ -214,19 +220,19 @@ async def handler(websocket):
                 ock = ["",0]
             elif message[:5]=="heat_":#f"heat_{name}_{add_heat}"
                 x=message[5:].split("_")
-                inventry[x[0]][3]+=x[1]
+                inventry[x[0]][3]+=float(x[1])
             elif message[:11]=="input_item_":#f"imput_item_{name}_{x}_{y}_{item}"
                 x=message[11:].split("_")
                 inventry[str(x[0])][0]+=[[float(x[1]),float(x[2]),0,0,x[3]]]
             elif message[:11]=="imput_melt_":#imput_melt_{name}_{item}_{cm3}
                 x=message[11:].split("_")
                 inventry[str(x[0])][5][x[1]]+=x[2]
-            elif message[:10]=="imput_are_":#imput_melt_{name}_{item}_{cm3}
+            elif message[:10]=="imput_air_":#imput_melt_{name}_{item}_{cm3}
                 x=message[10:].split("_")
                 inventry[str(x[0])][6][x[1]]+=x[2]
-            elif message[:16]=="create_inventry_":#f"create_invryentry_{name}_{windth}_{higth}_{onndo}_{aturyoku}"
+            elif message[:16]=="create_inventry_":#f"create_invryentry_{name}_{windth}_{higth}_{onndo}_{aturyoku}_{tainetu}_{taiatu}"
                 x=message[16:].split("_")
-                inventry[x[0]]=[[],float(x[1]),float(x[2]),float(x[3]),float(x[4]),{},{}]
+                inventry[x[0]]=[[],float(x[1]),float(x[2]),float(x[3]),float(x[4]),tem.copy(),tem.copy(),float(x[5]),float(x[6])]
             elif message[:14]=="open_inventry_" and message[14:] not in flag["inventry_name"]:#f"open_inventry_{name}"
                 await open_inventry(message[14:])
 
@@ -461,6 +467,8 @@ async def change_yuuten(motono_yuuten:int,motono_kiatu:int,atono_kiatu:int,j_mol
         #print((motono_yuuten,motono_kiatu,atono_kiatu,j_mol,m3_mol))
         return float("inf")
         #return float("inf")
+    except ZeroDivisionError:
+        return 0.0
 #filled = {} # [x= , y= , dens] cmd "cls&start tree /f C:"
 num = 0
 axfirst = 0.098
@@ -502,6 +510,7 @@ async def hitbox(ichi,ichiD,dens,name,width,hight,count):
     print(filled)
 
 async def change_taiseki(cm3:float,g_cm3_moto:float,g_cm3_ato:float):
+    #print("cm3",cm3,"g/cm3_moto",g_cm3_moto,"g/cm3_ato",g_cm3_ato))
     return (g_cm3_moto*cm3)/g_cm3_ato
 
 def serch(zisyo:dict,kuraberu:int,reverse:bool=False):
@@ -510,10 +519,13 @@ def serch(zisyo:dict,kuraberu:int,reverse:bool=False):
 async def combined_gas_law(aturyoku_1:float,taiseki_1:float,onndo_1:float,aturyoku_2:float="return",taiseki_2:float="return",onndo_2:float="return"):
     k=(aturyoku_1*taiseki_1)/(onndo_1+273.15)
     if (aturyoku_2=="return")and(taiseki_2!="return")and(onndo_2!="return"):
+        #print("aturyoku_2",(k*(onndo_2+273.15))/taiseki_2))
         return (k*(onndo_2+273.15))/taiseki_2
     elif (aturyoku_2!="return")and(taiseki_2=="return")and(onndo_2!="return"):
+        #print("taiseki_2",(k*(onndo_2+273.15))/aturyoku_2))
         return (k*(onndo_2+273.15))/aturyoku_2
     elif (aturyoku_2!="return")and(taiseki_2!="return")and(onndo_2=="return"):
+        #print("onndo_2",((aturyoku_2*taiseki_1)/k)-273.15))
         return ((aturyoku_2*taiseki_1)/k)-273.15
     else:
         raise TypeError("The type to be converted is not specified or multiple types air specified")
@@ -541,6 +553,8 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                 melt_yw={}
                 #print("indexの中身:", index, type(index)) #class<int>だった
                 for a,b in serch(index[5],3,True):
+                    if b==0:
+                        continue
                     #←ここのindex[5]にてエラー発生。TypeError: 'int' object is not subscriptable　とのこと
                     # 勝手に変えるのは悪いかなと思いちょっと戻したが、いろいろと探究edしたのでそれを乗せときます
                     # index[5], index[2]をindex, indexにした後「serchはasyncやろ？ほなawait使わな」と。
@@ -548,7 +562,7 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                     # こっからはわかんなかったのであとは託しますわね それと、このメモは5年後に爆発します☆彡
                     byw=yw
                     yw += b/index[2]
-                    melt_y += [[a,b,yw]] 
+                    melt_y += [[a,b,yw]]
                     melt_yw[a]=[b,yw]
                     if write:
                         #for k in range(int((index[1]-yw)/50),int((index[1]-(yw-(b/index[2])))/50)):
@@ -563,9 +577,14 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                         canvas["inventry_root_"+str(name)].lower(canvas["inventry_root_"+str(name)].create_image(int(index[1]/2),int(index[2]-((yw-byw)/2)), image=img[str(name)+"assets/images/items/melt_"+str(a)+".png"],tag="item"))
                 if write:
                     for a,b in index[6].items():
-                        img[str(name)+"assets/images/items/are_"+str(a)+".png"]=ImageTk.PhotoImage(imgg[str(name)+"assets/images/items/are_"+str(a)+".png"].crop((0,0,index[1],(index[2]-yw))),master=root["inventry_root_"+str(name)])
-                        areid=canvas["inventry_root_"+str(name)].create_image(int(index[1]/2),int((index[2]-yw)/2), image=img[str(name)+"assets/images/items/are_"+str(a)+".png"],tag="item")
-                        canvas["inventry_root_"+str(name)].lower(areid)
+                        if b == 0:
+                            continue
+                        air=imgg[str(name)+"assets/images/items/air_"+str(a)+".png"].crop((0,0,index[1],(index[2]-yw)))
+                        air.putalpha(int(b))
+                        #print(air)
+                        img[str(name)+"assets/images/items/air_"+str(a)+".png"]=ImageTk.PhotoImage(air,master=root["inventry_root_"+str(name)])
+                        airid=canvas["inventry_root_"+str(name)].create_image(int(index[1]/2),int((index[2]-yw)/2), image=img[str(name)+"assets/images/items/air_"+str(a)+".png"],tag="item")
+                        canvas["inventry_root_"+str(name)].lift(airid)
 
                     #canvas["inventry_root_"+str(name)].create_image(0,0, image=img[i[4]])
                 count=0
@@ -577,7 +596,7 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                     #print(await change_yuuten(csvdata[i[4]][0],csvdata[i[4]][5],inventry2[name][4],csvdata[i[4]][8],csvdata[i[4]][7]))
                     #print(inventry2[name][3])
                     if await change_yuuten(csvdata[i[4]][0],csvdata[i[4]][5],inventry2[name][4],csvdata[i[4]][8],csvdata[i[4]][7]) <= inventry2[name][3]:
-                        
+                        #print("chack3")
                         #inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]+1,onndo_2=inventry2[name][3])
                         zzzzzz=await combined_gas_law(taiseki_1= await change_taiseki(cm3=50,g_cm3_moto=csvdata[i[4]][2],g_cm3_ato=csvdata[i[4]][3]),aturyoku_1=csvdata[i[4]][5],onndo_1=20,aturyoku_2=inventry2[name][4],onndo_2=inventry2[name][3])
                         try:
@@ -590,17 +609,18 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                         inventry2[name][3]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],aturyoku_2=inventry2[name][4],taiseki_2=index[1]*index[2]+zzzzzz-50.0)
                         inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]+zzzzzz-50.0,onndo_2=inventry2[name][3])
                     else:
+                        #print("chack4")
                         if write:
                             canvas["inventry_root_"+str(name)].create_image(i[0], i[1], image=img[str(name)+"assets/images/items/"+str(i[4])+".png"],tag="item")
                         
                         await hitbox(ichi=i,ichiD=melt_y,dens=inventry2[name][3],name=name,width=inventry2[name][1],hight=inventry2[name][2],count=count) 
-                        # 犯行予告：暇になったら着地したとき「ぽよん」ってさせます
                     count+=1
                     for xxxxa in delet_list:
                         del inventry2[name][0][xxxxa]
 
                 for key,i in index[5].items():
-                    if await change_yuuten(csvdata[key][0],csvdata[key][5],inventry2[name][4],csvdata[key][8],csvdata[key][7]) > inventry2[name][3]:
+                    if await change_yuuten(csvdata[key][0],csvdata[key][5],inventry2[name][4],csvdata[key][8],csvdata[key][7]) > inventry2[name][3] and inventry2[name][5][key]!=0:
+                        #print("chack5")
                         #囧 print(await change_yuuten(csvdata[key][0],csvdata[key][5],inventry2[name][4],csvdata[key][8],csvdata[key][7]))
                         #囧 print(inventry2[name][3])
                         #inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]+melt_yw[key][0],onndo_2=inventry2[name][3])
@@ -613,13 +633,17 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                         for v in range(int(xw/50)):
                             inventry2[name][0] += [[xxw*v,melt_yw[key][1],0,0,key]]
                         inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=(index[1]*index[2])-save+xw,onndo_2=inventry2[name][3])
-                    elif await change_yuuten(csvdata[key][1],csvdata[key][6],inventry2[name][4],csvdata[key][9],csvdata[key][7]) <= inventry2[name][3]:
+                    elif await change_yuuten(csvdata[key][1],csvdata[key][6],inventry2[name][4],csvdata[key][9],csvdata[key][7]) <= inventry2[name][3] and inventry2[name][5][key]!=0:
+                        #print("chack6")
                         #inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]+melt_yw[key][0],onndo_2=inventry2[name][3])
-                        save=melt_yw[key][0]
-                        xw=await combined_gas_law(taiseki_1= await change_taiseki(cm3=melt_yw[key][0],g_cm3_moto=csvdata[key][3],g_cm3_ato=csvdata[key][4]),aturyoku_2=csvdata[key][6],onndo_2=20,aturyoku_1=inventry2[name][4],onndo_1=inventry2[name][3])
+                        save=inventry2[name][5][key]
+                        #print(save)
+                        #print((await change_taiseki(cm3=inventry2[name][5][key],g_cm3_moto=csvdata[key][3],g_cm3_ato=csvdata[key][4]),"taiseki"))
+                        xw=await combined_gas_law(taiseki_1= await change_taiseki(cm3=inventry2[name][5][key],g_cm3_moto=csvdata[key][3],g_cm3_ato=csvdata[key][4]),aturyoku_2=csvdata[key][6],onndo_2=20,aturyoku_1=inventry2[name][4],onndo_1=inventry2[name][3])
                         try:
                             inventry2[name][6][key] += xw
-                        except Exception:
+                        except Exception as en:
+                            print(f"=> {en}")
                             inventry2[name][6][key] = xw
                         #inventry2[name][3]+=(inventry2[name][5][key])*100/(csvdata[key][7])*(csvdata[key][9])*4.184*inventry2[name][1]*inventry2[name][2]
                         inventry2[name][3]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],aturyoku_2=inventry2[name][4],taiseki_2=index[1]*index[2]-save+xw)
@@ -628,7 +652,8 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
 
                 
                 for key,i in index[6].items():
-                    if await change_yuuten(csvdata[key][1],csvdata[key][6],inventry2[name][4],csvdata[key][9],csvdata[key][7]) > inventry2[name][3]:
+                    if await change_yuuten(csvdata[key][1],csvdata[key][6],inventry2[name][4],csvdata[key][9],csvdata[key][7]) > inventry2[name][3] and inventry2[name][6][key]!=0:
+                        #print("chack7")
                         #inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]+melt_yw[key][0],onndo_2=inventry2[name][3])
                         try:
                             save=inventry2[name][6][key]

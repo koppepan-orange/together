@@ -1,8 +1,4 @@
 # kizukuna_aiが消えてる～～～～～～～～ まあ問題はないが
 
-a={"name":[[["石"]],300,300,10,25000,{},{}]}
-
-#b=["a"]
-
-a["name"][5][a["name"][0][0].pop(0)]=10
-print(a)
+for a in range(int(0.0/50)):
+    print(a)

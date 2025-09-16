@@ -171,7 +171,7 @@ let r = {
 async function error(){
     addtext('errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
     await delay(2000);
-    window.open('about:blank', '_self').close();
+    // window.open('about:blank', '_self').close();
 }
 function hoshoku(color) {
     color = color.replace(/^#/, ''); // #付きなら取る
@@ -435,6 +435,7 @@ var webSocket; //ウェブソケット
 var messageTextArea = document.getElementById("messageTextArea"); // HTML内のテキスト出力エリア
 let message = document.getElementById("textMessage");
 let sendBtn = document.querySelector('#commands .send');
+let connecten = 0;
 
 sendBtn.addEventListener('click', () => {   
     sendpyTx(message.value);
@@ -446,18 +447,20 @@ function connect(){
 
     // 接続したで～～！！
     webSocket.onopen = function(message){
+        connecten = 1;
         logadd(`Server connecten。`);
     };
 
     // 接続、切断...
     webSocket.onclose = function(message){
+        connecten = 0;
         logadd("Server Disconnected！！");
         error();
     };
 
     // エラー発生時の処理
     webSocket.onerror = function(message){
-        logadd("errrrrrrrrrrrrrrrrrrr");
+        logadd("errored!! very very errored!!!!");
     };
 
     // 受け取ったとき
@@ -486,13 +489,9 @@ function sendpyTx(text){
     if(IranMikans[text]) return 0;
     
     logadd(`Send => ${text.replace(/pr  intTx,/g, () => '').replace(/print,/g, () => '')}`);
-    webSocket.send(text);
+    if(connecten) webSocket.send(text);
 };
 
-// サーバとの通信を切断する関数
-function disconnect(){
-    webSocket.close();
-}
 
 
 
@@ -974,9 +973,9 @@ bigmmC.kitekeyD.addEventListener('click', async function(){
     }
 
     if(gen.startsWith('loadfile,')){
-        [, src, event] = gen.split(',');
+        [, src, name] = gen.split(',');
         await loadScriptFile(src);
-        read(allScripts[src][event], 'arrayed')
+        read(allScripts[src][name], 'arrayed');
     };
 })
 bigmmC.actL = [
@@ -985,16 +984,22 @@ bigmmC.actL = [
         disp:'makeInv',
         func: async function(){
             sendpyTx('printTx,脳2に接続しています....')
-            sendpyTx('create_inventry_koppe_400_400_20_101325');
+            sendpyTx('create_inventry_koppe_400_400_120_101325_20000000_1000000000');
             sendpyTx('open_inventry_koppe');
             sendpyTx('print,inventry');
-            mapMake();
-            get('stone');
-            get('stone');
-            get('water');
-            get('water');
+            map_make();
             sendpyTx('printTx,接続..切断....');
         }
+    },
+    {
+        name: 'give me water',
+        disp: 'Qoo! water is delisious!!', //くぅ～っ！水がうめぇ！！
+        func: () => {for(let i = 0; i < 99; i++) get('water')}
+    },
+    {
+        name:'give me stone',
+        disp:'ishiwo kudasai',
+        func: () => {for(let i = 0; i < 99; i++) get('stone')}
     }
 ];
 for(let s of bigmmC.actL){
@@ -1056,8 +1061,11 @@ function inv_make(){
     };
 }
 function get(item){
-    if(!item) return nicoText('アイテム名を指定してください');4
+    console.log('get:: ')
+    console.log(item)
+    if(!item) return nicoText('アイテム名を指定してください');
     let data = Items.find(o => o.name == item);
+    console.log(data)
 
     let target = [...invC.areaD.querySelectorAll('.cell')].find(c => c.dataset.item == data.jpnm && +c.dataset.num < 99);
     
@@ -1382,8 +1390,18 @@ async function drawGrid(){
 }
 
 let backmap = [];
-let objmap = [[],[],[],[],[],[],[],[],[],[]];
-
+let objmap = [];
+function map_load(){
+    let mas = canC.mas;
+    for (let i = 0; i < mas; i++) {
+        backmap[i] = [];
+        objmap[i] = [];
+        for (let i2 = 0; i2 < mas; i2++) {
+            backmap[i][i2] = 0;
+            objmap[i][i2] = 0;
+        }
+    }
+}
 function chooseWeighted(weights) {
     // 重み付き乱択
     let total = weights.reduce((a, b) => a + b, 0);
@@ -1394,32 +1412,32 @@ function chooseWeighted(weights) {
     }
     return weights.length - 1; // fallback
 }
-function mapMake(){
+function map_make(){
     let tiles = ['a','b']
     let mas = canC.mas;
     for (let i = 0; i < mas; i++) {
         backmap[i] = [];
-        for (let j = 0; j < mas; j++) {
-            if(i == 0 && j == 0){
+        for (let i2 = 0; i2 < mas; i2++) {
+            if(i == 0 && i2 == 0){
                 // 左上だけ完全ランダム
-                backmap[i][j] = tiles[Math.floor(Math.random() * tiles.length)];
+                backmap[i][i2] = tiles[Math.floor(Math.random() * tiles.length)];
             }else{
                 // 重みを初期化（全種類1からスタート＝最低限の確率確保）
                 let weights = new Array(tiles.length).fill(1);
     
-                if(j > 0){ //左
-                    let left = tiles.indexOf(backmap[i][j - 1]);
+                if(i2 > 0){ //左
+                    let left = tiles.indexOf(backmap[i][i2 - 1]);
                     weights[left] += 5; // 重み補正（数値で調整）
                 }
     
                 if(i > 0){ //上
-                    let up = tiles.indexOf(backmap[i - 1][j]);
+                    let up = tiles.indexOf(backmap[i - 1][i2]);
                     weights[up] += 5;
                 }
     
                 // 選択
                 let choice = chooseWeighted(weights);
-                backmap[i][j] = tiles[choice];
+                backmap[i][i2] = tiles[choice];
             }
         }
     }
@@ -1427,8 +1445,8 @@ function mapMake(){
     //#region obj
     for(let i = 0; i < canC.mas; i++){
         objmap[i] = [];
-        for(let j = 0; j < canC.mas; j++){
-            objmap[i][j] = {
+        for(let i2 = 0; i2 < canC.mas; i2++){
+            objmap[i][i2] = {
                 name: 0,
             };
         }
@@ -1441,7 +1459,7 @@ function mapMake(){
 
     draw();
 }
-document.getElementById('mapmake').addEventListener('click', mapMake);
+document.getElementById('mapmake').addEventListener('click', map_make);
 
 function objmake(){
     console.log('objつくるよ！')
@@ -1602,11 +1620,70 @@ function cardDraw(){
 }
 //#endregion arcana
 
+//#region jamer_popup
+async function popup_dasu(num = 1){
+    for(let i = 0; i < num; i++){
+        let div = document.createElement('div');
+        div.className = 'jamerP';
+        div.style.top = `${random(0, (window.innerHeight - 100))}px`;
+        div.style.right = `${random(0, (window.innerWidth - 100))}px`;
+
+        let code = random(1,1);
+        switch(code){
+            case 1:{
+                div.classList.add('A');
+                div.dataset.code = probability(20) ? 1 : 0; // 1 == 増えるタイプ, 0 == 無個性劣等生
+                if(div.dataset.code == 1){
+                    div.addEventListener('click', async function(e){
+                        div.remove();
+                        await popup_dasu(10)
+                    })
+                }
+                
+                let bodie = document.createElement('div');
+                bodie.className = 'body';
+                
+                let text = 'click here!';
+                if(div.dataset.code == 1) text += '!';
+                bodie.textContent = text;
+                div.appendChild(bodie);
+
+                let upper = document.createElement('div');
+                upper.className = 'upper';
+                
+                 let under = document.createElement('div');
+                 under.className = 'mono under';
+                 under.textContent = '-';
+                 upper.appendChild(under);
+
+                 let mouth = document.createElement('div');
+                 mouth.className = 'mono mouth';
+                 mouth.textContent = 'o';
+                 upper.appendChild(mouth);
+                
+                 let mett = document.createElement('div');
+                 mett.className = 'mono mett';
+                 mett.textContent = 'x';
+                 mett.addEventListener('click', async function(e){
+                     div.remove();
+                 });
+                 upper.appendChild(mett);
+                div.appendChild(upper);
+            }       
+        }
+
+        document.body.appendChild(div);
+
+        await delay(50);
+    }
+}
+//#endregion
 
 function start(){
     connect();
     
     inv_make();
+    map_load()
     resizeCanvas();
 
     loop = 1;

@@ -81,9 +81,9 @@ let Items = [
         jpnm:'ウラン',
         kind:'natural metal'
     },
-    {
+    {   
         name:'tsukaretanodeyamerunium',
-        jpnm:'ツカレタノデメルニウム', //自作金属。どうかしてるぜ
+        jpnm:'ツカレタノデヤメルニウム', //自作金属。どうかしてるぜ
         kind:'natural metal'
     },
 
@@ -107,7 +107,7 @@ let Items = [
 
     {
         name:'ruby',
-        jpnm:'ルビー',
+        jpnm:'ルビー',
         kind:'natural gem'
     },
     {
@@ -116,8 +116,8 @@ let Items = [
         kind:'natural gem'
     },
     {
-        name:'larimal',
-        jpnm:'ラリマール', //自作宝石。
+        name:'larimar   ',
+        jpnm:'ラリマール',
         kind:'natural gem'
     },
 ]
@@ -181,7 +181,7 @@ let Objects = [
         desc:'石。\n灰色の鉱石が出てくるぞい。',
         sozai:[
             {name:'stone', p:100, amo:[1,3]},
-            {name:'alminium', p:40, amo:[3,6]},
+            {name:'aluminium', p:40, amo:[3,6]},
             {name:'titanium', p:40, amo:[3,6]},
             {name:'iron', p:65, amo:[4,5]},
         ]
