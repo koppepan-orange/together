@@ -221,6 +221,9 @@ async def handler(websocket):
             elif message[:5]=="heat_":#f"heat_{name}_{add_heat}"
                 x=message[5:].split("_")
                 inventry[x[0]][3]+=float(x[1])
+            elif message[:9]=="pressure_":#f"pressure_{name}_{add_pressure}"
+                x=message[9:].split("_")
+                inventry[x[0]][4]+=float(x[1])
             elif message[:11]=="input_item_":#f"imput_item_{name}_{x}_{y}_{item}"
                 x=message[11:].split("_")
                 inventry[str(x[0])][0]+=[[float(x[1]),float(x[2]),0,0,x[3]]]
@@ -457,7 +460,7 @@ def window_del(rootPPP,itembox=[]):
 
 #root["test"].protocol("WM_DELETE_WINDOW",end)
 
-async def change_yuuten(motono_yuuten:int,motono_kiatu:int,atono_kiatu:int,j_mol:int,m3_mol:int) -> int:
+async def change_yuuten(motono_yuuten:int,motono_kiatu:int,atono_kiatu:int,j_mol:int,m3_mol:int) -> float:
     #return (motono_yuuten+((motono_yuuten+273.15)*m3_mol/j_mol)*(atono_kiatu-motono_kiatu)*1000000)
     try:
         #print((1/((1/(motono_yuuten+273.15))-((8.314*math.log((motono_kiatu/atono_kiatu)))/j_mol)))-273.15)
@@ -495,10 +498,10 @@ async def hitbox(ichi,ichiD,dens,name,width,hight,count):
         if now[0] > width or now[0] > -(width):
             if now[0] in filled and now[1] in filled: #ここ今だと-の方向に振り切れた場合に高速で画面外に行きます
                 ichi[3] = 0
-                ichi[0] += -(gox) + 1
+                ichi[0] += -(gox) + 1 # type: ignore
             elif now[1] > hight or now[1] > -(hight) : #同上
                 ichi[4] = 0
-                ichi[1] += -(goy)
+                ichi[1] += -(goy) # type: ignore
             else:
                 filled[num] = [now]
                 num += 1       
@@ -516,7 +519,7 @@ async def change_taiseki(cm3:float,g_cm3_moto:float,g_cm3_ato:float):
 def serch(zisyo:dict,kuraberu:int,reverse:bool=False):
     return sorted(zisyo.items(), key=lambda x:csvdata[x[0]][kuraberu], reverse=reverse)
 
-async def combined_gas_law(aturyoku_1:float,taiseki_1:float,onndo_1:float,aturyoku_2:float="return",taiseki_2:float="return",onndo_2:float="return"):
+async def combined_gas_law(aturyoku_1:float,taiseki_1:float,onndo_1:float,aturyoku_2:float="return",taiseki_2:float="return",onndo_2:float="return"): # type: ignore
     k=(aturyoku_1*taiseki_1)/(onndo_1+273.15)
     if (aturyoku_2=="return")and(taiseki_2!="return")and(onndo_2!="return"):
         #print("aturyoku_2",(k*(onndo_2+273.15))/taiseki_2))
@@ -710,8 +713,19 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                                 if cem[4][aaaa]=="cal":
                                     inventry2[name][3] += cem[5][aaaa]*inventry2[name][2]*inventry2[name][1]
                                 else:
-                                    inventry2[name][5][cem[4][aaaa]] += cem[5][aaa]*csvdata[cem[4][aaa]][7]/1000000
-                            
+                                    inventry2[name][5][cem[4][aaaa]] += cem[5][aaaa]*csvdata[cem[4][aaaa]][7]/1000000
+                
+
+                if  write:
+                    canvas["inventry_root_"+str(name)].delete("pressuregauge")
+                    canvas["inventry_root_"+str(name)].delete("thermometer")
+                    if 16-(15/inventry2[name][7])*inventry2[name][3]<0:
+                        canvas["inventry_root_"+str(name)].itemconfigure("thermometer_outline",image=img[str(name)+"thermometer_blue"])
+
+                    canvas["inventry_root_"+str(name)].create_line(13, 13, 13+(8*math.cos(math.radians(90-(-(300/inventry2[name][8])*inventry2[name][4])+30))),  13+(8*math.sin(math.radians(90-(-(300/inventry2[name][8])*inventry2[name][4])+30))),tag=("system","pressuregauge"),arrow=tk.FIRST,arrowshape=(8, 2, 1),fill = "#000000")
+                    canvas["inventry_root_"+str(name)].create_line(39, 16,39,abs(16-(15/inventry2[name][7])*inventry2[name][3],tag=("system","thermometer")),fill = "#ED1C24",width=1)
+                    #print(90-((360/inventry2[name][8])*inventry2[name][4])-10)
+                    canvas["inventry_root_"+str(name)].lift("system")
 
             inventry=copy.deepcopy(inventry2)
 
@@ -763,9 +777,8 @@ def delete_inventry_GUI(name):
             a.append(name2)
     for ax in a:
         del img[ax]
-            
 
-#def inventry_GUI_update(name):
+##def inventry_GUI_update(name):
 #    canvas["inventry_root_"+str(name)].delete('all')
 #    for inventry[name]
 
@@ -796,6 +809,11 @@ async def open_inventry(name:str):
         root["inventry_root_"+str(name)].resizable(False, False)
         canvas["inventry_root_"+str(name)] = tk.Canvas(master=root["inventry_root_"+str(name)],bg = "white", width = inventry[name][1],height = inventry[name][2])
         canvas["inventry_root_"+str(name)].place(x = 0,y = 0)
+        img[str(name)+"pressuregauge"]=tk.PhotoImage(file = "./assets/images/systems/pressuregauge.png")
+        img[str(name)+"thermometer"]=tk.PhotoImage(file = "./assets/images/systems/thermometer.png")
+        img[str(name)+"thermometer_blue"]=tk.PhotoImage(file = "./assets/images/systems/thermometer_blue.png")
+        canvas["inventry_root_"+str(name)].create_image(13,13, image=img[str(name)+"pressuregauge"],tag="system")
+        canvas["inventry_root_"+str(name)].create_image(39,13, image=img[str(name)+"thermometer"],tag=("system","thermometer_outline"))
         root["inventry_root_"+str(name)].bind("<Leave>",lambda e,name=name:out(e,name))
         root["inventry_root_"+str(name)].bind("<Motion>",lambda e,name=name:motion(e,name))
         root["inventry_root_"+str(name)].bind("<ButtonRelease-1>",lambda e,name=name:click(e,name))

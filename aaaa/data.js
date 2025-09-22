@@ -35,14 +35,30 @@ let Items = [
         jpnm:'棒',
         kind:'natural tree',
     },
+    
     {
         name:'apple',
         jpnm:'椎名', //大怒られしそうだなこれ
         kind:'natural fruit tree',
     },
     {
-        name:'bad_apple', //どう使おうねこれ
+        name:'apple_bad', //どう使おうねこれ
         jpnm:'Bad Apple!!',
+        kind:'natural fruit tree',
+    },
+    {
+        name:'orange',
+        jpnm:'みかん',
+        kind:'natural fruit tree',
+    },
+    {
+        name:'lemon',
+        jpnm:'夢ならば',
+        kind:'natural fruit tree',
+    },
+    {
+        name:'kabosu',
+        jpnm:'現実です',
         kind:'natural fruit tree',
     },
 
@@ -95,7 +111,7 @@ let Items = [
 
 
     {
-        name:'cobalt', //x
+        name:'cobalt',
         jpnm:'コバルト',
         kind:'natural metal magnetic'
     },
@@ -193,6 +209,7 @@ let Objects = [
         desc:'石。\n青色の鉱石が出てくるぞい。',
         sozai:[
             {name:'stone', p:100, amo:[1,3]},
+            {name:'cobalt', p:35, amo:[]}
         ]
     },
     {
