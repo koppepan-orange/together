@@ -578,7 +578,7 @@ async function read(gen, type = 'organic'){
 
     // continueされた == その行は飛ばされた, 処理が終了した
     for(let moto of bunkatsu){
-        console.log(stack)
+        // console.log(stack)
 
         let raw = moto.trim().split(','); // "," で分割
         if(raw.length == 0) continue;
@@ -777,178 +777,16 @@ function revision(moto){
 }
 //#endregion
 
-//may
-/*
-//#region may
-let mayList = document.getElementById('mayList');
-let maylists = {
-    'command':{
-        id:'command',
-        process:async function(item, description){
-            message.value = item;
-            sendBtn.click();
-        },
-        list:[
-            {
-                name:'koppepan',
-                description:'ラップでタップなダンスをバック'
-            },
-            {
-                name:'コッペ',
-                description:'相互フォローの造語'
-            },
-            {
-                name:'chack',
-                description:'デバッグ用。俺もわからん'
-            },
-            {
-                name:'endgame',
-                description:'pythonのサーバーを終了させます<br>アベンジャーズではないです'
-            },
-            {
-                name:'red_button',
-                description:'赤いボタンを出します<br>音量注意'
-            },
-            {
-                name:'command_box',
-                description:'番号を入力することのできるやつを出します<br>気分はさながらハッカーですね<br>さながら腸爆裂礼砲'
-            },
-            {
-                name:'craft_table',
-                description:'何か。pick_のあとにmebra_plankとかで持てる'
-            },
-        ]
-    },
-    'items':{
-        id:this,
-        process:async function(item, description){
-            let text = `pick_${item}`
-            message.value = text;
-            sendBtn.click();
-        },
-        list:[
-            {
-                name:'mebra_log',
-                description:''
-            },
-            {
-                name:'mebra_plank',
-                description:''
-            },
-            {
-                name:'stone',
-                description:''
-            }
-        ]
-    }
+//#region titleArea
+let titleD = document.getElementById('titleArea');
+let titleC = {
+    newB: titleD.querySelector('.buttons .new'),
+    loadB: titleD.querySelector('.buttons .load'),
 }
-async function mayImport(){
-    for(hotmoto of Object.keys(maylists)){
-        let moto = hotmoto;
-        let m = 0, s = 0;
-        let div = document.createElement('div')
-        div.className = `floatdiv draggable ${moto}`;
-        div.style.top = `${random(0, (window.innerHeight - 100))}px`;
-        div.style.right = `${random(0, (window.innerWidth - 100))}px`;
-        div.addEventListener('mouseleave', async function(e){
-            if(m){
-                if(s) return;
-                s = 1;
-                while(m) await delay(10)
-                s = 0;
-            };
-            desc.style.opacity = 0;
-            list.style.height = '0px';
-            m = 1;
-            await delay(300)
-            list.style.opacity = 0;
-            m = 0;
-        })
-        div.addEventListener('click', async function(e){
-            div.classList.toggle('hidden')
-        })
-
-        let focus = document.createElement('div');
-        focus.className = 'focus';
-        focus.textContent = moto;
-        focus.style.width = '120px'
-        focus.addEventListener('mouseenter', async function(e){
-            if(m){
-                if(s) return;
-                s = 1;
-                while(m) await delay(10)
-                s = 0;
-            };
-            list.style.opacity = 1;
-            list.style.height = `${listHgh}px`;
-            m = 1;
-            await delay(300);
-            desc.style.opacity = 1;
-            m = 0;
-        })
-        div.appendChild(focus)
-        
-        let list = document.createElement('div');
-        list.className = 'list';
-        list.style.height = 'auto';
-        let listHgh = '0px';
-        
-        let desc = document.createElement('div');
-        desc.className = 'desc';
-        desc.style.height = '0px';
-        div.appendChild(desc);
-
-        for(a of maylists[moto].list){
-            let item = document.createElement('div');
-            let itemn = a.name;
-            let itemd = a.description;
-            item.className = 'item'
-            item.textContent = a.name;
-            // item.dataset.description = a.description;
-            item.addEventListener('click', async function(){
-                maylists[moto].process(itemn, itemd);
-            })
-            item.addEventListener('mouseenter', async function(){
-                desc.innerHTML = itemd;
-                desc.style.left = '120px';
-                focus.style.width = '240px';
-            });
-            list.addEventListener('mouseleave', async function(){
-                desc.innerHTML = '';
-                desc.style.left = '0';
-                focus.style.width = '120px';
-            });
-            
-            list.appendChild(item);
-        }
-        div.appendChild(list);
-        document.getElementById('mainArea').appendChild(div)
-
-        listHgh = document.querySelector(`.floatdiv.draggable.${moto} .list`).offsetHeight;
-        document.querySelector(`.floatdiv.draggable.${moto} .desc`).style.height = `${listHgh}px`;
-        document.querySelector(`.floatdiv.draggable.${moto} .list`).style.height = `0px`;
-    }
-}
-// document.addEventListener('mouseenter', e => {
-//     let e = e.target;
-//     if(!e) return 0;
-//     if(!e.classList.contains('floatdiv')) return 0;
-//     let list = e.querySelector('.list');
-//     list.style.opacity = 1;
-//     list.style.height = 'auto';
-// });
-
-// document.addEventListener('mouseleave', e => {
-//     let e = e.target;
-//     if(!e) return 0;
-//     if(!e.classList.contains('floatdiv')) return 0;
-//     let list = e.querySelector('.list');
-//     list.style.opacity = 0;
-//     list.style.height = '0px';
-// });
-
-//#endregion may
-*/
+titleC.newB.addEventListener('click', () => {
+    titleD.classList.add('hidden');
+})
+//#endregion titleArea
 
 //#region ビッグマシュマロ（唐突）
 let bigmmD = document.getElementById('bigmashmaro');
@@ -984,11 +822,18 @@ bigmmC.actL = [
         disp:'makeInv',
         func: async function(){
             sendpyTx('printTx,脳2に接続しています....')
-            sendpyTx('create_inventry_koppe_400_400_120_101325_20000000_1000000000');
+            sendpyTx('create_inventry_koppe_400_400_120_101325_660_2170008'); //最大はほぼアルミニウム
             sendpyTx('open_inventry_koppe');
             sendpyTx('print,inventry');
             map_make();
             sendpyTx('printTx,接続..切断....');
+        }
+    },
+    {
+        name:'inv_detail',
+        disp:'inventryの詳細を',
+        func: async function(){
+            sendpyTx('print,inventry');
         }
     },
     {
@@ -1021,14 +866,14 @@ let rainC = {
     tapend: 0
 }
 rainB.addEventListener('click', () => {
-    // let f = 0;
-    // if(rainC.tapend) f = 1, rainC.tapend = 0;
-    //             else f = 0, rainC.tapend = 1;
+    let f = 0;
+    if(rainC.tapend) f = 1, rainC.tapend = 0;
+                else f = 0, rainC.tapend = 1;
 
-    // document.querySelectorAll('*').forEach(el => {
-    //     if(f) el.classList.remove('rainback');
-    //     if(!f) el.classList.add('rainback');
-    // });
+    document.querySelectorAll('*').forEach(el => {
+        if(f) el.classList.remove('rainback');
+        if(!f) el.classList.add('rainback');
+    });
 
     let item = cocGacha();
     sendpyTx(`printTx,${item}`);
@@ -1600,25 +1445,6 @@ canV.addEventListener('click', e => {
 
 
 //#endregion canvas
-
-//#region arcana
-let arcanaD = document.getElementById("arcana");
-let arcanaC = {
-    drawD: arcanaD.querySelector(".draw"),
-    placeD: arcanaD.querySelector(".place")
-}
-
-function cardDraw(){
-    let arr = Arcanas.filter(a => a.able);
-    if(arr.length == 0) return addtext('引けるカードがないっすよ〜？');
-    let card = arraySelect(arr);
-
-    let cardD = document.createElement("div");
-    cardD.className = "card";
-    cardD.style.backgroundImage = `url(assets/images/arcanas/${card.img})`;
-    arcanaC.placeD.appendChild(cardD);
-}
-//#endregion arcana
 
 //#region jamer_popup
 async function popup_dasu(num = 1){

@@ -9,6 +9,7 @@ import random
 import csv
 import copy
 import os
+import pickle
 
 """import socket
 import os"""
@@ -221,7 +222,7 @@ async def handler(websocket):
             elif message[:5]=="heat_":#f"heat_{name}_{add_heat}"
                 x=message[5:].split("_")
                 inventry[x[0]][3]+=float(x[1])
-            elif message[:9]=="pressure_":#f"pressure_{name}_{add_pressure}"
+            elif message[:9]=="pressure_":#f"pressure}"
                 x=message[9:].split("_")
                 inventry[x[0]][4]+=float(x[1])
             elif message[:11]=="input_item_":#f"imput_item_{name}_{x}_{y}_{item}"
@@ -238,14 +239,20 @@ async def handler(websocket):
                 inventry[x[0]]=[[],float(x[1]),float(x[2]),float(x[3]),float(x[4]),tem.copy(),tem.copy(),float(x[5]),float(x[6])]
             elif message[:14]=="open_inventry_" and message[14:] not in flag["inventry_name"]:#f"open_inventry_{name}"
                 await open_inventry(message[14:])
-
+            elif message[:15]=="save_data_load_":
+                f = open(message[15:],"rb")
+                inventry=pickle.load(f)
+            elif message[:15]=="save_data_save_":
+                f = open(message[15:],"wb")
+                pickle.dump(inventry,f)
+                f.close
             #囧
             
             elif message[:8]=="printTx,":
                 print(message[8:])
             
             elif message[:6]=="print,":
-                print(False)#eval(message[6:]))
+                print(eval(message[6:]))
                 
             elif message[:3]=="次は、" and message[-2:]=="です":
                 print("次は？") # 次は、${nextIS}です
@@ -720,10 +727,14 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                     canvas["inventry_root_"+str(name)].delete("pressuregauge")
                     canvas["inventry_root_"+str(name)].delete("thermometer")
                     if 16-(15/inventry2[name][7])*inventry2[name][3]<0:
+                        coloer="#241CED"
                         canvas["inventry_root_"+str(name)].itemconfigure("thermometer_outline",image=img[str(name)+"thermometer_blue"])
+                    else:
+                        coloer="#ED1C24"
+                        canvas["inventry_root_"+str(name)].itemconfigure("thermometer_outline",image=img[str(name)+"thermometer"])
 
                     canvas["inventry_root_"+str(name)].create_line(13, 13, 13+(8*math.cos(math.radians(90-(-(300/inventry2[name][8])*inventry2[name][4])+30))),  13+(8*math.sin(math.radians(90-(-(300/inventry2[name][8])*inventry2[name][4])+30))),tag=("system","pressuregauge"),arrow=tk.FIRST,arrowshape=(8, 2, 1),fill = "#000000")
-                    canvas["inventry_root_"+str(name)].create_line(39, 16,39,abs(16-(15/inventry2[name][7])*inventry2[name][3],tag=("system","thermometer")),fill = "#ED1C24",width=1)
+                    canvas["inventry_root_"+str(name)].create_line(39, 16,39,(16-abs(15/inventry2[name][7])*inventry2[name][3]),tag=("system","thermometer"),fill = coloer,width=1)
                     #print(90-((360/inventry2[name][8])*inventry2[name][4])-10)
                     canvas["inventry_root_"+str(name)].lift("system")
 

@@ -3,6 +3,7 @@
 @font-face{src:url('assets/fonts/marukoius.ttf');font-family: marukoius;}
 @font-face{src:url('assets/fonts/starrysky.otf');font-family: starrysky;}
 @font-face{src:url('assets/fonts/kurundeco.otf');font-family: kurundeco;}
+@font-face{src:url('assets/fonts/urara.otf');font-family: urara;}
 html{
     margin: -8px;
     overflow: hidden;
@@ -22,6 +23,12 @@ img{
     -khtml-user-drag: none;
     -moz-user-drag: none;
     -o-user-drag: none;
+}
+::-webkit-scrollbar{
+    display: none;
+}
+:focus{
+    outline: none;
 }
 
 /*nicotext*/
@@ -167,6 +174,63 @@ textarea{
     /* font-family: kurundeco; */
 }
 
+:root{
+    --txwaku: #6bb9ff
+}
+#titleArea{
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    background: #f0f8ff;
+    white-space: nowrap;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+}
+#titleArea.hidden{
+    display: none;
+}
+#titleArea .title{
+    display: inline;
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    /* text-decoration: underline #cfe9ff; */
+    color: #b5dcff;
+    font-size: 60px;
+    font-family: urara;
+    text-shadow:1px 1px 0 var(--txwaku), -1px -1px 0 var(--txwaku),
+                -1px 1px 0 var(--txwaku), 1px -1px 0 var(--txwaku),
+                0px 1px 0 var(--txwaku),  0 -1px 0 var(--txwaku),
+                -1px 0 0 var(--txwaku), 1px 0 0 var(--txwaku)
+}
+#titleArea .buttons{
+    display: flex;
+    flex-direction: column;
+    justify-self: flex-start;
+    align-items: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+#titleArea .buttons .bt{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30vw;
+    aspect-ratio: 4/1;
+    padding: 5px 30px;
+    background-color: #def0ff;
+    border: 3px solid #cfe9ff;
+    color: #4473ad;
+    font-size: 25px;
+    cursor: pointer;
+    margin: 5px;
+}
+
 #mainArea{
     width: calc(100vw - 80px);
     height: calc(100vh - 80px);
@@ -268,7 +332,7 @@ textarea{
 }
 
 #bigmashmaro{
-    z-index: 69;
+    z-index: 4;
 }
 #bigmashmaro .kitekey{
     display: block;
@@ -280,7 +344,7 @@ textarea{
     top: 0;
     right: 10%;
     transition: top 0.5s ease;
-    z-index: 69;
+    z-index: inherit;
 }
 #bigmashmaro .kitekey .column{
     width: 80%;
@@ -289,7 +353,7 @@ textarea{
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 69;
+    z-index: inherit;
 }
 #bigmashmaro .kitekey .theta{
     width: 100%;
@@ -297,7 +361,7 @@ textarea{
     background: #90ccff;
     clip-path: polygon(0% 0%, 50% 50%, 100% 0%, 100% 50%, 50% 100%, 0% 50%);
     box-sizing: border-box;
-    z-index: 69;
+    z-index: inherit;
 }
 #bigmashmaro .kitekey.tap{
     top: 80%;   
@@ -315,7 +379,7 @@ textarea{
     right: 10%;
     transition: top 0.5s ease;
     box-sizing: border-box;
-    z-index: 69;
+    z-index: inherit;
 }
 #bigmashmaro .bodies.tap{
     top: 0;
@@ -334,6 +398,7 @@ textarea{
     top: -80%;
     right: calc(10% - 80px);   
     transition: top 0.5s ease;
+    z-index: inherit;
 }
 #bigmashmaro .sub.tap{
     top: 0;
@@ -362,7 +427,7 @@ textarea{
     position: fixed;
     top: 5px;
     left: 5px;
-    z-index: 100;
+    z-index: 3;
     box-sizing: border-box;
     pointer-events: none;
 }
@@ -479,46 +544,6 @@ textarea{
     right: 20px;
     transform: translateY(-50%);
     cursor: pointer;
-}
-
-#arcana{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    width: 400px;
-    max-height: 80%;
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #eaf5ff80;
-}
-#arcana .draw{
-    display: block;
-    width: 100px;
-    height: 60px;
-    background: #b5dcff
-}
-#arcana .draw:hover{
-    cursor: pointer;
-    filter: brightness(1.2);
-}
-#arcana .place{
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    width: 100%;
-    height: 100px;
-    overflow-x: auto;
-}
-#arcana .place .card{
-    height: 100%;
-    aspect-ratio: 2/3;
-    background-size: cover;
-    background-position: center;
-    border: 2px solid #000000;
-    box-sizing: border-box;
 }
 
 .jamerP.A{

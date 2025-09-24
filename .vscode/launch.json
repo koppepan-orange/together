@@ -70,6 +70,12 @@
             "name": "じゃんけんしようぜ！俺グョー出す！！",
             "file": "koppe/jungkeng/index.html"
         },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "農業ゲーム feat.カジノ",
+            "file": "koppe/farm-game/index.html"
+        },
 
     ],                                                                                                                                              
 }

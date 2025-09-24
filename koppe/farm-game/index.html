@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>blackjack-daisuki</title>
+  <html lang="ja">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="mitame.css">
+</head>
+<body>
+  <div id="GameZone">
+  <span id="PlayerMoney">euro:0€</span><br>
+  <div id="MiniGameArea">
+    <div style="display: flex;">
+      <div id="UIinfo"><img src='assets/wheat.png' style='width: 15px; height: 15px;'>0<br><img src='assets/carrot.png' style='width: 15px; height: 15px;'>0<br><img src='assets/potato.png' style='width: 15px; height: 15px;'>0<br><img src='assets/apple.png' style='width: 15px; height: 15px;'>0<br><img src='assets/goldapple.png' style='width: 15px; height: 15px;'>0</div>
+      <div id="UIfield"></div>
+    </div>
+    <div id="shops" style="text-align: left;">SHOP<br>
+        <button class="farmbutton" onclick="BuyTool()">Buy<img src="assets/hoe.png" style="width: 15px; height: 15px;"><span id="Toolprice">200€</span></button><br>
+        <button class="farmbutton" onclick="BuyField()">Buy field<img src="assets/field.png" style="width: 15px; height: 15px;"><span id="Fieldprice">100€</span></button><br>
+        <button class="farmbutton" onclick="SellAll()">Sell all<img src="assets/euro.png" style="width: 15px; height: 15px;"></button>
+    </div>
+  </div>
+  <span id="log"></span><br>
+  <button id="BackButton" onclick="Back()">go to casino</button>
+  </div>
+  <script src="nakami.js"></script>
+</body>
+</html>
