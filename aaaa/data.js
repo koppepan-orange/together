@@ -390,7 +390,11 @@ let Friends = [
         rare:3
     },
 
-
+    {
+        ruby:'fack~you',
+        name:'fack~you',
+        rare:1
+    },
 
 ]
 

@@ -475,7 +475,7 @@ function connect(){
 }
 
 function logadd(text){
-    messageTextArea.value += `${text}\n`; // ${random(1000,2900)}-${random(1,12)}-${random(1,31)} ${random(0,23)}:${random(0,59)}:${random(0,59)} INFO
+    messageTextArea.value += `\n${text}`; // ${random(1000,2900)}-${random(1,12)}-${random(1,31)} ${random(0,23)}:${random(0,59)}:${random(0,59)} INFO
     messageTextArea.scrollTop = messageTextArea.scrollHeight;
     if(text.includes('endgame')) window.open('about:blank', '_self').close();
 };
@@ -793,12 +793,14 @@ let bigmmD = document.getElementById('bigmashmaro');
 let bigmmC = {
     kitekeyD: bigmmD.querySelector('.kitekey'),
     bodyD:bigmmD.querySelector('.bodies'),
-    subD:bigmmD.querySelector('.sub')
+    subD:bigmmD.querySelector('.sub'),
+    jougeD:bigmmD.querySelector('.jouge'),
 }
 bigmmC.kitekeyD.addEventListener('click', async function(){
     bigmmC.kitekeyD.classList.toggle('tap');
     bigmmC.bodyD.classList.toggle('tap');
     bigmmC.subD.classList.toggle('tap');
+    bigmmC.jougeD.classList.toggle('tap');
 
     let gen = bigmmC.bodyD.value.trim('');
     bigmmC.bodyD.value = '';
@@ -816,13 +818,13 @@ bigmmC.kitekeyD.addEventListener('click', async function(){
         read(allScripts[src][name], 'arrayed');
     };
 })
-bigmmC.actL = [
+bigmmC.subL = [
     {
         name:'make inv',
         disp:'makeInv',
         func: async function(){
             sendpyTx('printTx,脳2に接続しています....')
-            sendpyTx('create_inventry_koppe_400_400_120_101325_660_2170008'); //最大はほぼアルミニウム
+            sendpyTx('create_inventry_koppe_400_400_120_101325_770_1013250_64'); //最大はほぼアルミニウム
             sendpyTx('open_inventry_koppe');
             sendpyTx('print,inventry');
             map_make();
@@ -847,7 +849,7 @@ bigmmC.actL = [
         func: () => {for(let i = 0; i < 99; i++) get('stone')}
     }
 ];
-for(let s of bigmmC.actL){
+for(let s of bigmmC.subL){
     let sD = document.createElement('div');
     sD.className = 's';
     sD.textContent = s.disp;
@@ -855,6 +857,74 @@ for(let s of bigmmC.actL){
         s.func();
     });
     bigmmC.subD.appendChild(sD);
+}
+
+/*
+<div class="j heat">
+    <div class="un"></div>
+    <div class="do"></div>
+    <div class="troa"></div>
+</div>
+*/
+bigmmC.jougeL = [
+    {
+        name:'heat',
+        num:20,
+        img:'thermometer'
+    },
+    {
+        name:'pressure',
+        num:1000,
+        img:'pressuregauge_pre'
+    }
+];
+for(let j of bigmmC.jougeL){
+    let jD = document.createElement('div');
+    jD.className = `j ${j.name}`;
+    
+    let ageF = () => {sendpyTx(`${j.name}_koppe_${+j.num}`)};
+    let sgeF = () => {sendpyTx(`${j.name}_koppe_${-j.num}`)};
+    let resF = () => {clearInterval(holdIn), clearTimeout(holdTi)};
+    let holdTi, holdIn;
+
+    let unD = document.createElement('div');
+    unD.className = 'un';
+    unD.addEventListener('mousedown', async function(){
+        ageF();
+
+        holdTi = setTimeout(() => {
+            holdIn = setInterval(async function(){
+                ageF();
+            }, 50);
+        }, 750);
+    });
+    unD.addEventListener('mouseup', resF);
+    unD.addEventListener('mouseleave', resF);
+    jD.appendChild(unD);
+    
+    let doD = document.createElement('div');
+    doD.className = 'do';
+     let img = document.createElement('img');
+     img.src = `assets/images/systems/${j.img}_big.png`;
+     doD.appendChild(img);
+    jD.appendChild(doD);
+
+    let troaD = document.createElement('div');
+    troaD.className = 'troa';
+    troaD.addEventListener('mousedown', async function(){
+        sgeF();
+
+        holdTi = setTimeout(() => {
+            holdIn = setInterval(async function(){
+                sgeF();
+            }, 100);
+        }, 750);
+    });
+    troaD.addEventListener('mouseup', resF);
+    troaD.addEventListener('mouseleave', resF);
+    jD.appendChild(troaD);
+
+    bigmmC.jougeD.appendChild(jD);
 }
 
 
@@ -1150,6 +1220,10 @@ document.addEventListener('keyup', e => {
    if(e.key == ' ') key = 'space';
    keys[key] = false;
 });
+
+let clicking = false;
+document.addEventListener('mousedown', () => clicking = true);
+document.addEventListener('mouseup', () => clicking = false);
 
 function resizeCanvas(){
     let wid =  window.innerWidth/2;
@@ -1506,6 +1580,7 @@ async function popup_dasu(num = 1){
 //#endregion
 
 function start(){
+    messageTextArea.value += `hello! no name!`;
     connect();
     
     inv_make();

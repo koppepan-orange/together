@@ -414,6 +414,64 @@ textarea{
     border: 2px solid #b5dcff;
     border-radius: 5px;
 }
+#bigmashmaro .sub .s:hover{
+    cursor: pointer;
+    filter: brightness(1.2);
+}
+#bigmashmaro .jouge{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    width: fit-content;
+    height: 25%;
+    position: fixed;
+    top: -25%;
+    left: 50px;
+    transition: top 0.5s ease;
+    z-index: inherit;
+}
+#bigmashmaro .jouge.tap{
+    top: 60%;
+}
+#bigmashmaro .jouge .j{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 70px;
+    height: 100%;
+    z-index: inherit;
+}
+#bigmashmaro .jouge .j .un{
+    width: 100%;
+    height: 36%;
+    background: #ff8383;
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    z-index: inherit;
+}
+#bigmashmaro .jouge .j .do{
+    width: 100%;
+    height: 28%;
+    background: #b6b6b6;
+    z-index: inherit;
+}
+#bigmashmaro .jouge .j .do img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    z-index: inherit;
+}
+
+#bigmashmaro .jouge .j .troa{
+    width: 100%;
+    height: 36%;
+    background: #7ec3ff;
+    clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+    z-index: inherit;
+}
+
 
 :root{
     --inv_rowG: 8px;

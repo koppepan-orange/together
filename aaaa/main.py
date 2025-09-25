@@ -24,14 +24,16 @@ with open('book1.csv',"r",encoding="utf-8_sig", newline='\r\n') as f:
     for fa in csv.reader(f):
         fas=[]
         float_non_fack=True
+        coun=0
         for fafad in fa[1:11]:
             try:
-                if fafad=="":
+                if fafad=="" and coun!=7:
                     float_non_fack=False
                 fas.append(float(fafad))
             except Exception as e:
                 #print(e)
                     fas.append(float("inf"))
+            coun+=1
         if float_non_fack : tem[fa[0]]=0.0
         csvdata[fa[0]]=fas#+[float(fa[8])/100]+fa[9:]
         #csvname.append(fa[0])
@@ -234,9 +236,9 @@ async def handler(websocket):
             elif message[:10]=="imput_air_":#imput_melt_{name}_{item}_{cm3}
                 x=message[10:].split("_")
                 inventry[str(x[0])][6][x[1]]+=x[2]
-            elif message[:16]=="create_inventry_":#f"create_invryentry_{name}_{windth}_{higth}_{onndo}_{aturyoku}_{tainetu}_{taiatu}"
+            elif message[:16]=="create_inventry_":#f"create_invryentry_{name}_{windth}_{higth}_{onndo}_{aturyoku}_{tainetuMAX}_{taiatu}_{taiatuMIN}"
                 x=message[16:].split("_")
-                inventry[x[0]]=[[],float(x[1]),float(x[2]),float(x[3]),float(x[4]),tem.copy(),tem.copy(),float(x[5]),float(x[6])]
+                inventry[x[0]]=[[],float(x[1]),float(x[2]),float(x[3]),float(x[4]),tem.copy(),tem.copy(),float(x[5]),float(x[6]),float(x[7])]
             elif message[:14]=="open_inventry_" and message[14:] not in flag["inventry_name"]:#f"open_inventry_{name}"
                 await open_inventry(message[14:])
             elif message[:15]=="save_data_load_":
@@ -726,15 +728,17 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                 if  write:
                     canvas["inventry_root_"+str(name)].delete("pressuregauge")
                     canvas["inventry_root_"+str(name)].delete("thermometer")
-                    if 16-(15/inventry2[name][7])*inventry2[name][3]<0:
+                    if (15/inventry2[name][7])*inventry2[name][3]<0:
+                        cclemon=16-abs((15/inventry2[name][9])*(inventry2[name][3]))
                         coloer="#241CED"
                         canvas["inventry_root_"+str(name)].itemconfigure("thermometer_outline",image=img[str(name)+"thermometer_blue"])
                     else:
+                        cclemon=16-abs((15/inventry2[name][7])*(inventry2[name][3]))
                         coloer="#ED1C24"
                         canvas["inventry_root_"+str(name)].itemconfigure("thermometer_outline",image=img[str(name)+"thermometer"])
 
                     canvas["inventry_root_"+str(name)].create_line(13, 13, 13+(8*math.cos(math.radians(90-(-(300/inventry2[name][8])*inventry2[name][4])+30))),  13+(8*math.sin(math.radians(90-(-(300/inventry2[name][8])*inventry2[name][4])+30))),tag=("system","pressuregauge"),arrow=tk.FIRST,arrowshape=(8, 2, 1),fill = "#000000")
-                    canvas["inventry_root_"+str(name)].create_line(39, 16,39,(16-abs(15/inventry2[name][7])*inventry2[name][3]),tag=("system","thermometer"),fill = coloer,width=1)
+                    canvas["inventry_root_"+str(name)].create_line(39, 16,39,cclemon,tag=("system","thermometer"),fill = coloer,width=1)
                     #print(90-((360/inventry2[name][8])*inventry2[name][4])-10)
                     canvas["inventry_root_"+str(name)].lift("system")
 
@@ -793,7 +797,29 @@ def delete_inventry_GUI(name):
 #    canvas["inventry_root_"+str(name)].delete('all')
 #    for inventry[name]
 
+def pressuregauge(e,name):
+    try:
+        root["inventry_Toplevel_pressuregauge"+str(name)].focus_set()
+    except:
+        root["inventry_Toplevel_pressuregauge"+str(name)]=tk.Toplevel(root["inventry_root_"+str(name)])
+        img[str(name)+"pressuregauge"]=tk.PhotoImage(file = "./assets/images/systems/pressuregauge_mid.png",master=root["inventry_Toplevel_pressuregauge"+str(name)])
+        root["inventry_Toplevel_pressuregauge"+str(name)].geometry(f"300x300+100+100")
+        root["inventry_Toplevel_pressuregauge"+str(name)].attributes("-toolwindow",True)
+        root["inventry_Toplevel_pressuregauge"+str(name)].attributes("-topmost", True)
+        root["inventry_Toplevel_pressuregauge"+str(name)].resizable(False, False)
+        root["inventry_Toplevel_pressuregauge"+str(name)].focus_set()
 
+def thermometer(e,name):
+    try:
+        root["inventry_Toplevel_thermometer"+str(name)].focus_set()
+    except:
+        root["inventry_Toplevel_thermometer"+str(name)]=tk.Toplevel(root["inventry_root_"+str(name)])
+        img[str(name)+"thermometer_mid"]=tk.PhotoImage(file = "./assets/images/systems/thermometer_mid.png",master=root["inventry_Toplevel_thermometer"+str(name)])
+        root["inventry_Toplevel_thermometer"+str(name)].geometry(f"300x300+100+100")
+        root["inventry_Toplevel_thermometer"+str(name)].attributes("-toolwindow",True)
+        root["inventry_Toplevel_thermometer"+str(name)].attributes("-topmost", True)
+        root["inventry_Toplevel_thermometer"+str(name)].resizable(False, False)
+        root["inventry_Toplevel_thermometer"+str(name)].focus_set()
 
 def out(e,name):
     canvas["inventry_root_"+str(name)].delete('have')
@@ -820,11 +846,11 @@ async def open_inventry(name:str):
         root["inventry_root_"+str(name)].resizable(False, False)
         canvas["inventry_root_"+str(name)] = tk.Canvas(master=root["inventry_root_"+str(name)],bg = "white", width = inventry[name][1],height = inventry[name][2])
         canvas["inventry_root_"+str(name)].place(x = 0,y = 0)
-        img[str(name)+"pressuregauge"]=tk.PhotoImage(file = "./assets/images/systems/pressuregauge.png")
-        img[str(name)+"thermometer"]=tk.PhotoImage(file = "./assets/images/systems/thermometer.png")
-        img[str(name)+"thermometer_blue"]=tk.PhotoImage(file = "./assets/images/systems/thermometer_blue.png")
-        canvas["inventry_root_"+str(name)].create_image(13,13, image=img[str(name)+"pressuregauge"],tag="system")
-        canvas["inventry_root_"+str(name)].create_image(39,13, image=img[str(name)+"thermometer"],tag=("system","thermometer_outline"))
+        img[str(name)+"pressuregauge"]=tk.PhotoImage(file = "./assets/images/systems/pressuregauge.png",master=root["inventry_root_"+str(name)])
+        img[str(name)+"thermometer"]=tk.PhotoImage(file = "./assets/images/systems/thermometer.png",master=root["inventry_root_"+str(name)])
+        img[str(name)+"thermometer_blue"]=tk.PhotoImage(file = "./assets/images/systems/thermometer_blue.png",master=root["inventry_root_"+str(name)])
+        canvas["inventry_root_"+str(name)].tag_bind(canvas["inventry_root_"+str(name)].create_image(13,13, image=img[str(name)+"pressuregauge"],tag="system"),"<ButtonPress-1>",lambda e,name=name:pressuregauge(e,name))
+        canvas["inventry_root_"+str(name)].tag_bind(canvas["inventry_root_"+str(name)].create_image(39,13, image=img[str(name)+"thermometer"],tag=("system","thermometer_outline")),"<ButtonPress-1>",lambda e,name=name:thermometer(e,name))
         root["inventry_root_"+str(name)].bind("<Leave>",lambda e,name=name:out(e,name))
         root["inventry_root_"+str(name)].bind("<Motion>",lambda e,name=name:motion(e,name))
         root["inventry_root_"+str(name)].bind("<ButtonRelease-1>",lambda e,name=name:click(e,name))

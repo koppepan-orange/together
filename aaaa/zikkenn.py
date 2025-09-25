@@ -1,5 +1,3 @@
-# kizukuna_aiが消えてる～～～～～～～～ まあ問題はないが
-
 import pickle
 
 #sample_list = [1,2,3]
@@ -11,6 +9,7 @@ import pickle
 
 f = open("sample.binaryfile","rb")
 
+print('こんにちは！！！！discoでリアクションが禁止されたコッペパンです！！！！！！！！')
 
 print(pickle.load(f))
 
