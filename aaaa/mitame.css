@@ -472,6 +472,40 @@ textarea{
     z-index: inherit;
 }
 
+#fonts{
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 150px;
+    height: fit-content;
+    padding: 2px;
+    background: #00000085;
+    position: fixed;
+    top: 50px;
+    left: 20px;
+    box-sizing: border-box;
+}
+#fonts .f{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    padding: 10px 5px;
+    border: 2px solid #ffffff00;
+}
+#fonts .f.selected{
+    border-bottom: none;
+    border: 2px solid #ffffff;
+}
+#fonts .f .name{
+    width: 100%;
+    display: block;
+    text-align: center;
+    color: #ffffff;
+}
+
 
 :root{
     --inv_rowG: 8px;

@@ -76,6 +76,12 @@
             "name": "農業ゲーム feat.カジノ",
             "file": "koppe/farm-game/index.html"
         },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "数学鱈",
+            "file": "koppe/mass_cod/index.html"
+        },
 
     ],                                                                                                                                              
 }

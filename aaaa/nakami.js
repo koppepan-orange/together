@@ -930,6 +930,75 @@ for(let j of bigmmC.jougeL){
 
 //#endregion bigmashmaro
 
+//#region fontChange
+let fontD = document.getElementById('fonts')
+let fontC = {
+    now: 0,
+    max: null,
+    font: 'comicsans',
+    appe: 0
+}
+let fontF = {
+    load: () => {
+        let arr = Fonts.filter(a => a.able);
+        fontC.max = arr.length;
+        for(let a of arr){
+            let div = document.createElement('div');
+            div.className = 'f';
+            div.setAttribute('data-name', a.name);
+            div.setAttribute('data-description', a.desc);
+
+            let name = document.createElement('div');
+            name.className = 'name';
+            name.textContent = a.name;
+            div.appendChild(name);
+
+            fontD.appendChild(div);
+        };
+    },
+    tekiou: () => {
+        let items = fontD.querySelectorAll('.f');
+        items.forEach(a => {
+            if(a.classList.contains('selected')) a.classList.remove('selected')
+        })
+        items[fontC.now - 1].classList.add('selected')
+        fontC.font = items[fontC.now - 1].getAttribute('data-name');
+    },
+    select: () => {
+        fontC.ing = 0;
+        fontD.style.display = 'none';
+        fontF.change(fontC.font);
+    }
+}
+document.addEventListener('keydown', event => {
+    if(event.key == "Shift"){
+        if(fontC.ing) return;
+        fontD.style.display = "flex";
+        fontC.ing = 1;
+    }
+});
+document.addEventListener('keyup', (event) => {
+    if(fontC.ing){
+        switch(event.key){
+            case 'ArrowDown':
+            case 'ArrowRight':
+                fontC.now += 1;
+                if(fontC.max < fontC.now) fontC.now = fontC.max;
+                fontF.tekiou()
+                break;
+            case 'ArrowUp':
+            case 'ArrowLeft':
+                fontC.now -= 1;
+                if(fontC.now < 1) fontC.now = 1;
+                fontF.tekiou()
+                break;
+            case 'Shift':
+                fontF.select();
+                break;
+        };
+    }
+})
+
 //#region rainbow
 let rainB = document.querySelector('#rainbt');
 let rainC = {
@@ -1585,6 +1654,7 @@ function start(){
     
     inv_make();
     map_load()
+    fontF.load();
     resizeCanvas();
 
     loop = 1;
