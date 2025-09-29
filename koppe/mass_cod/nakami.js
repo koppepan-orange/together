@@ -23,11 +23,11 @@ function kaijou(num){
     return num * kaijou(num - 1);
 }
 function isSosu(num){
-  if (num < 2) return 0;
-  for(let i = 2; i * i <= n; i++){
-    if(n % i == 0) return 0;
-  }
-  return 1;
+    if(num < 2) return 0;
+    for(let i = 2; i * i <= n; i++){
+        if(n % i == 0) return 0;
+    }
+    return 1;
 }
 function arraySelect(array){
     let select = Math.floor(Math.random()*array.length);
@@ -500,14 +500,8 @@ function tryPet(now, dirChanges){
 
 function doPetReaction(intensity){
     // intensity に応じてリアクションを変えられる（今は短いアニメと台詞）
-    head.classList.add('purr');
-    ghost.classList.add('boost');
     let text = arraySelect(['ん','..','満足？'])
     showBubble(text);
-
-    // 再利用可能に戻す
-    setTimeout(()=> head.classList.remove('purr'), 700);
-    setTimeout(()=> ghost.classList.remove('boost'), 300);
 }
 
 function showBubble(text){

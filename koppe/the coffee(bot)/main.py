@@ -10,7 +10,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 # TOKENは好きに使うがいい〜
-TOKEN = 'MTQyMTQ3NDg2OTY2MDM1MjU5Ng.Gb49PR.2dVWR8AKbOvhLErSHZ0Idyfq2wqQyzdKyI7LP8'
+TOKEN = 'MTQyMTQ3NDg2OTY2MDM1MjU5Ng.Gfdlio.wQmD4lYMvYcQY_cI5SPNG5ErhH3iCx0WNg45aU'
 
 bot = commands.Bot(command_prefix = "kP", intents = intents)
 
@@ -21,7 +21,7 @@ Pingpong = [
     },
     {
         "ping": 'おもち',
-        "pong": 'どした？'
+        "pong": 'もちもち'
     },
     {
         "ping": '@everyone',

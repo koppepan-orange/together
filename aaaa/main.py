@@ -519,7 +519,7 @@ async def hitbox(ichi,ichiD,dens,name,width,hight,count):
         inventry2[name][0][count][1] = ichi[1]
         inventry2[name][0][count][0] = ichi[0]
         inventry2[name][0][count][3] = ichi[3]
-    print(filled)
+    #print(filled) #デバックで邪魔なので切りました
 
 async def change_taiseki(cm3:float,g_cm3_moto:float,g_cm3_ato:float):
     #print("cm3",cm3,"g/cm3_moto",g_cm3_moto,"g/cm3_ato",g_cm3_ato))
@@ -628,7 +628,11 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                         await hitbox(ichi=i,ichiD=melt_y,dens=inventry2[name][3],name=name,width=inventry2[name][1],hight=inventry2[name][2],count=count) 
                     count+=1
                     for xxxxa in delet_list:
-                        del inventry2[name][0][xxxxa]
+                        try:
+                            del inventry2[name][0][xxxxa]
+                        except IndexError as e:
+                            print(inventry2)
+                            print(e)
 
                 for key,i in index[5].items():
                     if await change_yuuten(csvdata[key][0],csvdata[key][5],inventry2[name][4],csvdata[key][8],csvdata[key][7]) > inventry2[name][3] and inventry2[name][5][key]!=0:

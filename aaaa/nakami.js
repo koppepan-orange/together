@@ -998,6 +998,7 @@ document.addEventListener('keyup', (event) => {
         };
     }
 })
+//#endregion
 
 //#region rainbow
 let rainB = document.querySelector('#rainbt');
@@ -1005,14 +1006,14 @@ let rainC = {
     tapend: 0
 }
 rainB.addEventListener('click', () => {
-    let f = 0;
-    if(rainC.tapend) f = 1, rainC.tapend = 0;
-                else f = 0, rainC.tapend = 1;
+    // let f = 0;
+    // if(rainC.tapend) f = 1, rainC.tapend = 0;
+    //             else f = 0, rainC.tapend = 1;
 
-    document.querySelectorAll('*').forEach(el => {
-        if(f) el.classList.remove('rainback');
-        if(!f) el.classList.add('rainback');
-    });
+    // document.querySelectorAll('*').forEach(el => {
+    //     if(f) el.classList.remove('rainback');
+    //     if(!f) el.classList.add('rainback');
+    // });
 
     let item = cocGacha();
     sendpyTx(`printTx,${item}`);
@@ -1646,6 +1647,119 @@ async function popup_dasu(num = 1){
         await delay(50);
     }
 }
+//#endregion
+
+//#region mass_cod
+const head = document.getElementById('head');
+const headTop = head.querySelector('.top');
+const headBottom = head.querySelector('.bottom');
+const bubble = document.getElementById('bubble');
+const ghost = document.getElementById('ghost');
+
+// --- 設定（必要ならいじれ） ---
+const WINDOW_MS = 700;             // 何msの履歴を見るか
+const MIN_MOVE_PX = 3;             // このpx以下の移動未満は無視（ノイズ対策）
+const REQUIRED_DIR_CHANGES = 4;    // この回数で撫で判定
+const COOLDOWN_MS = 1100;          // 反応後のクールダウン
+// -------------------------------
+
+let samples = []; // {x, t}
+let lastPetAt = -9999;
+let lastPointerId = null;
+
+// util: 指定座標が head の内部にあるか
+function isInsideHead(x, y){
+    const r = headTop.getBoundingClientRect();
+    return (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom);
+}
+
+// document 全体のポインター移動で監視（早い動きでも拾える）
+document.addEventListener('pointermove', (ev) => {
+    // ev.preventDefault();
+    const x = ev.clientX, y = ev.clientY, t = performance.now();
+
+    if (!isInsideHead(x,y)) return;
+    // 頭から外れたら履歴は少し残すが基本ここで終わり
+    // Option: samples = []; で外れた瞬間リセットすることもできる
+
+    // add sample
+    samples.push({x, t});
+    const cutoff = t - WINDOW_MS;
+    // prune old
+    while (samples.length && samples[0].t < cutoff) samples.shift();
+
+    // compute direction changes among significant moves
+    let lastSign = 0;
+    let dirChanges = 0;
+    let lastX = null;
+    for(const s of samples){
+        if (lastX === null){lastX = s.x; continue};
+        const dx = s.x - lastX;
+        lastX = s.x;
+        if (Math.abs(dx) < MIN_MOVE_PX) continue; // ノイズ小さいやつは無視
+        const sign = dx > 0 ? 1 : -1;
+        if (lastSign === 0) lastSign = sign;
+        else if (sign !== lastSign){
+            dirChanges++;
+            lastSign = sign;
+        }
+    }
+
+    if (dirChanges >= REQUIRED_DIR_CHANGES){
+        tryPet(t, dirChanges);
+        // 反応させたら履歴を軽くクリアして連続トリガーを抑える
+        samples = [];
+    }
+});
+
+function tryPet(now, dirChanges){
+    if (now - lastPetAt < COOLDOWN_MS) return;
+    lastPetAt = now;
+    doPetReaction(dirChanges);
+}
+
+function doPetReaction(intensity){
+    // intensity に応じてリアクションを変えられる（今は短いアニメと台詞）
+    let text = arraySelect(['ん','..','満足？'])
+    showBubble(text);
+}
+
+function showBubble(text){
+    bubble.textContent = text;
+    bubble.classList.add('show');
+    // 表示時間は文字数で変える（短いほど短め）
+    const displayMs = Math.max(900, Math.min(2200, 300 + text.length * 120));
+    setTimeout(()=> bubble.classList.remove('show'), displayMs);
+}
+
+// --- オプション: head をクロスブラウザでドラッグしても反応するようにする簡易処理 ---
+// pointerdown で pointer capture して高速な挙動でも拾える（任意）
+// head.addEventListener('pointerdown', (e)=>{
+//     try{head.setPointerCapture(e.pointerId)}catch(e){}
+// });
+
+// head.addEventListener('pointerup', (e)=>{
+//     try{ head.releasePointerCapture(e.pointerId); }catch(e){}
+// });
+
+headBottom.addEventListener('dblclick', async function(){
+    showBubble('何？');
+    await delay(1000);
+    menuShow();
+});
+
+// --- タッチでも動く（pointer イベント使用してあるからそのまま動く） ---
+
+// ------- デバッグ用: キーで閾値をいじれる（任意） -------
+window.__ghost = {
+    tweak: (k, v) => {
+        if (k === 'window') WINDOW_MS=v;
+        if (k === 'minmove') MIN_MOVE_PX=v;
+        if (k === 'req') REQUIRED_DIR_CHANGES=v;
+        if (k === 'cool') COOLDOWN_MS=v;
+        return {WINDOW_MS, MIN_MOVE_PX, REQUIRED_DIR_CHANGES, COOLDOWN_MS};
+    }
+};
 //#endregion
 
 function start(){

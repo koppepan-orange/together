@@ -9,7 +9,7 @@ import pickle
 
 f = open("sample.binaryfile","rb")
 
-print('こんにちは！！！！discoでリアクションが禁止されたコッペパンです！！！！！！！！')
+print('こんにちは！！！')
 
 print(pickle.load(f))
 
