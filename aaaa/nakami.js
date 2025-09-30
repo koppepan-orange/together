@@ -431,6 +431,7 @@ soundsNames.forEach(num => {
 }); 
 //#endregion
 
+//#region Re:connection!!
 var webSocket; //ウェブソケット
 var messageTextArea = document.getElementById("messageTextArea"); // HTML内のテキスト出力エリア
 let message = document.getElementById("textMessage");
@@ -492,8 +493,20 @@ function sendpyTx(text){
     if(connecten) webSocket.send(text);
 };
 
-
-
+window.setInterval(() => {
+    if(probability(2)){
+        let Emozis = [
+            `^~^`,
+            `uwu`,
+            `owo`,
+            `;~;`,
+            `$w$`,
+            `┐o_o┌`,
+        ]
+        let emozi = arraySelect(Emozis);
+        logadd(`??? => ${emozi}`);
+    }
+}, 1000)
 
 function cocGacha(code = 0){
     let list = [
@@ -520,6 +533,8 @@ function cocGacha(code = 0){
     
     return n
 }
+
+//#endregion
 
 //#region reads
 let allScripts = {};
@@ -1272,12 +1287,52 @@ let canC = {
         if(ress.length == 0) return nicoText('なんの成果も!!得られませんでした!!');
         if(ress.length == 1) return ress[0];
         return ress;
+    },
+    draw: () => {
+        //back
+        for(let y = 0; y < canC.mas; y++){
+            for(let x = 0; x < canC.mas; x++){
+                if(!backmap[y][x]) continue;
+                let img = canC.imgs['maps'][backmap[y][x]];
+                if(img) canC.ctx.drawImage(img, x*canC.size, y*canC.size, canC.size, canC.size);
+                else console.error(`assets/maps/${backmap[y][x]}.png is not found.`);
+                
+            }
+        }
+    
+        //obj
+        //x,y 0~9等の、現在いる"マス"のこと。sx,syは、現在いる位置のこと。yx,yyは、今向かっている位置のこと。
+        for(let ob of canC.objs){
+            if(ob.name == 0) continue;
+    
+            // ob.x = Math.floor(ob.sx/canC.size);
+            // ob.y = Math.floor(ob.sy/canC.size);
+            ob.x = ob.sx;
+            ob.y = ob.sy;
+    
+            let type = ob.type;
+            let img = ob.img;
+    
+            canC.ctx.drawImage(canC.imgs[type][img], ob.sx*canC.size, ob.sy*canC.size, canC.size, canC.size);
+        }
+
+        drawGrid()
+    },
+    resize: () => {
+        let wid =  window.innerWidth/2;
+        canV.width = wid;
+        canV.height = wid;
+        canC.size = wid / canC.mas;
+        canC.ctx.clearRect(0, 0, canV.width, canV.height);
+        canC.draw();
     }
 }
 canV.width = window.innerWidth/2;
 canV.height = window.innerWidth/2;
 canC.ctx.fillStyle = '#ffffff';
 canC.ctx.clearRect(0, 0, canV.width, canV.height);
+window.addEventListener('resize', canC.resize);
+
 
 let keys = {}
 document.addEventListener('keydown', e => {
@@ -1294,17 +1349,6 @@ document.addEventListener('keyup', e => {
 let clicking = false;
 document.addEventListener('mousedown', () => clicking = true);
 document.addEventListener('mouseup', () => clicking = false);
-
-function resizeCanvas(){
-    let wid =  window.innerWidth/2;
-    canV.width = wid;
-    canV.height = wid;
-    canC.size = wid / canC.mas;
-    canC.ctx.clearRect(0, 0, canV.width, canV.height);
-    draw();
-}
-window.addEventListener('resize', resizeCanvas);
-
 
 let canI = {
     imagesLoaded: 0,
@@ -1333,35 +1377,6 @@ Object.keys(canI.imagesNames).forEach(type => {
 });
 
 
-
-function draw(){
-    //back
-    for(let y = 0; y < canC.mas; y++){
-        for(let x = 0; x < canC.mas; x++){
-            if(!backmap[y][x]) continue;
-            let img = canC.imgs['maps'][backmap[y][x]];
-            if(img) canC.ctx.drawImage(img, x*canC.size, y*canC.size, canC.size, canC.size);
-            else console.error(`assets/maps/${backmap[y][x]}.png is not found.`);
-            
-        }
-    }
-
-    //obj
-    //x,y 0~9等の、現在いる"マス"のこと。sx,syは、現在いる位置のこと。yx,yyは、今向かっている位置のこと。
-    for(let ob of canC.objs){
-        if(ob.name == 0) continue;
-
-        // ob.x = Math.floor(ob.sx/canC.size);
-        // ob.y = Math.floor(ob.sy/canC.size);
-        ob.x = ob.sx;
-        ob.y = ob.sy;
-
-        let type = ob.type;
-        let img = ob.img;
-
-        canC.ctx.drawImage(canC.imgs[type][img], ob.sx*canC.size, ob.sy*canC.size, canC.size, canC.size);
-    }
-}
 
 async function drawGrid(){
     canC.ctx.strokeStyle = '#555555';
@@ -1446,9 +1461,10 @@ function map_make(){
 
     drawGrid();
 
-    draw();
+    canC.draw();
 }
-document.getElementById('mapmake').addEventListener('click', map_make);
+let mapmakeD = document.getElementById('mapmake');
+mapmakeD.addEventListener('click', map_make);
 
 function objmake(){
     console.log('objつくるよ！')
@@ -1477,7 +1493,7 @@ function objmake(){
 
         canC.objs.push(ob);
     }
-    draw();
+    canC.draw();
 }
 
 
@@ -1526,7 +1542,7 @@ async function gomove(id, fyx, fyy){
         //console.log(`移動:: 量:${idou}, 回数:${kaisu}, 速度:${ikkai}`);
         for(let i = 0; i < kaisu; i++){
             ob[g.k] += ikkai;
-            draw();
+            canC.draw();
             await delay(5);
         }
 
@@ -1534,7 +1550,7 @@ async function gomove(id, fyx, fyy){
         ob[g.k] = g.o;
     }
 
-    draw();
+    canC.draw();
     nicoText('移動完了ed')
 
     if(ob.name =='player') pmoved();
@@ -1569,7 +1585,7 @@ async function pmoved(){
         }
         
         ob3.name = 0;
-        draw();
+        canC.draw();
     }
 }
 
@@ -1654,11 +1670,12 @@ const head = document.getElementById('head');
 const headTop = head.querySelector('.top');
 const headBottom = head.querySelector('.bottom');
 const bubble = document.getElementById('bubble');
+const bubbleText = bubble.querySelector('.text');
 const ghost = document.getElementById('ghost');
 
 // --- 設定（必要ならいじれ） ---
 const WINDOW_MS = 700;             // 何msの履歴を見るか
-const MIN_MOVE_PX = 3;             // このpx以下の移動未満は無視（ノイズ対策）
+const MIN_MOVE_PX = 2;             // このpx以下の移動未満は無視（ノイズ対策）
 const REQUIRED_DIR_CHANGES = 4;    // この回数で撫で判定
 const COOLDOWN_MS = 1100;          // 反応後のクールダウン
 // -------------------------------
@@ -1725,7 +1742,7 @@ function doPetReaction(intensity){
 }
 
 function showBubble(text){
-    bubble.textContent = text;
+    bubbleText.textContent = text;
     bubble.classList.add('show');
     // 表示時間は文字数で変える（短いほど短め）
     const displayMs = Math.max(900, Math.min(2200, 300 + text.length * 120));
@@ -1745,7 +1762,7 @@ function showBubble(text){
 headBottom.addEventListener('dblclick', async function(){
     showBubble('何？');
     await delay(1000);
-    menuShow();
+    // menuShow();
 });
 
 // --- タッチでも動く（pointer イベント使用してあるからそのまま動く） ---
@@ -1762,6 +1779,136 @@ window.__ghost = {
 };
 //#endregion
 
+//#region bullet festabal
+let bleC = {
+    canvas:document.getElementById('bleBack'),
+    ctx:document.getElementById('bleBack').getContext('2d'),
+    ing:0,
+    bls:[],
+}
+bleC.p = {
+    x: 0,
+    y: 0,
+    width: 5,
+    height: 5,
+    color: '#000000',
+    seigyo: 0,
+}
+let bleF = {}
+
+bleF.draw = () => {
+    bleC.ctx.clearRect(0, 0, bleC.canvas.width, bleC.canvas.height);
+    // bleC.ctx.fillStyle = '#cecece'
+    
+    //player
+    bleC.ctx.fillStyle = bleC.p.color;
+    bleC.ctx.fillRect(bleC.p.x - bleC.p.width / 2, bleC.p.y - bleC.p.height / 2, bleC.p.width, bleC.p.height);
+
+    //bullets
+    for(let bl of bleC.bls){
+        if(!bl.name) continue;
+
+        bleC.ctx.beginPath();
+        bleC.ctx.fillStyle = bl.color;
+        bleC.ctx.arc(bl.x, bl.y, bl.radius, 0, Math.PI * 2);
+        bleC.ctx.fill();
+        bleC.ctx.closePath();
+    }
+}
+bleF.resize = () => {
+    bleC.canvas.width = window.innerWidth;
+    bleC.canvas.height = window.innerHeight;
+    bleF.draw();
+}
+bleF.kidou = async function(){
+    if(bleC.ing) return;
+    bleC.ing = 0.5;
+    bleC.canvas.style.top = 0;
+    await delay(8000);
+    bleC.ing = 1;
+    
+    bleC.p.x = bleC.canvas.width/2;
+    bleC.p.y = bleC.canvas.height - 50;
+}
+mapmakeD.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    bleF.kidou()
+});
+
+bleF.update = () => {
+    bleF.bls.forEach((bl, index) => {
+        function destroy(){bleC.bls.splice(index, 1)};
+        
+        bl.x += bl.dx;
+        bl.y += bl.dy;
+        
+        if (bl.y - bl.radius > canvas.height || 
+            bl.y + bl.radius < 0 ||
+            bl.x + bl.radius < 0 ||
+            bl.x - bl.radius > canvas.width &&
+            bl.name != 'meteo') {
+            destroy();
+        }
+
+        if(bl.color == '#880015' && bl.y <= canvas.height*0.75 && bl.name != 'meteo'){
+            destroy()
+        }
+        if(bl.name == 'meteo' && bl.y - bl.radius > canvas.height){
+            destroy();
+        }
+        
+        if (bl.color != '#880015') {
+            let nearLava = bls.some(other => {
+                // 自分自身は除外
+                if (other === bl) return false;
+
+                // 溶岩かどうか whetherやね
+                if (other.color != '#880015') return false;
+
+                const distance = distanceBetween(bl, other);
+                const combinedRadius = bl.radius + other.radius;
+
+                return distance < combinedRadius + 5;
+            });
+
+            if(nearLava){
+                bl.hp -= 1;
+                if(bl.hp <= 0){
+                    destroy()
+                }
+            }
+        }
+
+
+        if (checkCollision(bl, player) && bl.name != 'meteo') {
+            if(bl.color == '#880015'){
+                NicoNicoText('溶岩来てますよ～')
+            }else{
+                NicoNicoText('痛って〜〜〜〜');
+            }
+            hited += 1;
+            destroy();
+        }
+    });
+}
+bleF.kyori = (a, b) => {
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+bleF.shoto2 = (from, to) => {
+    const dx = Math.abs(from.x - to.x);
+    const dy = Math.abs(from.y - to.y);
+    const combinedHalfWidths = to.width / 2 + from.radius;
+    const combinedHalfHeights = to.height / 2 + from.radius;
+
+    return dx < combinedHalfWidths && dy < combinedHalfHeights;
+}
+
+
+
+//#endregion
+
 function start(){
     messageTextArea.value += `hello! no name!`;
     connect();
@@ -1769,7 +1916,8 @@ function start(){
     inv_make();
     map_load()
     fontF.load();
-    resizeCanvas();
+    canC.resize();
+    bleF.resize();
 
     loop = 1;
     gameloop();
@@ -1782,7 +1930,7 @@ async function gameloop(){
     let en = looped % 800 == 0 ? 1 : 0;
 
     // if(en) objmake();
-    document.getElementById('mapmake').textContent = pickItem?.dataset?.item;
+    mapmakeD.textContent = pickItem?.dataset?.item;
 
     if(loop) requestAnimationFrame(gameloop);
 }

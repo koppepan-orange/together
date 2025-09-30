@@ -631,6 +631,7 @@ textarea{
     width: 100px;
     height: 70px;
     background: #d4ffc3;
+    border: 2px solid #723005;
     position: fixed;
     top: 50%;
     right: 20px;
@@ -678,4 +679,152 @@ textarea{
     padding: 0 2%;
     box-sizing: border-box;
     box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+:root{
+    --size: 180px;
+}
+
+/* ゴーストのコンテナ */
+#ghost{
+    width:var(--size);
+    height:calc(var(--size) * 1.2);
+    position:fixed;
+    right: 0;
+    bottom: 5%;
+    touch-action:none; /* タッチでページスクロールさせない */
+}
+
+/* 胴体 */
+.body{
+    position:absolute;
+    left:50%;
+    top:40%;
+    transform:translateX(-50%);
+    width:72%;
+    height:70%;
+    background:linear-gradient(180deg,#fff 0%, #f2f7ff 100%);
+    border-radius:60% 60% 40% 40% / 60% 60% 50% 50%;
+    box-shadow: 0 8px 18px rgba(10,20,40,0.15), inset 0 -6px 12px rgba(0,0,0,0.03);
+    z-index:1;
+}
+
+/* 頭（撫でる部分） */
+.head{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:56%;
+    height:46%;
+    background: radial-gradient(circle at 35% 30%, #fff 0%, #f7fbff 40%, #e6efff 100%);
+    border-radius:50%;
+    box-shadow: 0 6px 14px rgba(10,20,40,0.12);
+    position:absolute;
+    left:50%;
+    top:6%;
+    transform:translateX(-50%);
+    transition: transform 120ms ease;
+    overflow:visible;
+    z-index:3;
+}
+.head .top, .head .bottom {
+    position:absolute;
+    left:0;
+    width:100%;
+    height:50%;
+    z-index: 4;
+}
+.head .top {
+    top:0;
+}
+.head .bottom {
+    bottom:0;
+}
+/* 見えないがイベント拾える */
+
+
+/* 目（簡易） */
+.eye{
+    position:absolute;
+    top:46%;
+    width:10%;
+    height:10%;
+    background: #222;
+    border-radius:50%;
+    transform:translateY(-50%);
+    z-index:4;
+}
+.eye.left{ left:38%; }
+.eye.right{ right:38%; }
+
+
+/* 台詞バブル */
+.bubble{
+    width: calc(var(--size) * 2 / 3);
+    height: calc(var(--size));
+    position:absolute;
+    bottom:0;
+    left:-40%;
+    transform:translateX(-50%) scale(0.98);
+    background: #ffffff;
+    border-radius:12px;
+    padding:8px 12px;
+    font-size: 10px;
+    font-family: arial;
+    box-shadow: 0 6px 16px rgba(10,20,40,0.12);
+    white-space:nowrap;
+    opacity:0;
+    pointer-events:none;
+    transition: opacity 100ms ease, transform 100ms cubic-bezier(.2,.9,.2,1);
+    z-index:10;
+}
+.bubble.show{
+    opacity:1;
+    transform:translateX(-50%) scale(1);
+}
+.bubble .sankack{
+    height: 10%;
+    aspect-ratio: 1/1;
+    background: #fffffff2;
+    position:absolute;
+    bottom:75%;
+    left:100%;
+    clip-path: polygon(0% 0%, 100% 70%, 0% 100%);
+}
+
+/* 撫でリアクション（頭の振動） */
+@keyframes head-purr {
+    0%{ transform: translateX(-50%) rotate(0deg); }
+    25%{ transform: translateX(-50%) rotate(-6deg); }
+    50%{ transform: translateX(-50%) rotate(6deg); }
+    75%{ transform: translateX(-50%) rotate(-3deg); }
+    100%{ transform: translateX(-50%) rotate(0deg); }
+}
+.head.purr{
+    animation: head-purr 560ms ease;
+}
+
+/* 小さく尻尾みたいな装飾 */
+.tail{
+    position:absolute;
+    left:50%;
+    bottom:2%;
+    width:24%;
+    height:8%;
+    transform:translateX(-50%);
+    background: linear-gradient(180deg,#fff 0%, #e7f0ff 100%);
+    border-radius:60% 60% 30% 30%;
+    z-index:0;
+    filter: blur(0.3px);
+}
+
+#bleBack{
+    display: block;
+    margin: 0 auto;
+    background: #cecece60;
+    position: fixed;
+    top: -100vh;
+    left: 0;
+    transition: top 8.0s ease;
+    z-index: 20
 }

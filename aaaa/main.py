@@ -2,7 +2,7 @@ import asyncio
 import websockets
 import webbrowser
 import tkinter as tk
-from PIL import Image, ImageTk, ImageDraw, ImageFilter
+from PIL import Image, ImageTk
 import math
 import re
 import random
@@ -242,10 +242,10 @@ async def handler(websocket):
             elif message[:14]=="open_inventry_" and message[14:] not in flag["inventry_name"]:#f"open_inventry_{name}"
                 await open_inventry(message[14:])
             elif message[:15]=="save_data_load_":
-                f = open(message[15:],"rb")
+                f = open("./save/"+message[15:],"rb")
                 inventry=pickle.load(f)
             elif message[:15]=="save_data_save_":
-                f = open(message[15:],"wb")
+                f = open("./save/"+message[15:],"wb")
                 pickle.dump(inventry,f)
                 f.close
             #囧
@@ -613,9 +613,11 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                         zzzzzz=await combined_gas_law(taiseki_1= await change_taiseki(cm3=50,g_cm3_moto=csvdata[i[4]][2],g_cm3_ato=csvdata[i[4]][3]),aturyoku_1=csvdata[i[4]][5],onndo_1=20,aturyoku_2=inventry2[name][4],onndo_2=inventry2[name][3])
                         try:
                             inventry2[name][5][i[4]] += zzzzzz
-                            delet_list.append(count)
+                            #del inventry2[name][0][count]
+                            delet_list.append(i)
                         except KeyError as e:
-                            delet_list.append(count)
+                            delet_list.append(i)
+                            #del inventry2[name][0][count]
                             inventry2[name][5][i[4]] = zzzzzz
                         #inventry2[name][3]+=(50)*100/(csvdata[i[4]][7])*(csvdata[i[4]][8])*4.184*inventry2[name][1]*inventry2[name][2]
                         inventry2[name][3]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],aturyoku_2=inventry2[name][4],taiseki_2=index[1]*index[2]+zzzzzz-50.0)
@@ -627,12 +629,13 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                         
                         await hitbox(ichi=i,ichiD=melt_y,dens=inventry2[name][3],name=name,width=inventry2[name][1],hight=inventry2[name][2],count=count) 
                     count+=1
-                    for xxxxa in delet_list:
-                        try:
-                            del inventry2[name][0][xxxxa]
-                        except IndexError as e:
-                            print(inventry2)
-                            print(e)
+                for xxxxa in delet_list:
+                    try:
+                        inventry2[name][0].remove(xxxxa)
+                    except IndexError as e:
+                        print(inventry2)
+                        print(xxxxa)
+                        print(e)
 
                 for key,i in index[5].items():
                     if await change_yuuten(csvdata[key][0],csvdata[key][5],inventry2[name][4],csvdata[key][8],csvdata[key][7]) > inventry2[name][3] and inventry2[name][5][key]!=0:
@@ -812,6 +815,12 @@ def pressuregauge(e,name):
         root["inventry_Toplevel_pressuregauge"+str(name)].attributes("-topmost", True)
         root["inventry_Toplevel_pressuregauge"+str(name)].resizable(False, False)
         root["inventry_Toplevel_pressuregauge"+str(name)].focus_set()
+        root["inventry_Toplevel_pressuregauge"+str(name)].after(600,pressuregauge_move,name)
+        label = tk.Label(root["inventry_Toplevel_pressuregauge"+str(name)],width=200, height=200,image=img[str(name)+"pressuregauge"])
+        label.pack()
+def pressuregauge_move(name):
+
+    root["inventry_Toplevel_pressuregauge"+str(name)].after(600,pressuregauge_move,name)
 
 def thermometer(e,name):
     try:

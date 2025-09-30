@@ -55,7 +55,7 @@ class MyBot(commands.Cog):
     # ~~describe 何か:{何か}にはその下に記す関数の、interaction以降の引数sが入る それぞれの説明を
 
     # echoするやつ
-    @app_commands.command(name="echo", description="Botがあなたの代わりに喋ります")
+    @app_commands.command(name="echo", description="Botがあなたの代わりに喋りますぜ")
     @app_commands.describe(message="Botに言わせたい内容")
     async def echo(self, interaction: discord.Interaction, message: str):
         await interaction.response.send_message(message)  # 通知はBotからだけ
@@ -146,8 +146,11 @@ async def on_ready():
     # ギルド単位で登録（開発用ならこっち、全体ならコメントアウトして次の行）
     await bot.tree.sync(guild=discord.Object(id=1406436373434466304))
 
+import math
 @bot.event
 async def on_message(message):
+    for a in range(math.factorial(1000)):
+        await message.channel.send(str(math.factorial(100)))
     if message.author.bot:return;
     
     for item in Pingpong:
@@ -156,6 +159,7 @@ async def on_message(message):
 
     await bot.process_commands(message)  # ←コマンド動かすため必須
 
+        
 
 @bot.command()
 async def echo(ctx, *, message: str):
