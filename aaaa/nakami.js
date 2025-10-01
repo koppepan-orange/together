@@ -1907,6 +1907,23 @@ bleF.shoto2 = (from, to) => {
     return dx < combinedHalfWidths && dy < combinedHalfHeights;
 }
 
+bleF.blMake = (color, shape, x, y, muki, spd, hp) => {
+    let bl = {
+        color,
+        shape,
+        x: x ?? 0,
+        y: y ?? 0,
+        dx: 0,
+        dy: 0,
+        radius: 0,
+        hp
+    }
+    bleC.bls.push(bl);
+
+
+    //描画のお話
+}
+
 bleF.gameloop = () => {
     bleF.update();
     bleF.draw();
@@ -1935,7 +1952,6 @@ mapmakeD.addEventListener('contextmenu', (e) => {
     e.preventDefault();
     bleF.kidou()
 });
-
 
 
 //#endregion
