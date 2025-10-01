@@ -42,10 +42,21 @@ with open('book1.csv',"r",encoding="utf-8_sig", newline='\r\n') as f:
 
 with open('cemical.csv',"r",encoding="utf-8_sig", newline='\r\n') as f:
     for fa in csv.reader(f):
-            if fa[0]!="元":
-                cemicaldata.append([fa[0].split(";")]+[fa[1].split(";")]+[fa[2].split(";")]+[fa[3].split(";")]+[fa[4].split(";")]+[fa[5].split(";")])
+        #print(fa)
+        if fa[0]!="元":
+            cemicaldata.append([fa[0].split(";"),fa[1].split(";"),fa[2].split(";"),fa[3].split(";"),fa[4].split(";"),fa[5].split(";")])
+
+for a in range(len(cemicaldata)):
+    for b in range(len(cemicaldata[a])):
+        for c in range(len(cemicaldata[a][b])):
+            try:
+                cemicaldata[a][b][c]=float(cemicaldata[a][b][c])
+            except Exception as e:
+                #print(e)
+                pass
 
 
+#print(cemicaldata)
 
 # print(csvdata)
 # 一旦消させてもらいますね
@@ -592,7 +603,7 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                         if b == 0:
                             continue
                         air=imgg[str(name)+"assets/images/items/air_"+str(a)+".png"].crop((0,0,index[1],(index[2]-yw)))
-                        air.putalpha(int(b))
+                        air.putalpha(int(b/10))
                         #print(air)
                         img[str(name)+"assets/images/items/air_"+str(a)+".png"]=ImageTk.PhotoImage(air,master=root["inventry_root_"+str(name)])
                         airid=canvas["inventry_root_"+str(name)].create_image(int(index[1]/2),int((index[2]-yw)/2), image=img[str(name)+"assets/images/items/air_"+str(a)+".png"],tag="item")
@@ -815,12 +826,12 @@ def pressuregauge(e,name):
         root["inventry_Toplevel_pressuregauge"+str(name)].attributes("-topmost", True)
         root["inventry_Toplevel_pressuregauge"+str(name)].resizable(False, False)
         root["inventry_Toplevel_pressuregauge"+str(name)].focus_set()
-        root["inventry_Toplevel_pressuregauge"+str(name)].after(600,pressuregauge_move,name)
+        #root["inventry_Toplevel_pressuregauge"+str(name)].after(600,pressuregauge_move,name)
         label = tk.Label(root["inventry_Toplevel_pressuregauge"+str(name)],width=200, height=200,image=img[str(name)+"pressuregauge"])
         label.pack()
-def pressuregauge_move(name):
+#def pressuregauge_move(name):
 
-    root["inventry_Toplevel_pressuregauge"+str(name)].after(600,pressuregauge_move,name)
+#    root["inventry_Toplevel_pressuregauge"+str(name)].after(600,pressuregauge_move,name)
 
 def thermometer(e,name):
     try:
@@ -847,7 +858,9 @@ async def open_inventry(name:str):
         root["inventry_root_"+str(name)]=tk.Tk()
         for axzxz in os.listdir("./assets/images/items"):
             try:
-                imggg=Image.open(f"./assets/images/items/{axzxz}")
+                imggg=Image.open(f"./assets/images/items/{axzxz}").convert("RGBA")
+                #alpha = imggg.getchannel("A")
+                #imggg = imggg.convert("RGB").convert("P", palette=Image.ADAPTIVE, colors=255)
                 imgg[str(name)+"assets/images/items/"+str(axzxz)]=imggg
                 imggg = imggg.resize((50, 50))
                 img[str(name)+"assets/images/items/"+str(axzxz)]=ImageTk.PhotoImage(imggg,master=root["inventry_root_"+str(name)])

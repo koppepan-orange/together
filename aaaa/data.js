@@ -86,6 +86,17 @@ let Items = [
     },
 
     {
+        name:'suiso',
+        jpnm:'水素',
+        kind:'natural gas',
+    },
+    {
+        name:'sanso',
+        jpnm:'酸素',
+        kind:'natural gas',
+    },
+
+    {
         name:'stone',
         jpnm:'石',
         kind:'natural stone'

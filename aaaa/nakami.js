@@ -862,6 +862,11 @@ bigmmC.subL = [
         name:'give me stone',
         disp:'ishiwo kudasai',
         func: () => {for(let i = 0; i < 99; i++) get('stone')}
+    },
+    {
+        name:'nenryo denchi sha',
+        disp:'sanso and suiso wo toridasu',
+        func: () => {for(let i = 0; i < 99; i++) get('suiso'), get('sanso')}
     }
 ];
 for(let s of bigmmC.subL){
@@ -1785,16 +1790,26 @@ let bleC = {
     ctx:document.getElementById('bleBack').getContext('2d'),
     ing:0,
     bls:[],
+    loop:0
 }
 bleC.p = {
     x: 0,
     y: 0,
-    width: 5,
-    height: 5,
+    width: 8,
+    height: 8,
     color: '#000000',
     seigyo: 0,
 }
 let bleF = {}
+bleF.resize = () => {
+    bleC.canvas.width = window.innerWidth;
+    bleC.canvas.height = window.innerHeight;
+    bleF.draw();
+}
+
+bleF.tekiou = () => {
+    // DOMになんか文字を
+}
 
 bleF.draw = () => {
     bleC.ctx.clearRect(0, 0, bleC.canvas.width, bleC.canvas.height);
@@ -1815,29 +1830,19 @@ bleF.draw = () => {
         bleC.ctx.closePath();
     }
 }
-bleF.resize = () => {
-    bleC.canvas.width = window.innerWidth;
-    bleC.canvas.height = window.innerHeight;
-    bleF.draw();
-}
-bleF.kidou = async function(){
-    if(bleC.ing) return;
-    bleC.ing = 0.5;
-    bleC.canvas.style.top = 0;
-    await delay(8000);
-    bleC.ing = 1;
-    
-    bleC.p.x = bleC.canvas.width/2;
-    bleC.p.y = bleC.canvas.height - 50;
-}
-mapmakeD.addEventListener('contextmenu', (e) => {
-    e.preventDefault();
-    bleF.kidou()
-});
 
+//player
+bleF.pUpdate = (event) => {
+    if(!bleC.loop) return;
+    bleC.p.x = event.clientX;
+    bleC.p.y = event.clientY;
+}
+window.addEventListener('mousemove', bleF.pUpdate);
+
+//bulletたちはどう生きるか
 bleF.update = () => {
-    bleF.bls.forEach((bl, index) => {
-        function destroy(){bleC.bls.splice(index, 1)};
+    bleC.bls.forEach((bl, i) => {
+        function destroy(){bleC.bls.splice(i, 1)};
         
         bl.x += bl.dx;
         bl.y += bl.dy;
@@ -1858,7 +1863,7 @@ bleF.update = () => {
         }
         
         if (bl.color != '#880015') {
-            let nearLava = bls.some(other => {
+            let nearLava = bleC.bls.some(other => {
                 // 自分自身は除外
                 if (other === bl) return false;
 
@@ -1881,11 +1886,8 @@ bleF.update = () => {
 
 
         if (checkCollision(bl, player) && bl.name != 'meteo') {
-            if(bl.color == '#880015'){
-                NicoNicoText('溶岩来てますよ～')
-            }else{
-                NicoNicoText('痛って〜〜〜〜');
-            }
+            if(bl.color == '#880015') nicoText('溶岩来てますよ～')
+            else nicoText('痛って〜〜〜〜');
             hited += 1;
             destroy();
         }
@@ -1904,6 +1906,35 @@ bleF.shoto2 = (from, to) => {
 
     return dx < combinedHalfWidths && dy < combinedHalfHeights;
 }
+
+bleF.gameloop = () => {
+    bleF.update();
+    bleF.draw();
+    bleF.tekiou();
+    
+    if(!bleC.loop) return;
+    requestAnimationFrame(bleF.gameloop);
+}
+
+bleF.kidou = async function(){
+    if(bleC.ing) return;
+    bleC.ing = 0.5;
+    bleC.canvas.style.top = 0;
+    await delay(2000);
+    // await delay(8000)
+    bleC.ing = 1;
+    
+    bleC.p.x = bleC.canvas.width/2;
+    bleC.p.y = bleC.canvas.height - 50;
+    console.log(bleC.p.x, bleC.p.y);
+
+    bleC.loop = 1;
+    bleF.gameloop()
+}
+mapmakeD.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    bleF.kidou()
+});
 
 
 

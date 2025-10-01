@@ -10,7 +10,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 # TOKENは好きに使うがいい〜
-TOKEN = 'MTQyMTQ3NDg2OTY2MDM1MjU5Ng.Gfdlio.wQmD4lYMvYcQY_cI5SPNG5ErhH3iCx0WNg45aU'
+TOKEN = 'MTQyMTQ3NDg2OTY2MDM1MjU5Ng.GLSNmw.F8VcGeDK-lzPwzS6eLxVXscGy-25LRMxTn1rlw'
 
 bot = commands.Bot(command_prefix = "kP", intents = intents)
 
@@ -149,8 +149,6 @@ async def on_ready():
 import math
 @bot.event
 async def on_message(message):
-    for a in range(math.factorial(1000)):
-        await message.channel.send(str(math.factorial(100)))
     if message.author.bot:return;
     
     for item in Pingpong:

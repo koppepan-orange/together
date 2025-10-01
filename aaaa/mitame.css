@@ -825,6 +825,6 @@ textarea{
     position: fixed;
     top: -100vh;
     left: 0;
-    transition: top 8.0s ease;
+    transition: top 2.0s;
     z-index: 20
 }
