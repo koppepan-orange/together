@@ -471,6 +471,24 @@ function connect(){
         nicoText(mes);
         logadd(`Receive => ${mes}`);
         
+        if(mes.startsWith('item,pick,')){
+            let lis = mes.split(','); //['item', 'pick', name, num];
+            let name = lis[2], num = lis[3];
+            let data = Items.find(o => o.jpnm == name);
+            console.log(mes, lis, name, num, data);
+            if(!data) return console.error(`エラー！${name}のdataがねーぜ！！`);
+
+            let itemD = document.createElement('img');
+            itemD.className = 'item';
+            itemD.src = `assets/images/items/${data.jpnm}.png`;
+            itemD.draggable = false;
+            itemD.dataset.item = data.jpnm;
+            itemD.dataset.num = num;
+            pickItem = itemD;
+            inv_pick(0, 0, 0);
+        }
+        if(mes.startsWith('sendpy')) sendpy(mes.slice(7)); // asdasd
+        
         if(mes == 'helasu') inv_pick_decr();
     };
 }
@@ -1066,30 +1084,30 @@ function inv_make(){
     };
 }
 function get(item){
-    console.log('get:: ')
-    console.log(item)
+    // console.log('get:: ')
+    // console.log(item)
     if(!item) return nicoText('アイテム名を指定してください');
     let data = Items.find(o => o.name == item);
-    console.log(data)
+    // console.log(data)
 
-    let target = [...invC.areaD.querySelectorAll('.cell')].find(c => c.dataset.item == data.jpnm && +c.dataset.num < 99);
+    let cell = [...invC.areaD.querySelectorAll('.cell')].find(c => c.dataset.item == data.jpnm && +c.dataset.num < 99);
     
-    if(!target){
-        target = [...invC.areaD.querySelectorAll('.cell')].find(c => !c.dataset.item);
-        if(!target) return nicoText('インベントリがいっぱいです');
+    if(!cell){
+        cell = [...invC.areaD.querySelectorAll('.cell')].find(c => !c.dataset.item);
+        if(!cell) return nicoText('インベントリがいっぱいです');
 
-        let img = document.createElement('img');
-        img.className = 'item';
-        img.src = `assets/images/items/${data.jpnm}.png`;
-        img.draggable = false;
-        img.dataset.item = data.jpnm;
+        let itemD = document.createElement('img');
+        itemD.className = 'item';
+        itemD.src = `assets/images/items/${data.jpnm}.png`;
+        itemD.draggable = false;
+        itemD.dataset.item = data.jpnm;
 
-        target.innerHTML = '';
-        target.appendChild(img);
-        target.dataset.item = data.jpnm;
-        target.dataset.num = 1;
+        cell.innerHTML = '';
+        cell.appendChild(itemD);
+        cell.dataset.item = data.jpnm;
+        cell.dataset.num = 1;
     }else{
-        target.dataset.num = (+target.dataset.num + 1).toString();
+        cell.dataset.num = (+cell.dataset.num + 1).toString();
     }
 
     inv_tekiou();
@@ -1163,7 +1181,7 @@ document.addEventListener('click', e => {
              if(num) pickItem.dataset.num = num, cell.querySelector('.num')?.remove();
             delete cell.dataset.item;
             delete cell.dataset.num;
-            inv_pick(cell, e.pageX, e.pageY, 1);
+            inv_pick(cell, e.pageX, e.pageY);
             return;
         }
 
@@ -1847,12 +1865,11 @@ bleF.update = () => {
         bl.x += bl.dx;
         bl.y += bl.dy;
         
-        if (bl.y - bl.radius > canvas.height || 
+        if( bl.y - bl.radius > canvas.height || 
             bl.y + bl.radius < 0 ||
             bl.x + bl.radius < 0 ||
-            bl.x - bl.radius > canvas.width &&
-            bl.name != 'meteo') {
-            destroy();
+            bl.x - bl.radius > canvas.width ){
+            if(bl.name != 'meteo') destroy();
         }
 
         if(bl.color == '#880015' && bl.y <= canvas.height*0.75 && bl.name != 'meteo'){
@@ -1870,7 +1887,7 @@ bleF.update = () => {
                 // 溶岩かどうか whetherやね
                 if (other.color != '#880015') return false;
 
-                const distance = distanceBetween(bl, other);
+                const distance = kyori(bl, other);  
                 const combinedRadius = bl.radius + other.radius;
 
                 return distance < combinedRadius + 5;
@@ -1885,7 +1902,7 @@ bleF.update = () => {
         }
 
 
-        if (checkCollision(bl, player) && bl.name != 'meteo') {
+        if (shoto2(bl, player) && bl.name != 'meteo') {
             if(bl.color == '#880015') nicoText('溶岩来てますよ～')
             else nicoText('痛って〜〜〜〜');
             hited += 1;
