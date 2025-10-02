@@ -261,7 +261,7 @@
 
         if(target == 'aim'){
             let dx = player.x - x;
-            let dy = player.y
+            let dy = player.y - y;
             let angle = Math.atan2(dy, dx);
 
             bullet.vx = Math.cos(angle) * speed;

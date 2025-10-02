@@ -92,7 +92,7 @@ def arrayGacha(array, probables):
         if r < prob:
             return item
         r -= prob
-
+        
 #def probably(num, code = 0):
 #   res = random.uniform(0, 100) <= num;
 #   if code!=0:
@@ -119,6 +119,9 @@ async def handler(websocket):
 
     try:
         async for message in websocket:
+            
+            if message.startswith('"') and message.endswith('"'):
+                message = message[1:-1] # 囧
             
             if message[:7] != "printTx" or message[:4] == "none":print(f"{message}")
             
@@ -228,9 +231,14 @@ async def handler(websocket):
             elif message[:5]=="pick_":
                 pic_item=message[5:]
             elif message[:10]=="item_pick_":
+                sendjs('pickしたed')
                 x=message[10:].split("_")
-                ock=[x[0],x[1]]
+                ock = [x[0],x[1]]
+            elif message[:9]=="item_ock_":
+                sendjs('ockしたed')
+                ock = ["",0]
             elif message[:12]=="item_shositu":
+                sendjs('shosituしたed')
                 ock = ["",0]
             elif message[:5]=="heat_":#f"heat_{name}_{add_heat}"
                 x=message[5:].split("_")
@@ -299,7 +307,7 @@ async def handler(websocket):
                     kontext["乱数"] = res
                     return
             else:
-                await websocket.send("your kotoba is very gomi!!")
+                sendjs(f"your kotoba is very gomi!! ==> {message}")
             
             
             #print(message[:5])
@@ -416,7 +424,7 @@ def plass_command_box_chack():
     #sendjs("logadd,pressed")
     val = canvas["command_box_Entry"].get()
     print(f"chack-{val}")
-    sendjs(f"logadd,入力 => {val}")#←おくれ！
+    sendjs(f"入力: {val}")
     canvas["command_box_Entry"].delete(0,tk.END)
     plass_command_box_button("chack")
     
@@ -556,6 +564,7 @@ async def combined_gas_law(aturyoku_1:float,taiseki_1:float,onndo_1:float,aturyo
 
 
 async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1},2,reverse=True))
+    #await asyncio.sleep(0)
     global inventry
     global inventry2
     global filled
@@ -618,6 +627,9 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                     #囧 print(i)
                     #print(await change_yuuten(csvdata[i[4]][0],csvdata[i[4]][5],inventry2[name][4],csvdata[i[4]][8],csvdata[i[4]][7]))
                     #print(inventry2[name][3])
+                    
+                    if not i or len(i) <= 4: return; #囧: こんな感じでどうでしょう
+                    # print(i[4], csvdata[i[4]][0])
                     if await change_yuuten(csvdata[i[4]][0],csvdata[i[4]][5],inventry2[name][4],csvdata[i[4]][8],csvdata[i[4]][7]) <= inventry2[name][3]:
                         #print("chack3")
                         #inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]+1,onndo_2=inventry2[name][3])
@@ -759,6 +771,8 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                     canvas["inventry_root_"+str(name)].create_line(39, 16,39,cclemon,tag=("system","thermometer"),fill = coloer,width=1)
                     #print(90-((360/inventry2[name][8])*inventry2[name][4])-10)
                     canvas["inventry_root_"+str(name)].lift("system")
+                    canvas["inventry_root_"+str(name)].lift("have")
+                    
 
             inventry=copy.deepcopy(inventry2)
 
@@ -768,6 +782,9 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
 
     except asyncio.exceptions.CancelledError:
         print("inventry_system:mainloop Cancelling now...")
+    except Exception as e:
+        print(e)
+        await inventry_update()
 
 
 def motion(e,name):
@@ -795,7 +812,8 @@ def click2(e,name):
                 cccc=a
                 break
         if cccc != "":
-            sendjs("pick_"+inventry[name][0][cccc][4])
+            print(inventry[name][0][cccc][4])
+            sendjs(f"item,pick,{inventry[name][0][cccc][4]},1")
             del inventry[name][0][cccc][4]
 
 def delete_inventry_GUI(name):
@@ -826,12 +844,12 @@ def pressuregauge(e,name):
         root["inventry_Toplevel_pressuregauge"+str(name)].attributes("-topmost", True)
         root["inventry_Toplevel_pressuregauge"+str(name)].resizable(False, False)
         root["inventry_Toplevel_pressuregauge"+str(name)].focus_set()
-        #root["inventry_Toplevel_pressuregauge"+str(name)].after(600,pressuregauge_move,name)
-        label = tk.Label(root["inventry_Toplevel_pressuregauge"+str(name)],width=200, height=200,image=img[str(name)+"pressuregauge"])
-        label.pack()
-#def pressuregauge_move(name):
+        canvas["inventry_Toplevel_pressuregauge"+str(name)] = tk.Canvas(master=root["inventry_Toplevel_pressuregauge"+str(name)],bg = "white", width = 300,height = 300)
+        canvas["inventry_Toplevel_pressuregauge"+str(name)].place(x = 0,y = 0)
+        canvas["inventry_Toplevel_pressuregauge"+str(name)].create_image(100,100, image=img[str(name)+"pressuregauge_mid"],tag="system")
+        
 
-#    root["inventry_Toplevel_pressuregauge"+str(name)].after(600,pressuregauge_move,name)
+
 
 def thermometer(e,name):
     try:
@@ -844,6 +862,9 @@ def thermometer(e,name):
         root["inventry_Toplevel_thermometer"+str(name)].attributes("-topmost", True)
         root["inventry_Toplevel_thermometer"+str(name)].resizable(False, False)
         root["inventry_Toplevel_thermometer"+str(name)].focus_set()
+        img[str(name)+"thermometer_mid"]=tk.PhotoImage(file = "./assets/images/systems/thermometer_mid.png",master=root["inventry_Toplevel_thermometer"+str(name)])
+        canvas["inventry_Toplevel_thermometer"+str(name)] = tk.Canvas(master=root["inventry_Toplevel_thermometer"+str(name)],bg = "white", width = 300,height = 300)
+        canvas["inventry_Toplevel_thermometer"+str(name)].place(x = 0,y = 0)
 
 def out(e,name):
     canvas["inventry_root_"+str(name)].delete('have')
@@ -870,6 +891,7 @@ async def open_inventry(name:str):
         root["inventry_root_"+str(name)].attributes("-toolwindow",True)
         root["inventry_root_"+str(name)].attributes("-topmost", True)
         root["inventry_root_"+str(name)].resizable(False, False)
+        root["inventry_root_"+str(name)].title(str(name))
         canvas["inventry_root_"+str(name)] = tk.Canvas(master=root["inventry_root_"+str(name)],bg = "white", width = inventry[name][1],height = inventry[name][2])
         canvas["inventry_root_"+str(name)].place(x = 0,y = 0)
         img[str(name)+"pressuregauge"]=tk.PhotoImage(file = "./assets/images/systems/pressuregauge.png",master=root["inventry_root_"+str(name)])

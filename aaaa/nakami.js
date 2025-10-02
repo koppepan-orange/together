@@ -1839,13 +1839,17 @@ bleF.draw = () => {
 
     //bullets
     for(let bl of bleC.bls){
-        if(!bl.name) continue;
-
-        bleC.ctx.beginPath();
-        bleC.ctx.fillStyle = bl.color;
-        bleC.ctx.arc(bl.x, bl.y, bl.radius, 0, Math.PI * 2);
-        bleC.ctx.fill();
-        bleC.ctx.closePath();
+        if(bl.shape == 'circle'){
+            bleC.ctx.beginPath();
+            bleC.ctx.fillStyle = bl.color;
+            bleC.ctx.arc(bl.x, bl.y, bl.width/2, 0, Math.PI * 2);
+            bleC.ctx.fill();
+            bleC.ctx.closePath();
+        }
+        if(bl.shape == 'rect'){
+            bleC.ctx.fillStyle = bl.color;
+            bleC.ctx.fillRect(bl.x, bl.y, bl.width, bl.height);
+        }
     }
 }
 
@@ -1859,13 +1863,14 @@ window.addEventListener('mousemove', bleF.pUpdate);
 
 //bulletたちはどう生きるか
 bleF.update = () => {
+    let p = bleC.p;
     bleC.bls.forEach((bl, i) => {
         function destroy(){bleC.bls.splice(i, 1)};
         
         bl.x += bl.dx;
         bl.y += bl.dy;
         
-        if( bl.y - bl.radius > canvas.height || 
+        if (bl.y - bl.radius > canvas.height || 
             bl.y + bl.radius < 0 ||
             bl.x + bl.radius < 0 ||
             bl.x - bl.radius > canvas.width ){
@@ -1887,7 +1892,7 @@ bleF.update = () => {
                 // 溶岩かどうか whetherやね
                 if (other.color != '#880015') return false;
 
-                const distance = kyori(bl, other);  
+                const distance = bleF.kyori(bl, other);  
                 const combinedRadius = bl.radius + other.radius;
 
                 return distance < combinedRadius + 5;
@@ -1902,7 +1907,7 @@ bleF.update = () => {
         }
 
 
-        if (shoto2(bl, player) && bl.name != 'meteo') {
+        if (bleF.shoto2(bl, p) && bl.name != 'meteo') {
             if(bl.color == '#880015') nicoText('溶岩来てますよ～')
             else nicoText('痛って〜〜〜〜');
             hited += 1;
@@ -1924,7 +1929,7 @@ bleF.shoto2 = (from, to) => {
     return dx < combinedHalfWidths && dy < combinedHalfHeights;
 }
 
-bleF.blMake = (color, shape, x, y, muki, spd, hp) => {
+bleF.blMake = (color, shape, x, y, w, h, muki, spd, hp) => {
     let bl = {
         color,
         shape,
@@ -1932,19 +1937,47 @@ bleF.blMake = (color, shape, x, y, muki, spd, hp) => {
         y: y ?? 0,
         dx: 0,
         dy: 0,
-        radius: 0,
+        width: w,
+        height: h,
+        muki,
+        spd,
         hp
     }
-    bleC.bls.push(bl);
 
+    if(typeof muki == 'number'){
+        let dir = bl.muki * Math.PI / 180;
+        let si = Math.sin(dir);
+        let co = Math.cos(dir);
+        bl.dx = si * spd;
+        bl.dy = co * spd;
+        bleC.bls.push(bl);
+        return;
+    }
 
-    //描画のお話
+    switch(muki){
+        case 'p':{
+            let aim = bleC.p;
+            let kx = aim.x - x;
+            let ky = aim.y - y;
+            let dir = Math.atan2(ky, kx);
+
+            bl.dx = Math.cos(dir) * spd;
+            bl.dy = Math.sin(dir) * spd;
+            
+            console.log(kx, aim.x, ky, aim.y, dir, bl.dx, bl.dy);
+        }
+    }
+    
 }
 
 bleF.gameloop = () => {
     bleF.update();
     bleF.draw();
-    bleF.tekiou();
+    bleF.tekiou();  
+
+    if(keys.u) bleF.blMake('red', 'circle', bleC.canvas.width/2, bleC.canvas.height/2, 3, 3, random(0, 360), random(1,10), 1);
+    if(keys.y) bleF.blMake('red', 'circle', bleC.canvas.width/2, bleC.canvas.height/2, 10, 10, 'p', 1, 1);
+    // if(keys.u) bleF.blMake('red', 'circle', 0, bleC.canvas.height/2, 3, 3, 90, 0.1, 1);
     
     if(!bleC.loop) return;
     requestAnimationFrame(bleF.gameloop);

@@ -86,17 +86,6 @@ let Items = [
     },
 
     {
-        name:'suiso',
-        jpnm:'水素',
-        kind:'natural gas',
-    },
-    {
-        name:'sanso',
-        jpnm:'酸素',
-        kind:'natural gas',
-    },
-
-    {
         name:'stone',
         jpnm:'石',
         kind:'natural stone'
@@ -170,6 +159,24 @@ let Items = [
         jpnm:'ラリマール',
         kind:'natural gem'
     },
+
+    
+    {
+        name:'suiso',
+        jpnm:'水素',
+        kind:'natural gas',
+    },
+    {
+        name:'helium',
+        jpnm:'ヘリウム',
+        kind:'natural gas',
+    },
+    {
+        name:'sanso',
+        jpnm:'酸素',
+        kind:'natural gas',
+    },
+    
 ]
 
 let Objects = [
