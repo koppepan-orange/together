@@ -20,6 +20,10 @@ kakikae_list=[]
 tem={}
 
 
+gui={}
+
+
+
 with open('book1.csv',"r",encoding="utf-8_sig", newline='\r\n') as f:
     for fa in csv.reader(f):
         fas=[]
@@ -503,7 +507,7 @@ async def change_yuuten(motono_yuuten:int,motono_kiatu:int,atono_kiatu:int,j_mol
 #filled = {} # [x= , y= , dens] cmd "cls&start tree /f C:"
 num = 0
 axfirst = 0.098
-async def hitbox(ichi,ichiD,dens,name,width,hight,count): 
+async def hitbox(ichi, ichiD, dens, name, width, hight, count): 
     #ichiD=[["name",]...]　#気体密度,3,3/沸点　　←melt-yがわからん..というか今のところこれ使ってない
     #ichi=[x,y,ax,ay,item]
     #cccc=name,融点 (℃),沸点 (℃),固体密度 (g/cm3) (20℃),液体密度,気体密度,融点気圧(Pa),沸点気圧(Pa),m3/mol,誘拐熱(J/mol),蒸発熱(J/mol),コメント
@@ -514,31 +518,33 @@ async def hitbox(ichi,ichiD,dens,name,width,hight,count):
     global axfirst
     ichi[3] = axfirst
     now = [ichi[0]//5,ichi[1]//5,dens]
-    if now[0] not in filled and now[1] not in filled:
-        if ichi[3] >= 0:
-                goy = dens*(ichi[3]**2)*4.8
-                ichi[1] += goy
-                ichi[3] = ichi[3]
-        if ichi[2] >= 0:
-                gox = dens*(ichi[2]**2)*4.8
-                ichi[0] += gox 
-        now = [ichi[0]//5,ichi[1]//5,dens]
-        if now[0] > width or now[0] > -(width):
-            if now[0] in filled and now[1] in filled: #ここ今だと-の方向に振り切れた場合に高速で画面外に行きます
-                ichi[3] = 0
-                ichi[0] += -(gox) + 1 # type: ignore
-            elif now[1] > hight or now[1] > -(hight) : #同上
-                ichi[4] = 0
-                ichi[1] += -(goy) # type: ignore
-            else:
-                filled[num] = [now]
-                num += 1       
-        #await asyncio.sleep()
+    if now[0] not in filled or now[1] not in filled:
+        if ichi[2] != 0:
+            gox = dens*(ichi[2]**2)*4.8
+            ichi[0] += gox 
+        if ichi[3] != 0:
+            goy = dens*(ichi[3]**2)*4.8
+            ichi[1] += goy
+        #await asyncio.sleep(0.1)
+
+        now = [ichi[0]//2,ichi[1]//2,dens]
         
+        
+        if now[0] > width or now[0] > -(width):
+            if now[0] not in filled or now[1] not in filled: #ここ今だと-の方向に振り切れた場合に高速で画面外に行きます  orとandで動く法を採用する
+                filled[num] = [now]
+                num += 1
+            elif now[1] > hight or now[1] > -(hight) : #同上
+                ichi[4] += -(ichi[3])*2
+                ichi[1] += -(goy)
+            else:
+                ichi[3] += -(ichi[2])*2
+                ichi[0] += -(gox) + 1                  #これ一回モノの動きが止まったら同じものの次の動きの判定できてる？
+
         inventry2[name][0][count][1] = ichi[1]
         inventry2[name][0][count][0] = ichi[0]
         inventry2[name][0][count][3] = ichi[3]
-    #print(filled) #デバックで邪魔なので切りました
+    #print(filled) #デバックで邪魔なので切りました ←〇
 
 async def change_taiseki(cm3:float,g_cm3_moto:float,g_cm3_ato:float):
     #print("cm3",cm3,"g/cm3_moto",g_cm3_moto,"g/cm3_ato",g_cm3_ato))
@@ -812,7 +818,7 @@ def click2(e,name):
                 cccc=a
                 break
         if cccc != "":
-            print(inventry[name][0][cccc][4])
+            print(inventry[name][0][cccc][4]) #これ実行したときのどの文章？
             sendjs(f"item,pick,{inventry[name][0][cccc][4]},1")
             del inventry[name][0][cccc][4]
 
@@ -821,6 +827,14 @@ def delete_inventry_GUI(name):
     #print(canvas)
     #print(root)
     #print(motion_data)
+    for axx,sute in gui.items():
+        if axx[-len(name):]==name:
+            del gui[axx]
+    try:
+        window_del("inventry_Toplevel_pressuregauge"+str(name))()
+        window_del("inventry_Toplevel_thermometer"+str(name))()
+    except Exception as e:
+        print(e)
     a=[]
     flag["inventry_name"].remove(name)
     for name2,index in img.items():
@@ -838,17 +852,24 @@ def pressuregauge(e,name):
         root["inventry_Toplevel_pressuregauge"+str(name)].focus_set()
     except:
         root["inventry_Toplevel_pressuregauge"+str(name)]=tk.Toplevel(root["inventry_root_"+str(name)])
-        img[str(name)+"pressuregauge"]=tk.PhotoImage(file = "./assets/images/systems/pressuregauge_mid.png",master=root["inventry_Toplevel_pressuregauge"+str(name)])
+        root["inventry_Toplevel_pressuregauge"+str(name)].title(str(name)+"の気圧計")
+        #img[str(name)+"pressuregauge"]=tk.PhotoImage(file = "./assets/images/systems/pressuregauge_mid.png",master=root["inventry_Toplevel_pressuregauge"+str(name)])
         root["inventry_Toplevel_pressuregauge"+str(name)].geometry(f"300x300+100+100")
         root["inventry_Toplevel_pressuregauge"+str(name)].attributes("-toolwindow",True)
         root["inventry_Toplevel_pressuregauge"+str(name)].attributes("-topmost", True)
         root["inventry_Toplevel_pressuregauge"+str(name)].resizable(False, False)
         root["inventry_Toplevel_pressuregauge"+str(name)].focus_set()
+        img[str(name)+"pressuregauge_mid"]=tk.PhotoImage(file = "./assets/images/systems/pressuregauge_mid.png",master=root["inventry_Toplevel_pressuregauge"+str(name)])
         canvas["inventry_Toplevel_pressuregauge"+str(name)] = tk.Canvas(master=root["inventry_Toplevel_pressuregauge"+str(name)],bg = "white", width = 300,height = 300)
         canvas["inventry_Toplevel_pressuregauge"+str(name)].place(x = 0,y = 0)
-        canvas["inventry_Toplevel_pressuregauge"+str(name)].create_image(100,100, image=img[str(name)+"pressuregauge_mid"],tag="system")
-        
+        gui["inventry_Toplevel_pressuregauge_gui"+str(name)]=canvas["inventry_Toplevel_pressuregauge"+str(name)].create_image(100,100, image=img[str(name)+"pressuregauge_mid"],tag="system")
+        root["inventry_Toplevel_pressuregauge"+str(name)].after(1,pressuregauge_move,name)
 
+def pressuregauge_move(name):
+    canvas["inventry_Toplevel_pressuregauge"+str(name)].delete("pressuregauge_mid")
+    gui["inventry_Toplevel_pressuregauge__gui"+str(name)]=canvas["inventry_Toplevel_pressuregauge"+str(name)].create_line(100, 100, 100+(80*math.cos(math.radians(90-(-(330/inventry2[name][8])*inventry2[name][4])+15))),  100+(80*math.sin(math.radians(90-(-(330/inventry2[name][8])*inventry2[name][4])+15))),tag=("system","pressuregauge_mid"),arrow=tk.FIRST,arrowshape=(100, 2, 1),fill = "#000000")
+
+    root["inventry_Toplevel_pressuregauge"+str(name)].after(10,pressuregauge_move,name)
 
 
 def thermometer(e,name):
@@ -856,7 +877,8 @@ def thermometer(e,name):
         root["inventry_Toplevel_thermometer"+str(name)].focus_set()
     except:
         root["inventry_Toplevel_thermometer"+str(name)]=tk.Toplevel(root["inventry_root_"+str(name)])
-        img[str(name)+"thermometer_mid"]=tk.PhotoImage(file = "./assets/images/systems/thermometer_mid.png",master=root["inventry_Toplevel_thermometer"+str(name)])
+        root["inventry_Toplevel_thermometer"+str(name)].title(str(name)+"の温度計")
+        #img[str(name)+"thermometer"]=tk.PhotoImage(file = "./assets/images/systems/thermometer_mid.png",master=root["inventry_Toplevel_thermometer"+str(name)])
         root["inventry_Toplevel_thermometer"+str(name)].geometry(f"300x300+100+100")
         root["inventry_Toplevel_thermometer"+str(name)].attributes("-toolwindow",True)
         root["inventry_Toplevel_thermometer"+str(name)].attributes("-topmost", True)
@@ -865,6 +887,8 @@ def thermometer(e,name):
         img[str(name)+"thermometer_mid"]=tk.PhotoImage(file = "./assets/images/systems/thermometer_mid.png",master=root["inventry_Toplevel_thermometer"+str(name)])
         canvas["inventry_Toplevel_thermometer"+str(name)] = tk.Canvas(master=root["inventry_Toplevel_thermometer"+str(name)],bg = "white", width = 300,height = 300)
         canvas["inventry_Toplevel_thermometer"+str(name)].place(x = 0,y = 0)
+        gui["inventry_Toplevel_thermometer_gui"+str(name)]=canvas["inventry_Toplevel_thermometer"+str(name)].create_image(100,100, image=img[str(name)+"thermometer_mid"],tag="system")
+        #canvas["inventry_Toplevel_thermometer"+str(name)].place(x = 0,y = 0)
 
 def out(e,name):
     canvas["inventry_root_"+str(name)].delete('have')
@@ -897,8 +921,10 @@ async def open_inventry(name:str):
         img[str(name)+"pressuregauge"]=tk.PhotoImage(file = "./assets/images/systems/pressuregauge.png",master=root["inventry_root_"+str(name)])
         img[str(name)+"thermometer"]=tk.PhotoImage(file = "./assets/images/systems/thermometer.png",master=root["inventry_root_"+str(name)])
         img[str(name)+"thermometer_blue"]=tk.PhotoImage(file = "./assets/images/systems/thermometer_blue.png",master=root["inventry_root_"+str(name)])
-        canvas["inventry_root_"+str(name)].tag_bind(canvas["inventry_root_"+str(name)].create_image(13,13, image=img[str(name)+"pressuregauge"],tag="system"),"<ButtonPress-1>",lambda e,name=name:pressuregauge(e,name))
-        canvas["inventry_root_"+str(name)].tag_bind(canvas["inventry_root_"+str(name)].create_image(39,13, image=img[str(name)+"thermometer"],tag=("system","thermometer_outline")),"<ButtonPress-1>",lambda e,name=name:thermometer(e,name))
+        gui["inventry_pressuregauge_gui"+str(name)]=canvas["inventry_root_"+str(name)].create_image(13,13, image=img[str(name)+"pressuregauge"],tag="system")
+        gui["inventry_thermometer_gui"+str(name)]=canvas["inventry_root_"+str(name)].create_image(39,13, image=img[str(name)+"thermometer"],tag=("system","thermometer_outline"))
+        canvas["inventry_root_"+str(name)].tag_bind(gui["inventry_pressuregauge_gui"+str(name)],"<ButtonPress-1>",lambda e,name=name:pressuregauge(e,name))
+        canvas["inventry_root_"+str(name)].tag_bind(gui["inventry_thermometer_gui"+str(name)],"<ButtonPress-1>",lambda e,name=name:thermometer(e,name))
         root["inventry_root_"+str(name)].bind("<Leave>",lambda e,name=name:out(e,name))
         root["inventry_root_"+str(name)].bind("<Motion>",lambda e,name=name:motion(e,name))
         root["inventry_root_"+str(name)].bind("<ButtonRelease-1>",lambda e,name=name:click(e,name))

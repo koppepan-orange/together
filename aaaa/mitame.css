@@ -825,6 +825,31 @@ textarea{
     position: fixed;
     top: -100vh;
     left: 0;
-    transition: top 2.0s;
+    transition: top 2.0s cubic-bezier(0.6, -0.28, 0.74, 0.05);
     z-index: 20
+}
+#bleBack.tog{
+    top: 0
+}
+#ble{
+    display: block;
+    margin: 0 auto;
+    background: #cecece60;
+    position: fixed;
+    top: -100vh;
+    left: 0;
+    /* transition: top 2.0s, left 2.0s; */
+    z-index: 20
+}
+#ble.tog{
+    animation: bleIran 4.0s linear;
+    top: 0;
+}
+@keyframes bleIran{
+    0%{top: -100vh;}
+    50%{top: 0;}
+    62.5%{left: 3vw}
+    75%{left: -3vw}
+    87.5%{left: 3vw}
+    100%{left: 0; top: 0;}
 }

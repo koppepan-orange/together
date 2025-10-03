@@ -1806,31 +1806,61 @@ window.__ghost = {
 let bleC = {
     canvas:document.getElementById('bleBack'),
     ctx:document.getElementById('bleBack').getContext('2d'),
+    bleD:document.getElementById('ble'),
+    canW:0,
+    canH:0,
     ing:0,
     bls:[],
-    loop:0
+    loop:0,
+    hited:0,
 }
+bleC.hiteD = bleC.bleD.querySelector('.hited');
 bleC.p = {
     x: 0,
     y: 0,
-    width: 8,
-    height: 8,
+    w: 8,
+    h: 8,
     color: '#000000',
     seigyo: 0,
 }
 let bleF = {}
+
+/* 
+水色 #f0f8ff, #eaf5ff, #def0ff, #cfe9ff, #b5dcff
+紫色 #f8f6ff, #f5f2ff, #f1edff, #ece8ff, #e9e4ff
+橙色 #fffaf3, #fff7eb, #fff3e2, #fff0d9, #ffeccf
+緑色 #f6fff2, #eeffe7, #e6ffdc, #ddffd0, #d4ffc3
+*/
+
+bleC.Colors = {
+    red:['ff0000', 'ff8080'],
+   blue:['0000ff', '8080ff', '4473ad'],
+  alice:['f0f8ff', 'eaf5ff', 'def0ff', 'cfe9ff', 'b5d9ff'], //水色
+ orange:['fffaf3', 'fff7eb', 'fff3e2', 'fff0d9', 'ffeccf'],
+  green:['f6fff2', 'eeffe7', 'e6ffdc', 'ddffd0', 'd4ffc3'],
+   sion:['f8f6ff', 'f5f2ff', 'f1edff', 'ece8ff', 'e9e4ff'], //紫色
+}
+isCol = (iro, mono) => {
+    let res = bleC.Colors[iro].includes(mono);
+    if(res) return 1;
+
+    return 0;
+}
+
 bleF.resize = () => {
     bleC.canvas.width = window.innerWidth;
     bleC.canvas.height = window.innerHeight;
+    bleC.canW = window.innerWidth;
+    bleC.canH = window.innerHeight;
     bleF.draw();
-}
+}  
 
 bleF.tekiou = () => {
-    // DOMになんか文字を
+    bleC.hiteD.textContent = `hited: ${bleC.hited}`;
 }
 
 bleF.draw = () => {
-    bleC.ctx.clearRect(0, 0, bleC.canvas.width, bleC.canvas.height);
+    bleC.ctx.clearRect(0, 0, bleC.canW, bleC.canH);
     // bleC.ctx.fillStyle = '#cecece'
     
     //player
@@ -1839,16 +1869,16 @@ bleF.draw = () => {
 
     //bullets
     for(let bl of bleC.bls){
-        if(bl.shape == 'circle'){
+        if(bl.shape == 'maru'){
             bleC.ctx.beginPath();
             bleC.ctx.fillStyle = bl.color;
-            bleC.ctx.arc(bl.x, bl.y, bl.width/2, 0, Math.PI * 2);
+            bleC.ctx.arc(bl.x, bl.y, bl.w, 0, Math.PI * 2);
             bleC.ctx.fill();
             bleC.ctx.closePath();
         }
         if(bl.shape == 'rect'){
             bleC.ctx.fillStyle = bl.color;
-            bleC.ctx.fillRect(bl.x, bl.y, bl.width, bl.height);
+            bleC.ctx.fillRect(bl.x, bl.y, bl.w, bl.h);
         }
     }
 }
@@ -1870,32 +1900,29 @@ bleF.update = () => {
         bl.x += bl.dx;
         bl.y += bl.dy;
         
-        if (bl.y - bl.radius > canvas.height || 
-            bl.y + bl.radius < 0 ||
-            bl.x + bl.radius < 0 ||
-            bl.x - bl.radius > canvas.width ){
+        if (bl.y - bl.h > bleC.canH || 
+            bl.y + bl.h < 0 || 
+            bl.x + bl.w < 0 || 
+            bl.x - bl.w > bleC.canW) {
             if(bl.name != 'meteo') destroy();
         }
 
-        if(bl.color == '#880015' && bl.y <= canvas.height*0.75 && bl.name != 'meteo'){
+        if(isCol('red', bl.color) && bl.y <= bleC.canH*0.75 && bl.name != 'meteo'){
             destroy()
         }
-        if(bl.name == 'meteo' && bl.y - bl.radius > canvas.height){
+        if(bl.name == 'meteo' && bl.y - bl.w > bleC.canH){
             destroy();
         }
         
-        if (bl.color != '#880015') {
+        if (!isCol('red', bl.color)) {
             let nearLava = bleC.bls.some(other => {
                 // 自分自身は除外
-                if (other === bl) return false;
+                if (other == bl) return false;
 
                 // 溶岩かどうか whetherやね
-                if (other.color != '#880015') return false;
+                if (!isCol('red', other.color)) return false;
 
-                const distance = bleF.kyori(bl, other);  
-                const combinedRadius = bl.radius + other.radius;
-
-                return distance < combinedRadius + 5;
+                return bleF.shoto2(other, bl);
             });
 
             if(nearLava){
@@ -1907,10 +1934,10 @@ bleF.update = () => {
         }
 
 
-        if (bleF.shoto2(bl, p) && bl.name != 'meteo') {
-            if(bl.color == '#880015') nicoText('溶岩来てますよ～')
+        if(bleF.shoto2(bl, p)){
+            if(isCol('red', bl.color)) nicoText('溶岩来てますよ～')
             else nicoText('痛って〜〜〜〜');
-            hited += 1;
+            bleC.hited += 1;
             destroy();
         }
     });
@@ -1921,27 +1948,29 @@ bleF.kyori = (a, b) => {
     return Math.sqrt(dx * dx + dy * dy);
 }
 bleF.shoto2 = (from, to) => {
-    const dx = Math.abs(from.x - to.x);
-    const dy = Math.abs(from.y - to.y);
-    const combinedHalfWidths = to.width / 2 + from.radius;
-    const combinedHalfHeights = to.height / 2 + from.radius;
+    const kyorx = Math.abs(from.x - to.x);
+    const kyory = Math.abs(from.y - to.y);
+    const dist = Math.sqrt(kyorx * kyorx + kyory * kyory);
 
-    return dx < combinedHalfWidths && dy < combinedHalfHeights;
+    return dist < from.w + to.w;
 }
 
-bleF.blMake = (color, shape, x, y, w, h, muki, spd, hp) => {
+bleF.blMake = (color = '#000000', shape = 'maru', x = 0, y = 0, muki = 90, spd = 1, w = 1, h = 1, hw, hh) => {
+    if(shape == 'maru') h = w; // というよりかは使わん
     let bl = {
         color,
         shape,
-        x: x ?? 0,
-        y: y ?? 0,
+        x,
+        y,
         dx: 0,
         dy: 0,
-        width: w,
-        height: h,
         muki,
         spd,
-        hp
+        w,
+        h,
+        hw: hw??w,
+        hh: hh??h,
+
     }
 
     if(typeof muki == 'number'){
@@ -1954,18 +1983,17 @@ bleF.blMake = (color, shape, x, y, w, h, muki, spd, hp) => {
         return;
     }
 
-    switch(muki){
-        case 'p':{
-            let aim = bleC.p;
-            let kx = aim.x - x;
-            let ky = aim.y - y;
-            let dir = Math.atan2(ky, kx);
+    if(muki == 'p'){
+        let aim = bleC.p;
+        let kx = aim.x - x;
+        let ky = aim.y - y;
+        let dir = Math.atan2(ky, kx);
 
-            bl.dx = Math.cos(dir) * spd;
-            bl.dy = Math.sin(dir) * spd;
-            
-            console.log(kx, aim.x, ky, aim.y, dir, bl.dx, bl.dy);
-        }
+        bl.dx = Math.cos(dir) * spd;
+        bl.dy = Math.sin(dir) * spd;
+
+        bleC.bls.push(bl);
+        return;
     }
     
 }
@@ -1975,9 +2003,11 @@ bleF.gameloop = () => {
     bleF.draw();
     bleF.tekiou();  
 
-    if(keys.u) bleF.blMake('red', 'circle', bleC.canvas.width/2, bleC.canvas.height/2, 3, 3, random(0, 360), random(1,10), 1);
-    if(keys.y) bleF.blMake('red', 'circle', bleC.canvas.width/2, bleC.canvas.height/2, 10, 10, 'p', 1, 1);
-    // if(keys.u) bleF.blMake('red', 'circle', 0, bleC.canvas.height/2, 3, 3, 90, 0.1, 1);
+    let testSize = 10; 
+    // if(keys.u) bleF.blMake('red', 'maru', bleC.canW/2, bleC.canH/2, 3, 3, random(0, 360), random(1,10), 1);
+    if(keys.u) bleF.blMake('red', 'maru', bleC.canW/2, bleC.canH/2, testSize, testSize, random(0, 360), 1, 1);
+    if(keys.y) bleF.blMake('red', 'maru', bleC.canW/2, bleC.canH/2, testSize, testSize, 'p', 1, 1);
+    // if(keys.u) bleF.blMake('red', 'maru', 0, bleC.canH/2, 3, 3, 90, 0.1, 1);
     
     if(!bleC.loop) return;
     requestAnimationFrame(bleF.gameloop);
@@ -1986,13 +2016,14 @@ bleF.gameloop = () => {
 bleF.kidou = async function(){
     if(bleC.ing) return;
     bleC.ing = 0.5;
-    bleC.canvas.style.top = 0;
+    bleC.canvas.classList.add('tog');
+    bleC.bleD.classList.add('tog');
     await delay(2000);
     // await delay(8000)
     bleC.ing = 1;
     
-    bleC.p.x = bleC.canvas.width/2;
-    bleC.p.y = bleC.canvas.height - 50;
+    bleC.p.x = bleC.canW/2;
+    bleC.p.y = bleC.canH - 50;
     console.log(bleC.p.x, bleC.p.y);
 
     bleC.loop = 1;
