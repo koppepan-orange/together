@@ -512,19 +512,85 @@ function sendpyTx(text){
 };
 
 window.setInterval(() => {
+    // 急にランダムなタイミングで絵文字出すやつ
     if(probability(2)){
-        let Emozis = [
-            `^~^`,
-            `uwu`,
-            `owo`,
-            `;~;`,
-            `$w$`,
-            `┐o_o┌`,
-        ]
+        let Emozis = [`^~^`,`uwu`,`owo`,`;~;`,`$w$`,`┐o_o┌`,]
         let emozi = arraySelect(Emozis);
         logadd(`??? => ${emozi}`);
     }
+
+    // 急にランダムなタイミングでフォローされるやつ
+    if(probability(3)){
+        makeNotice();
+    }
 }, 1000)
+
+let notiL = []
+function makeNotice(nameOr = null){
+    let name = genename();
+    if(nameOr) name = nameOr;
+    let app = arraySelect(['twitter2','isostagram','tictac'])//ツイッター2、イソスタグラム、チックタック
+    let col = '';
+    if(app == 'twitter2') col = '#d1e9ffee';
+    if(app == 'isostagram') col = '#ffd2fcee';
+    if(app == 'tictac') col = '#2c2c2cee';
+    
+    let id = 0;
+    while(notiL.includes(id)) id += 1;
+    notiL.push(id);
+
+    let D = document.createElement('div');
+    D.className = 'notice';
+    D.style.backgroundColor = col;
+    D.dataset.id = id;
+    D.style.top = `${id*60}px`;
+    
+    let iconI = document.createElement('img');
+    iconI.className = 'icon';
+    iconI.src = `assets/images/systems/${app}.png`;
+    D.appendChild(iconI);
+    
+    let userD = document.createElement('div');
+    userD.className = 'text';
+    userD.innerHTML = `@${name}さんに<br>フォローされました`;
+    if(app == 'tictac') userD.style.color = '#ffffffee';
+    D.appendChild(userD);
+    
+    document.querySelector('body').appendChild(D);
+    
+    setTimeout(() => {
+        D.classList.add('tap');
+    }, 1000)
+    
+    setTimeout(() => {
+        notiL = notiL.filter(a => a != id);
+    }, 2500);
+
+    setTimeout(() => {
+        D.classList.remove('tap');
+    }, 3000);
+
+    setTimeout(() => {
+        D.remove();
+    }, 4000);
+}
+function genename(len = 14) {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789_';
+    const erab = () => chars[Math.floor(Math.random() * chars.length)];
+
+    let name = '';
+    for(let i = 0; i < len; i++){
+        let n = erab();
+        // 先頭・末尾が "_" ならNG
+        // 先頭が数字ならNG
+        while(
+           ((i == 0 || i == len - 1) && n == '_') ||
+            (i == 0 && n >= '0' && n <= '9')
+        ) n = erab();
+        name += n;
+    }
+    return name;
+}
 
 function cocGacha(code = 0){
     let list = [
@@ -968,6 +1034,66 @@ for(let j of bigmmC.jougeL){
 
 //#endregion bigmashmaro
 
+//#region sideL
+let sideLD = document.getElementById('sideL');
+let sideLC = {
+    open:0,
+    gararaD:sideLD.querySelector('.garara'),
+}
+let sideLF = {};
+
+sideLC.list = [
+    {
+        name:'setting',
+        img:'seafood', // == 歯車
+        func: () => {
+            sideLF.toggle();
+        }
+    },
+    {
+        name:'dummy!',
+        img:'seafood',
+        func: () => {sideLF.toggle();}
+    },
+    {
+        name:'dummy!!',
+        img:'seafood',
+        func: () => {sideLF.toggle();}
+    },
+    {
+        name:'dummy!!!',
+        img:'seafood',
+        func: () => {sideLF.toggle();}
+    }
+]
+
+sideLF.toggle = async function(){
+    sideLC.open = sideLC.open ? 0 : 1;
+    sideLD.classList.toggle('tog');
+}
+sideLC.gararaD.addEventListener('click', sideLF.toggle);
+
+sideLF.load = () => {
+    for(let ic of sideLC.list){
+        let D = document.createElement('div');
+        D.className = 'ic';
+        D.addEventListener('click', ic.func);
+
+        let srb = `assets/images/systems/${ic.img}_black.png`;
+        let src = `assets/images/systems/${ic.img}.png`;
+        let img = document.createElement('img');
+        img.src = srb;
+        D.appendChild(img);
+        img.addEventListener('mouseover',() => {img.src = src});
+        img.addEventListener('mouseout', () => {img.src = srb});
+
+        sideLD.appendChild(D);
+    }
+}
+
+
+//#endregion
+
 //#region fontChange
 let fontD = document.getElementById('fonts')
 let fontC = {
@@ -1044,17 +1170,20 @@ let rainC = {
     tapend: 0
 }
 rainB.addEventListener('click', () => {
-    // let f = 0;
-    // if(rainC.tapend) f = 1, rainC.tapend = 0;
-    //             else f = 0, rainC.tapend = 1;
-
-    // document.querySelectorAll('*').forEach(el => {
-    //     if(f) el.classList.remove('rainback');
-    //     if(!f) el.classList.add('rainback');
-    // });
-
     let item = cocGacha();
     sendpyTx(`printTx,${item}`);
+});
+rainB.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    
+    let f = 0;
+    if(rainC.tapend) f = 1, rainC.tapend = 0;
+                else f = 0, rainC.tapend = 1;
+
+    document.querySelectorAll('*').forEach(el => {
+        if(f) el.classList.remove('rainback');
+        if(!f) el.classList.add('rainback');
+    });
 });
 //#endregion rainbow
 
@@ -2003,10 +2132,10 @@ bleF.gameloop = () => {
     bleF.draw();
     bleF.tekiou();  
 
-    let testSize = 10; 
+    let testSize = 5; 
     // if(keys.u) bleF.blMake('red', 'maru', bleC.canW/2, bleC.canH/2, 3, 3, random(0, 360), random(1,10), 1);
-    if(keys.u) bleF.blMake('red', 'maru', bleC.canW/2, bleC.canH/2, testSize, testSize, random(0, 360), 1, 1);
-    if(keys.y) bleF.blMake('red', 'maru', bleC.canW/2, bleC.canH/2, testSize, testSize, 'p', 1, 1);
+    if(keys.u) bleF.blMake('red', 'maru', bleC.canW/2, bleC.canH/2, random(0, 360), 1, testSize, testSize,);
+    if(keys.y) bleF.blMake('red', 'maru', bleC.canW/2, bleC.canH/2, 'p',            1, testSize, testSize);
     // if(keys.u) bleF.blMake('red', 'maru', 0, bleC.canH/2, 3, 3, 90, 0.1, 1);
     
     if(!bleC.loop) return;
@@ -2043,6 +2172,7 @@ function start(){
     
     inv_make();
     map_load()
+    sideLF.load();
     fontF.load();
     canC.resize();
     bleF.resize();

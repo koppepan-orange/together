@@ -1,9 +1,9 @@
 @font-face{src:url("assets/fonts/hangyaku.ttf");font-family: hangyaku; }
 @font-face{src:url('assets/fonts/kurobara.ttf');font-family: kurobara;}
-@font-face{src:url('assets/fonts/marukoius.ttf');font-family: marukoius;}
 @font-face{src:url('assets/fonts/starrysky.otf');font-family: starrysky;}
 @font-face{src:url('assets/fonts/kurundeco.otf');font-family: kurundeco;}
 @font-face{src:url('assets/fonts/urara.otf');font-family: urara;}
+@font-face{src: url("assets/fonts/hackgen.ttf");font-family: hackgen;}
 html{
     margin: -8px;
     overflow: hidden;
@@ -270,67 +270,6 @@ textarea{
     100% { background-position: -400% 0; }
 }
 
-#commands{
-    display: flex;
-    flex-direction: column;
-    margin: 20px auto;
-}
-
-.floatdiv{
-    display: flex;
-    flex-direction: column;
-    width: 120px;
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    border-radius: 5px;
-    z-index: 47;
-}
-.floatdiv .focus{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 50px;
-    background-color: #ffcfec;
-    transition: width 0.5s ease;
-    z-index: 50;
-}
-.floatdiv .list{
-    display: flex;
-    flex-direction: column;
-    /* align-items: center;
-    justify-content: center; */
-    width: 100%;
-    max-height: 300px;
-    background-color: #b5dcff;
-    opacity: 0;
-    overflow-y: scroll;
-    transition: height 0.3s ease-out;
-    z-index: 49;
-}
-.floatdiv .list .item{
-    border-top: 1px #ceffcf;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    height: 20px;
-    padding: 5px;
-    min-height: 20px;
-    max-height: 20px;
-}
-.floatdiv .desc{
-    width: 100%;
-    background-color: #ffc400;
-    font-size: 20px;
-    position: absolute;
-    top: 50px;
-    left: 0;
-    transition: left 0.5s ease;
-    opacity: 0;
-    z-index: 48;
-}
-
 #bigmashmaro{
     z-index: 4;
 }
@@ -339,7 +278,7 @@ textarea{
     width: 60px;
     height: 70px;
     background: #def0ff;
-    border-radius: 0 0 5px 5px;
+    border-radius: 0 0 10px 10px;
     position: fixed;
     top: 0;
     right: 10%;
@@ -463,7 +402,6 @@ textarea{
     object-fit: contain;
     z-index: inherit;
 }
-
 #bigmashmaro .jouge .j .troa{
     width: 100%;
     height: 36%;
@@ -471,6 +409,86 @@ textarea{
     clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
     z-index: inherit;
 }
+
+#sideL{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+    width: 7vw;
+    height: 23vh;
+    padding: 2px;
+    background: #bebebe;
+    border: 3px solid #2b2b2b;
+    border-left: none;
+    position: fixed;
+    top: 50%;
+    left: calc(-7vw - 3px);
+    transform: translateY(-50%);
+    transition: left 1.0s ease;
+    box-sizing: border-box;
+    z-index: 4;
+}
+#sideL.tog{
+    left: 0;
+}
+#sideL .garara{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    height: 23vh;
+    background: #bebebe;
+    border: 3px solid #2b2b2b;
+    border-left: none;
+    border-radius: 0 20px 20px 0;
+    position: absolute;
+    top: -3px;
+    left: calc(100%);
+    transition: left 1.0s ease;
+    box-sizing: border-box;
+    z-index: inherit;
+}
+#sideL.tog .garara{
+    left: calc(100% - 1px);
+}
+#sideL .garara .row{
+    width: 75%;
+    height: 90%;
+    margin-left: 5px;
+    transition: margin-left 1.0s ease;
+    z-index: inherit;
+}
+#sideL.tog .garara .row{
+    margin-left: -5px;
+}
+#sideL .garara .megy{
+    width: 50%;
+    height: 100%; 
+    background: #2b2b2b;
+    transition: clip-path 1.0s ease;
+    clip-path: polygon(0% 0%, 50% 0%, 100% 50%, 50% 100%, 0% 100%, 50% 50%);
+    z-index: inherit;
+}
+#sideL.tog .garara .row .megy{
+    clip-path: polygon(50% 0%, 100% 0%, 50% 50%, 100% 100%, 50% 100%, 0% 50%); /* 反転 */
+}
+#sideL .ic{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: calc(100% - 4px);
+    aspect-ratio: 1/1;
+}
+#sideL .ic img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: inherit;
+}
+
 
 #fonts{
     display: none;
@@ -685,7 +703,6 @@ textarea{
     --size: 180px;
 }
 
-/* ゴーストのコンテナ */
 #ghost{
     width:var(--size);
     height:calc(var(--size) * 1.2);
@@ -694,8 +711,6 @@ textarea{
     bottom: 5%;
     touch-action:none; /* タッチでページスクロールさせない */
 }
-
-/* 胴体 */
 .body{
     position:absolute;
     left:50%;
@@ -708,8 +723,6 @@ textarea{
     box-shadow: 0 8px 18px rgba(10,20,40,0.15), inset 0 -6px 12px rgba(0,0,0,0.03);
     z-index:1;
 }
-
-/* 頭（撫でる部分） */
 .head{
     display:flex;
     align-items:center;
@@ -740,10 +753,6 @@ textarea{
 .head .bottom {
     bottom:0;
 }
-/* 見えないがイベント拾える */
-
-
-/* 目（簡易） */
 .eye{
     position:absolute;
     top:46%;
@@ -754,11 +763,12 @@ textarea{
     transform:translateY(-50%);
     z-index:4;
 }
-.eye.left{ left:38%; }
-.eye.right{ right:38%; }
-
-
-/* 台詞バブル */
+.eye.left{
+    left:38%;
+}
+.eye.right{
+    right:38%;
+}
 .bubble{
     width: calc(var(--size) * 2 / 3);
     height: calc(var(--size));
@@ -769,7 +779,7 @@ textarea{
     background: #ffffff;
     border-radius:12px;
     padding:8px 12px;
-    font-size: 10px;
+    font-size: 12px;
     font-family: arial;
     box-shadow: 0 6px 16px rgba(10,20,40,0.12);
     white-space:nowrap;
@@ -792,31 +802,6 @@ textarea{
     clip-path: polygon(0% 0%, 100% 70%, 0% 100%);
 }
 
-/* 撫でリアクション（頭の振動） */
-@keyframes head-purr {
-    0%{ transform: translateX(-50%) rotate(0deg); }
-    25%{ transform: translateX(-50%) rotate(-6deg); }
-    50%{ transform: translateX(-50%) rotate(6deg); }
-    75%{ transform: translateX(-50%) rotate(-3deg); }
-    100%{ transform: translateX(-50%) rotate(0deg); }
-}
-.head.purr{
-    animation: head-purr 560ms ease;
-}
-
-/* 小さく尻尾みたいな装飾 */
-.tail{
-    position:absolute;
-    left:50%;
-    bottom:2%;
-    width:24%;
-    height:8%;
-    transform:translateX(-50%);
-    background: linear-gradient(180deg,#fff 0%, #e7f0ff 100%);
-    border-radius:60% 60% 30% 30%;
-    z-index:0;
-    filter: blur(0.3px);
-}
 
 #bleBack{
     display: block;
@@ -853,3 +838,36 @@ textarea{
     87.5%{left: 3vw}
     100%{left: 0; top: 0;}
 }
+
+.notice{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    width: 240px;
+    height: 60px;
+    position: fixed;
+    top: 0;
+    right: -240px;
+    transition: right 0.5s ease;
+    background: #ffffffee;
+    z-index: 255;
+}
+.notice.tap{
+    right: 0;
+}
+.notice .icon{
+    height: 40px;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+}
+.notice .text{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 50%;
+    font-size: 15px;
+    font-family: hackgen;
+}
+
