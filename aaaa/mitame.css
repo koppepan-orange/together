@@ -186,7 +186,7 @@ textarea{
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 10;
+    z-index: 100;
 }
 #titleArea.hidden{
     display: none;
@@ -248,7 +248,7 @@ textarea{
     height: 50px;
     background: radial-gradient(#f0f8ff,#f6fff2,#fffaf3,#f8f6ff)!important;
     border-radius: 50%;
-    z-index: 255;
+    z-index: 7;
     box-sizing: border-box;
 }
 #back.rainback{
@@ -489,6 +489,28 @@ textarea{
     z-index: inherit;
 }
 
+#underBar{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 51%;
+    height: 80%;
+    background: linear-gradient(to top, #391d00fc 0%, #391d00fc 60%, #4f2c07fc 100%);
+    color: #fffffffc;
+    position: fixed;
+    bottom: -80%;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: bottom 1.0s ease;
+    box-sizing: border-box;
+    z-index: 5;
+}
+#underBar.tog{
+    bottom: 0;
+}
+
+
 
 #fonts{
     display: none;
@@ -551,7 +573,7 @@ textarea{
     aspect-ratio: 1;
     background: #b2b2b2;
     overflow: hidden;
-    z-index: 255;
+    z-index: 5;
     box-sizing: border-box;
 }
 #inventory .opener.tog{
@@ -852,7 +874,7 @@ textarea{
     right: -240px;
     transition: right 0.5s ease;
     background: #ffffffee;
-    z-index: 255;
+    z-index: 7;
 }
 .notice.tap{
     right: 0;
@@ -871,3 +893,15 @@ textarea{
     font-family: hackgen;
 }
 
+.rabbit{
+    /* img */
+    display: block;
+    width: 100px;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    position: fixed;
+    bottom: 0;
+    left: 100%;
+    transition: left 0.08s linear;
+    z-index: 4;
+}

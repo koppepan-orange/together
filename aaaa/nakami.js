@@ -511,87 +511,6 @@ function sendpyTx(text){
     if(connecten) webSocket.send(text);
 };
 
-window.setInterval(() => {
-    // 急にランダムなタイミングで絵文字出すやつ
-    if(probability(2)){
-        let Emozis = [`^~^`,`uwu`,`owo`,`;~;`,`$w$`,`┐o_o┌`,]
-        let emozi = arraySelect(Emozis);
-        logadd(`??? => ${emozi}`);
-    }
-
-    // 急にランダムなタイミングでフォローされるやつ
-    if(probability(3)){
-        makeNotice();
-    }
-}, 1000)
-
-let notiL = []
-function makeNotice(nameOr = null){
-    let name = genename();
-    if(nameOr) name = nameOr;
-    let app = arraySelect(['twitter2','isostagram','tictac'])//ツイッター2、イソスタグラム、チックタック
-    let col = '';
-    if(app == 'twitter2') col = '#d1e9ffee';
-    if(app == 'isostagram') col = '#ffd2fcee';
-    if(app == 'tictac') col = '#2c2c2cee';
-    
-    let id = 0;
-    while(notiL.includes(id)) id += 1;
-    notiL.push(id);
-
-    let D = document.createElement('div');
-    D.className = 'notice';
-    D.style.backgroundColor = col;
-    D.dataset.id = id;
-    D.style.top = `${id*60}px`;
-    
-    let iconI = document.createElement('img');
-    iconI.className = 'icon';
-    iconI.src = `assets/images/systems/${app}.png`;
-    D.appendChild(iconI);
-    
-    let userD = document.createElement('div');
-    userD.className = 'text';
-    userD.innerHTML = `@${name}さんに<br>フォローされました`;
-    if(app == 'tictac') userD.style.color = '#ffffffee';
-    D.appendChild(userD);
-    
-    document.querySelector('body').appendChild(D);
-    
-    setTimeout(() => {
-        D.classList.add('tap');
-    }, 1000)
-    
-    setTimeout(() => {
-        notiL = notiL.filter(a => a != id);
-    }, 2500);
-
-    setTimeout(() => {
-        D.classList.remove('tap');
-    }, 3000);
-
-    setTimeout(() => {
-        D.remove();
-    }, 4000);
-}
-function genename(len = 14) {
-    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789_';
-    const erab = () => chars[Math.floor(Math.random() * chars.length)];
-
-    let name = '';
-    for(let i = 0; i < len; i++){
-        let n = erab();
-        // 先頭・末尾が "_" ならNG
-        // 先頭が数字ならNG
-        while(
-           ((i == 0 || i == len - 1) && n == '_') ||
-            (i == 0 && n >= '0' && n <= '9')
-        ) n = erab();
-        name += n;
-    }
-    return name;
-}
-
 function cocGacha(code = 0){
     let list = [
         Friends.filter(a => a.rare == 1),
@@ -1048,6 +967,7 @@ sideLC.list = [
         img:'seafood', // == 歯車
         func: () => {
             sideLF.toggle();
+            undF.open()
         }
     },
     {
@@ -1092,6 +1012,47 @@ sideLF.load = () => {
 }
 
 
+//#endregion
+
+//#region ________
+let undD = document.getElementById('underBar'); //地下のbar(酒屋)
+let undC = {
+    open:0,
+    checkD:undD.querySelector('.checks'),
+    checking:{}
+}
+let undF = {};
+
+undF.open = () => {
+    undC.open = undC.open ? 0 : 1;
+    undD.classList.toggle('tog');
+}
+
+undC.checks = [
+    // [名前, 初期値]
+    ['emozi', 1],
+    ['follow', 1],
+    ['rabbit', 1],
+]
+undF.load = () => {
+    for(let ch of undC.checks){
+        let [name, kitei] = ch;
+        let div = document.createElement('div');
+        div.className = 'ch';
+
+        let input = document.createElement('input');
+        input.type = 'checkbox';
+        input.checked = kitei;
+        div.appendChild(input);
+
+        let label = document.createElement('label');
+        label.textContent = name;
+        div.appendChild(label);
+        undC.checkD.appendChild(div);
+
+        undC.checking[name] = kitei;
+    }
+}
 //#endregion
 
 //#region fontChange
@@ -1901,16 +1862,6 @@ function showBubble(text){
     setTimeout(()=> bubble.classList.remove('show'), displayMs);
 }
 
-// --- オプション: head をクロスブラウザでドラッグしても反応するようにする簡易処理 ---
-// pointerdown で pointer capture して高速な挙動でも拾える（任意）
-// head.addEventListener('pointerdown', (e)=>{
-//     try{head.setPointerCapture(e.pointerId)}catch(e){}
-// });
-
-// head.addEventListener('pointerup', (e)=>{
-//     try{ head.releasePointerCapture(e.pointerId); }catch(e){}
-// });
-
 headBottom.addEventListener('dblclick', async function(){
     showBubble('何？');
     await delay(1000);
@@ -2166,6 +2117,128 @@ mapmakeD.addEventListener('contextmenu', (e) => {
 
 //#endregion
 
+//#region intervalで動くやつ
+window.setInterval(() => {
+    // 急にランダムなタイミングで絵文字出すやつ
+    if(probability(2) && undC.checking['emozi']){
+        let Emozis = [`^~^`,`uwu`,`owo`,`;~;`,`$w$`,`┐o_o┌`,]
+        let emozi = arraySelect(Emozis);
+        logadd(`??? => ${emozi}`);
+    }
+
+    // 急にランダムなタイミングでフォローされるやつ
+    if(probability(3) && undC.checking['follow']) makeNotice();
+
+    if(probability(0.5) && undC.checking['rabbit']) goRabbit();
+}, 1000)
+
+let notiL = []
+function makeNotice(nameOr = null){
+    let name = genename();
+    if(nameOr) name = nameOr;
+    let app = arraySelect(['twitter2','isostagram','tictac'])//ツイッター2、イソスタグラム、チックタック
+    let col = '';
+    if(app == 'twitter2') col = '#d1e9ffee';
+    if(app == 'isostagram') col = '#ffd2fcee';
+    if(app == 'tictac') col = '#2c2c2cee';
+    
+    let id = 0;
+    while(notiL.includes(id)) id += 1;
+    notiL.push(id);
+
+    let D = document.createElement('div');
+    D.className = 'notice';
+    D.style.backgroundColor = col;
+    D.dataset.id = id;
+    D.style.top = `${id*60}px`;
+    
+    let iconI = document.createElement('img');
+    iconI.className = 'icon';
+    iconI.src = `assets/images/systems/${app}.png`;
+    D.appendChild(iconI);
+    
+    let userD = document.createElement('div');
+    userD.className = 'text';
+    userD.innerHTML = `@${name}さんに<br>フォローされました`;
+    if(app == 'tictac') userD.style.color = '#ffffffee';
+    D.appendChild(userD);
+    
+    document.querySelector('body').appendChild(D);
+    
+    setTimeout(() => {
+        D.classList.add('tap');
+    }, 1000)
+    
+    setTimeout(() => {
+        notiL = notiL.filter(a => a != id);
+    }, 2500);
+
+    setTimeout(() => {
+        D.classList.remove('tap');
+    }, 3000);
+
+    setTimeout(() => {
+        D.remove();
+    }, 4000);
+}
+function genename(len = 14) {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789_';
+    const erab = () => chars[Math.floor(Math.random() * chars.length)];
+
+    let name = '';
+    for(let i = 0; i < len; i++){
+        let n = erab();
+        // 先頭・末尾が "_" ならNG
+        // 先頭が数字ならNG
+        while(
+           ((i == 0 || i == len - 1) && n == '_') ||
+            (i == 0 && n >= '0' && n <= '9')
+        ) n = erab();
+        name += n;
+    }
+    return name;
+}
+
+async function goRabbit(num = 0){
+    if(!num) num = arrayGacha([1,2,3],[80,17,3]);
+
+    for(let i = 0; i < num; i++){
+        let src = 'assets/images/elses/rabbit';
+        let D = document.createElement('img');
+        D.className = 'rabbit';
+        D.src = `${src}[1].png`;
+        let wid = window.innerWidth;
+        document.querySelector('body').appendChild(D);
+        let tek = () => D.style.left = `${wid}px`;
+
+        let nowMai = 1;
+        let maxMai = 8;
+        setInterval(async function(){
+            nowMai += 1;
+            D.src = `${src}[${nowMai}].png`;
+
+            if(nowMai == 3 || nowMai == 4) wid -= 10;
+            tek();
+
+            if(nowMai >= maxMai) nowMai = 0;
+        }, 80)
+
+        // 3,4の時だけ動く〜にしたいなら
+
+        // setTimeout(() => {
+        //     D.classList.add('start')
+        // }, 500);
+
+        // setTimeout(() => {
+        //     D.remove();
+        // }, 9000);
+
+        await delay(500);
+    }
+}
+
+//#endregion
+
 function start(){
     messageTextArea.value += `hello! no name!`;
     connect();
@@ -2173,6 +2246,7 @@ function start(){
     inv_make();
     map_load()
     sideLF.load();
+    undF.load()
     fontF.load();
     canC.resize();
     bleF.resize();
