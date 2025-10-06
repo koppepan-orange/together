@@ -33,7 +33,7 @@ def dealerDraw():
         elif player_total < dealer_total:
             result_text.set("はーいおにーさんの負け～～～")
         else:
-            result_text.set("引き分けってことはつまり私の勝ちってこと")
+            result_text.set("引き分け？ごめんヘルシェイク矢野のこと考えてた")
 
 # 初期化
 

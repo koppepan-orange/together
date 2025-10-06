@@ -15,32 +15,33 @@ def check_website(url):
         
         
         if response.status_code != 200:
-            print(f"だめー✖ {url} はアクセス不可 ({response.status_code})")
+            # print(f"だめー✖ {url} はアクセス不可 ({response.status_code})")
             return False
         
        
         if "<!DOCTYPE html>" not in response.text[:1000]:  
-            print(f"✖ {url} はHTMLではない")
+            # print(f"✖ {url} はHTMLではない")
             return False
         
         if len(response.text) < 500:
-            print(f"✖ {url} はページが短すぎる ({len(response.text)} bytes)")
+            # print(f"✖ {url} はページが短すぎる ({len(response.text)} bytes)")
             return False
         
-        print(f"✔ {url} は有効なサイト！")
+        # print(f"✔ {url} は有効なサイト！")
         return True
     
     except requests.RequestException as e:
-        print(f"✖ {url} はアクセス不可 ({str(e)})")
+        # print(f"✖ {url} はアクセス不可 ({str(e)})")
         return False
 
 def open_random_website():
     """ ランダムなサイトを開く """
+    print('検索中...')
     while True:
         url = generate_random_domain()
         if check_website(url):
             print(f"🌍 ブラウザで開きます → {url}")
             webbrowser.open(url)
-            break
+            open_random_website()
 
 open_random_website()

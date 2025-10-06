@@ -496,8 +496,10 @@ textarea{
     align-items: center;
     width: 51%;
     height: 80%;
+    padding: 30px;
     background: linear-gradient(to top, #391d00fc 0%, #391d00fc 60%, #4f2c07fc 100%);
     color: #fffffffc;
+    font-family: hangyaku;
     position: fixed;
     bottom: -80%;
     left: 50%;
@@ -892,6 +894,9 @@ textarea{
     font-size: 15px;
     font-family: hackgen;
 }
+.notice.isostagram{background: #ffd2fcee}
+.notice.twitter2{background: #d1e9ffee}
+.notice.tictac{background: #2c2c2cee; color: #ffffffee}
 
 .rabbit{
     /* img */

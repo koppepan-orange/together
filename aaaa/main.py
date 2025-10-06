@@ -827,7 +827,13 @@ def delete_inventry_GUI(name):
     #print(canvas)
     #print(root)
     #print(motion_data)
-    for axx,sute in gui.items():
+    try:
+        flag["inventry_name"].remove(name)
+    except Exception as e:
+        print(e)
+
+    cclemonn=gui.copy()
+    for axx,sute in cclemonn.items():
         if axx[-len(name):]==name:
             del gui[axx]
     try:
@@ -866,9 +872,12 @@ def pressuregauge(e,name):
         root["inventry_Toplevel_pressuregauge"+str(name)].after(1,pressuregauge_move,name)
 
 def pressuregauge_move(name):
-    canvas["inventry_Toplevel_pressuregauge"+str(name)].delete("pressuregauge_mid")
-    gui["inventry_Toplevel_pressuregauge__gui"+str(name)]=canvas["inventry_Toplevel_pressuregauge"+str(name)].create_line(100, 100, 100+(80*math.cos(math.radians(90-(-(330/inventry2[name][8])*inventry2[name][4])+15))),  100+(80*math.sin(math.radians(90-(-(330/inventry2[name][8])*inventry2[name][4])+15))),tag=("system","pressuregauge_mid"),arrow=tk.FIRST,arrowshape=(100, 2, 1),fill = "#000000")
-
+    try:
+        canvas["inventry_Toplevel_pressuregauge"+str(name)].delete("pressuregauge_mid")
+        gui["inventry_Toplevel_pressuregauge_gui_move"+str(name)]=canvas["inventry_Toplevel_pressuregauge"+str(name)].create_line(100, 100, 100+(80*math.cos(math.radians(90-(-(330/inventry2[name][8])*inventry2[name][4])+15))),  100+(80*math.sin(math.radians(90-(-(330/inventry2[name][8])*inventry2[name][4])+15))),tag=("system","pressuregauge_mid"),arrow=tk.FIRST,arrowshape=(100, 2, 1),fill = "#000000")
+    except Exception as e:
+        print(e)
+        return
     root["inventry_Toplevel_pressuregauge"+str(name)].after(10,pressuregauge_move,name)
 
 
@@ -889,6 +898,17 @@ def thermometer(e,name):
         canvas["inventry_Toplevel_thermometer"+str(name)].place(x = 0,y = 0)
         gui["inventry_Toplevel_thermometer_gui"+str(name)]=canvas["inventry_Toplevel_thermometer"+str(name)].create_image(100,100, image=img[str(name)+"thermometer_mid"],tag="system")
         #canvas["inventry_Toplevel_thermometer"+str(name)].place(x = 0,y = 0)
+        root["inventry_Toplevel_thermometer"+str(name)].after(1,thermometer_move,name)
+
+def thermometer_move(name):
+    try:
+        canvas["inventry_Toplevel_thermometer"+str(name)].delete("thermometer_mid")
+        gui["inventry_Toplevel_thermometer_gui_move"+str(name)]=canvas["inventry_Toplevel_thermometer"+str(name)].create_line(100, 142, 100,  100-((133/(inventry2[name][7]-inventry2[name][9]))*(inventry2[name][3]-inventry2[name][9]))+42-15,tag=("system","thermometer_mid"),fill = "#000000",width=16)
+        #print(100+((133/(inventry2[name][7]-inventry2[name][9]))*(inventry2[name][9]-inventry2[name][3]))+42)
+    except Exception as e:
+        print(e)
+        return
+    root["inventry_Toplevel_thermometer"+str(name)].after(10,thermometer_move,name)
 
 def out(e,name):
     canvas["inventry_root_"+str(name)].delete('have')

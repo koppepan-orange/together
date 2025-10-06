@@ -842,10 +842,9 @@ bigmmC.subL = [
         disp:'makeInv',
         func: async function(){
             sendpyTx('printTx,脳2に接続しています....')
-            sendpyTx('create_inventry_koppe_400_400_120_101325_770_1013250_64'); //最大はほぼアルミニウム
+            sendpyTx('create_inventry_koppe_400_400_1000_101325_0_1013250_64'); //最大はほぼアルミニウム
             sendpyTx('open_inventry_koppe');
-            sendpyTx('print,inventry');
-            map_make();
+            sendpyTx('print,inventry')
             sendpyTx('printTx,接続..切断....');
         }
     },
@@ -964,10 +963,17 @@ let sideLF = {};
 sideLC.list = [
     {
         name:'setting',
-        img:'seafood', // == 歯車
+        img:'teethcar', // == 歯車
         func: () => {
             sideLF.toggle();
             undF.open()
+        }
+    },
+    {
+        name:'achievement',
+        img:'achieve',
+        func: () => {
+            sideLF.toggle();
         }
     },
     {
@@ -980,11 +986,6 @@ sideLC.list = [
         img:'seafood',
         func: () => {sideLF.toggle();}
     },
-    {
-        name:'dummy!!!',
-        img:'seafood',
-        func: () => {sideLF.toggle();}
-    }
 ]
 
 sideLF.toggle = async function(){
@@ -999,7 +1000,7 @@ sideLF.load = () => {
         D.className = 'ic';
         D.addEventListener('click', ic.func);
 
-        let srb = `assets/images/systems/${ic.img}_black.png`;
+        let srb = `assets/images/systems/${ic.img}_b.png`;
         let src = `assets/images/systems/${ic.img}.png`;
         let img = document.createElement('img');
         img.src = srb;
@@ -1024,9 +1025,23 @@ let undC = {
 let undF = {};
 
 undF.open = () => {
-    undC.open = undC.open ? 0 : 1;
-    undD.classList.toggle('tog');
+    undC.open = 0.5;
+    undD.classList.add('tog');
+
+    setTimeout(() => {
+        undC.open = 1;
+    }, 1000)
 }
+undF.clos = () => {
+    undC.open = 0;
+    undD.classList.remove('tog');
+}
+document.addEventListener('click', (e) => {
+    if(undC.open != 1) return;
+    if(!undD.contains(e.target)){
+        undF.clos();
+    }
+  });
 
 undC.checks = [
     // [名前, 初期値]
@@ -2129,7 +2144,7 @@ window.setInterval(() => {
     // 急にランダムなタイミングでフォローされるやつ
     if(probability(3) && undC.checking['follow']) makeNotice();
 
-    if(probability(0.5) && undC.checking['rabbit']) goRabbit();
+    if(probability(2) && undC.checking['rabbit']) goRabbit();
 }, 1000)
 
 let notiL = []
@@ -2138,29 +2153,25 @@ function makeNotice(nameOr = null){
     if(nameOr) name = nameOr;
     let app = arraySelect(['twitter2','isostagram','tictac'])//ツイッター2、イソスタグラム、チックタック
     let col = '';
-    if(app == 'twitter2') col = '#d1e9ffee';
-    if(app == 'isostagram') col = '#ffd2fcee';
-    if(app == 'tictac') col = '#2c2c2cee';
     
     let id = 0;
     while(notiL.includes(id)) id += 1;
     notiL.push(id);
 
     let D = document.createElement('div');
-    D.className = 'notice';
+    D.className = `notice ${app}`;
     D.style.backgroundColor = col;
     D.dataset.id = id;
     D.style.top = `${id*60}px`;
     
     let iconI = document.createElement('img');
-    iconI.className = 'icon';
+    iconI.className = `icon`;
     iconI.src = `assets/images/systems/${app}.png`;
     D.appendChild(iconI);
     
     let userD = document.createElement('div');
     userD.className = 'text';
     userD.innerHTML = `@${name}さんに<br>フォローされました`;
-    if(app == 'tictac') userD.style.color = '#ffffffee';
     D.appendChild(userD);
     
     document.querySelector('body').appendChild(D);
@@ -2223,17 +2234,10 @@ async function goRabbit(num = 0){
             if(nowMai >= maxMai) nowMai = 0;
         }, 80)
 
-        // 3,4の時だけ動く〜にしたいなら
+        
+        while (wid + 100 > 0) await delay(100);
 
-        // setTimeout(() => {
-        //     D.classList.add('start')
-        // }, 500);
-
-        // setTimeout(() => {
-        //     D.remove();
-        // }, 9000);
-
-        await delay(500);
+        D.remove();
     }
 }
 
@@ -2245,6 +2249,7 @@ function start(){
     
     inv_make();
     map_load()
+    map_make();
     sideLF.load();
     undF.load()
     fontF.load();
@@ -2266,14 +2271,48 @@ async function gameloop(){
 
     if(loop) requestAnimationFrame(gameloop);
 }
-document.addEventListener('keydown', (e) => {
-    if(e.key == 'Escape') loop = 0;
+
+let secrates = [
+    {
+        ind:0,
+        name:'koppepan',
+        arr:['k','o','p','p','e','p','a','n'],
+        func: async function(){
+            await goRabbit(10);
+        }
+    },
+    {
+        ind:0,
+        name:'conami',
+        arr:['arrowup','arrowup','arrowdown','arrowdown','arrowleft','arrowright','arrowleft','arrowright','a','b'],
+        func: async function(){
+            await goRabbit(100);
+        }
+    }
+]
+document.addEventListener('keydown', async function(e){
+    let key = e.key.toLowerCase();
+    if(key == 'escape') loop = 0;
 
 
     //これ以降はinput内では機能しない
-    if (document.activeElement == message) return;
+    if(document.activeElement == message) return;
     if(document.activeElement == bigmmC.bodyD) return;
 
-    if(e.key == 'o') objmake();
-    if(e.key == 'e') inv_open();
+    if(key == 'o') objmake();
+    if(key == 'e') inv_open();
+
+    for(let sec of secrates){
+        let nke = sec.arr[sec.ind];
+        // console.log(`必要は${nke}、押されたは${key}！`);
+        if(key == nke){
+            sec.ind += 1;
+            if(sec.ind == sec.arr.length){
+                console.log(`ジャンゴ！ ${sec.name}発動！！`);
+                sec.ind = 0;
+                await sec.func();
+            }
+        }
+        else sec.ind = 0;
+    }
 })
