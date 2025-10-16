@@ -949,7 +949,6 @@ for(let j of bigmmC.jougeL){
     bigmmC.jougeD.appendChild(jD);
 }
 
-
 //#endregion bigmashmaro
 
 //#region sideL
@@ -2135,7 +2134,7 @@ mapmakeD.addEventListener('contextmenu', (e) => {
 //#region intervalで動くやつ
 window.setInterval(() => {
     // 急にランダムなタイミングで絵文字出すやつ
-    if(probability(2) && undC.checking['emozi']){
+    if(probability(1) && undC.checking['emozi']){
         let Emozis = [`^~^`,`uwu`,`owo`,`;~;`,`$w$`,`┐o_o┌`,]
         let emozi = arraySelect(Emozis);
         logadd(`??? => ${emozi}`);
