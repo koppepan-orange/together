@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprite Example</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="300" height="300"></canvas> <!-- 描画サイズを広げました -->
+    <br><br><br><br>
+    <img id="N" src="../aaaa/assets/images/elses/rabbit.png" width="300">
+
+    <script>
+        // 画像をロードする
+        const spriteSheet = new Image();
+        spriteSheet.src = 'sheet.png';  // 画像パスを指定
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let images = {//開始地点x,開始地点y,そこからの幅,そこからの高さ,描画位置x,描画位置y
+            player:{
+                front:[0,0,190,190],
+                back: [180,0,190,190],
+                left1:[360,0,190,190],
+                left2:[690,0,190,190],
+                right1:[520,0,190,190],
+                right2:[860,0,190,190],
+            },
+        };
+        let angle = 0;
+        function delay(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
+        addEventListener('keydown', async(event) => {
+            switch(event.key){
+                case 'w':
+                    angle = 0;
+                    drawSprite(...images.player.back,0,0,300,300);
+                    break;
+                case 'a':
+                    drawSprite(...images.player.left1,0,0,300,300);
+                    await delay(100);
+                    drawSprite(...images.player.left2,0,0,300,300);
+                    await delay(100);
+                    if(angle == 0){
+                        drawSprite(...images.player.back,0,0,300,300);
+                    }else{
+                        drawSprite(...images.player.front,0,0,300,300);
+                    }
+                    break;
+                case 's':
+                    angle = 1;
+                    drawSprite(...images.player.front,0,0,300,300);
+                    break;
+                case 'd':
+                    drawSprite(...images.player.right1,0,0,300,300);
+                    await delay(100);
+                    drawSprite(...images.player.right2,0,0,300,300);
+                    await delay(100);
+                    if(angle == 0){
+                        drawSprite(...images.player.back,0,0,300,300);
+                    }else{
+                        drawSprite(...images.player.front,0,0,300,300);
+                    }
+                    break;
+                }
+
+        });
+        // スプライトシートからキャラクターを描画する関数
+        function drawSprite(frameX, frameY, frameWidth, frameHeight, x, y ,mx ,my) {
+            console.log(spriteSheet.width, spriteSheet.height); 
+            ctx.clearRect(0, 0, canvas.width, canvas.height); 
+            ctx.drawImage(spriteSheet, frameX, frameY, frameWidth, frameHeight, x, y, mx, my); 
+        }
+
+        // 画像がロードされたらスプライトのサイズを確認してから描画
+        spriteSheet.onload = function(){
+            drawSprite(...images.player.front,0,0,300,300);
+        }
+
+
+        const rabirabi = new Image();
+        rabirabi.src = '../aaaa/assets/images/elses/rabbit.png';  // 画像パスを指定
+
+        images.rabbit = {};
+        for(let i=0;i<10;i++){
+            let widd = 512;
+            images.rabbit[i] = [widd*i,0,widd,widd];
+        }
+
+        addEventListener('keydown', async(event) => {
+            if(event.key != 'z') return;
+            for(i=0;i<10;i++){
+                ctx.clearRect(0, 0, canvas.width, canvas.height); 
+                ctx.drawImage(rabirabi, ...images.rabbit[i], 0, 0, canvas.width, canvas.height); 
+                await delay(80);
+            }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        })
+    </script>
+</body>
+</html>
