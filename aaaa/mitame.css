@@ -4,6 +4,8 @@
 @font-face{src:url('assets/fonts/kurundeco.otf');font-family: kurundeco;}
 @font-face{src:url('assets/fonts/urara.otf');font-family: urara;}
 @font-face{src: url("assets/fonts/hackgen.ttf");font-family: hackgen;}
+@font-face{src:url('assets/fonts/craft.otf');font-family: craft;}
+@font-face{src: url("assets/fonts/misaki.ttf");font-family: misaki;}
 html{
     margin: -8px;
     overflow: hidden;
@@ -29,6 +31,58 @@ img{
 }
 :focus{
     outline: none;
+}
+
+input[type="range"] {
+    width: 300px;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 8px;
+    background: #202020;
+    border: solid 1px #9d9d9d;
+    outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 35px;
+    background: #9d9d9d;
+    border: solid 1px #202020;
+    cursor: pointer;
+}
+input[type="range"]::-moz-range-thumb {
+    width: 15px;
+    height: 35px;
+    background: #9d9d9d;
+    border: solid 1px #202020;
+    cursor: pointer;
+}
+
+#hakaisatsu{ /*img*/
+    height: 120vh;
+    aspect-ratio: 1/1;
+    position: fixed;
+    top: -10vh;
+    left: -10vh;
+    z-index: 254314;
+    pointer-events: none;
+}
+
+.checkbox{
+    display: flex;
+    flex-direction: row;
+    gap: 3px;
+}
+.checkbox .box{
+    width: 25px;
+    aspect-ratio: 1/1;
+    background-color: #b2b2b2;
+    border: solid 2px #2b2b2b;
+    cursor: pointer;
+}
+.checkbox.tog .box{
+    background-color: #23c51a;
 }
 
 /*nicotext*/
@@ -229,6 +283,16 @@ textarea{
     font-size: 25px;
     cursor: pointer;
     margin: 5px;
+}
+
+/**/
+#commands{
+    display: block;
+}
+#commands .log{
+    color: #001527;
+    font-size: 14px;
+    font-family: misaki;
 }
 
 #mainArea{
@@ -445,7 +509,6 @@ textarea{
     border-left: none;
     border-radius: 0 20px 20px 0;
     position: absolute;
-    top: -3px;
     left: calc(100%);
     transition: left 1.0s ease;
     box-sizing: border-box;
@@ -496,10 +559,10 @@ textarea{
     align-items: center;
     width: 51%;
     height: 80%;
-    padding: 30px;
+    padding: 20px 5px;
     background: linear-gradient(to top, #391d00fc 0%, #391d00fc 60%, #4f2c07fc 100%);
     color: #fffffffc;
-    font-family: hangyaku;
+    font-family: craft;
     position: fixed;
     bottom: -80%;
     left: 50%;
@@ -511,7 +574,38 @@ textarea{
 #underBar.tog{
     bottom: 0;
 }
-
+#underBar .checks{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 90%;
+    height: fit-content;
+    z-index: inherit;
+}
+#underBar .checks .check{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+    height: 30px;
+    padding: 0 5px;
+    background: #6a4720;
+    /* border: 3px solid #3c1f00; */
+    position: relative;
+    clip-path: polygon(2% 0%, 98% 0%, 100% 20%, 100% 80%, 98% 100%, 2% 100%, 0% 80%, 0% 20%);
+}
+#underBar .checks .check.tog{
+    background: #729f4e;
+}
+#underBar .checks .check .span{
+    font-size: 20px;
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    transform: translateY(-50%);
+    z-index: inherit;
+}
 
 
 #fonts{

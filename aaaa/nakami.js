@@ -89,6 +89,10 @@ function probability(num){
 function random(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 };
+function fr(num){
+    let res = num ? 1 : 0;
+    return res;
+}
 
 function anagramSaySay(text, loop = 10, bet = '<br>'){
     let menjo = 0;
@@ -433,13 +437,16 @@ soundsNames.forEach(num => {
 
 //#region Re:connection!!
 var webSocket; //ウェブソケット
-var messageTextArea = document.getElementById("messageTextArea"); // HTML内のテキスト出力エリア
-let message = document.getElementById("textMessage");
-let sendBtn = document.querySelector('#commands .send');
+let commanD = document.getElementById("commands");
+let commanC = {
+    texD: commanD.querySelector('.text'),
+    logD: commanD.querySelector('.log'),
+    senB: commanD.querySelector('.send')
+}
 let connecten = 0;
 
-sendBtn.addEventListener('click', () => {   
-    sendpyTx(message.value);
+commanC.senB.addEventListener('click', () => {   
+    sendpyTx(commanC.texD.value);
 })
 
 // サーバとの通信を接続する関数
@@ -494,8 +501,8 @@ function connect(){
 }
 
 function logadd(text){
-    messageTextArea.value += `\n${text}`; // ${random(1000,2900)}-${random(1,12)}-${random(1,31)} ${random(0,23)}:${random(0,59)}:${random(0,59)} INFO
-    messageTextArea.scrollTop = messageTextArea.scrollHeight;
+    commanC.logD.value += `\n${text}`; // ${random(1000,2900)}-${random(1,12)}-${random(1,31)} ${random(0,23)}:${random(0,59)}:${random(0,59)} INFO
+    commanC.logD.scrollTop = commanC.logD.scrollHeight;
     if(text.includes('endgame')) window.open('about:blank', '_self').close();
 };
 
@@ -507,7 +514,7 @@ function sendpy(content){
 function sendpyTx(text){
     if(IranMikans[text]) return 0;
     
-    logadd(`Send => ${text.replace(/pr  intTx,/g, () => '').replace(/print,/g, () => '')}`);
+    logadd(`Send => ${text.replace(/printTx,/g, () => '').replace(/print,/g, () => '')}`);
     if(connecten) webSocket.send(text);
 };
 
@@ -739,16 +746,16 @@ async function enter(line){
         };
 
         case '話者変更':{
-            let [, name] = line;
-            context['話者'] = name;
-            break;
+           let [, name] = line;
+           context['話者'] = name;
+           break;
         };
 
         case 'セリフ':{
-            let [, text] = line;
-            await addtext(`${context['話者']}「${text}」`);
-            console.log(`セリフ:: ${context['話者']}「${text}」`)
-            break;
+           let [, text] = line;
+           await addtext(`${context['話者']}「${text}」`);
+           console.log(`セリフ:: ${context['話者']}「${text}」`)
+           break;
         };
         
         case 'サウンド':{ //currentTime = 0要らん気がしてきた 連発の可能性あるし
@@ -842,7 +849,7 @@ bigmmC.subL = [
         disp:'makeInv',
         func: async function(){
             sendpyTx('printTx,脳2に接続しています....')
-            sendpyTx('create_inventry_koppe_400_400_1000_101325_0_1013250_64'); //最大はほぼアルミニウム
+            sendpyTx('create_inventry_koppe_400_400_600_101325_0_1013250_-300');
             sendpyTx('open_inventry_koppe');
             sendpyTx('print,inventry')
             sendpyTx('printTx,接続..切断....');
@@ -1044,27 +1051,59 @@ document.addEventListener('click', (e) => {
 
 undC.checks = [
     // [名前, 初期値]
-    ['emozi', 1],
-    ['follow', 1],
-    ['rabbit', 1],
+    {
+        name:'emozi',
+        kitei:1,
+        pro:2,
+        func: () => {
+            let Emozis = [`^~^`,`uwu`,`owo`,`;~;`,`$w$`,`┐o_o┌`,];
+            let emozi = arraySelect(Emozis);
+            logadd(`??? => ${emozi}`);
+        }
+    },
+    {
+        name:'follow',
+        kitei:1,
+        pro:3,
+        func: () => {
+            makeNotice();
+        }
+    },
+    {
+        name:'rabbit',
+        kitei:1,
+        pro:1,
+        func: () => {
+            setRabbit();
+        }
+    }
 ]
 undF.load = () => {
     for(let ch of undC.checks){
-        let [name, kitei] = ch;
         let div = document.createElement('div');
-        div.className = 'ch';
+        div.className = 'check';
 
-        let input = document.createElement('input');
-        input.type = 'checkbox';
-        input.checked = kitei;
-        div.appendChild(input);
+        function clcl(){
+            if(div.dataset.cl == 1) div.dataset.cl = 0;
+            else div.dataset.cl = 1;
+            undC.checking[ch.name] = div.dataset.cl;
 
-        let label = document.createElement('label');
-        label.textContent = name;
-        div.appendChild(label);
+            if(div.dataset.cl == 1) div.classList.add('tog');
+            else div.classList.remove('tog');
+        }
+        div.addEventListener('click', clcl);
+
+        let span = document.createElement('div');
+        span.className = 'span';
+        span.textContent = ch.name;
+        div.appendChild(span);
+
+
+
         undC.checkD.appendChild(div);
 
-        undC.checking[name] = kitei;
+        undC.checking[ch.name] = ch.kitei ? 1 : 0;
+        clcl();
     }
 }
 //#endregion
@@ -2133,17 +2172,17 @@ mapmakeD.addEventListener('contextmenu', (e) => {
 
 //#region intervalで動くやつ
 window.setInterval(() => {
-    // 急にランダムなタイミングで絵文字出すやつ
-    if(probability(1) && undC.checking['emozi']){
-        let Emozis = [`^~^`,`uwu`,`owo`,`;~;`,`$w$`,`┐o_o┌`,]
-        let emozi = arraySelect(Emozis);
-        logadd(`??? => ${emozi}`);
+    let is = (name) => {
+        if(undC.checking[name] == '1') return 1;
+        
+        return 0;
+    };
+    
+    for(let nanka of undC.checks){
+        if(probability(nanka.pro) && is(nanka.name)){
+            nanka.func();
+        }
     }
-
-    // 急にランダムなタイミングでフォローされるやつ
-    if(probability(3) && undC.checking['follow']) makeNotice();
-
-    if(probability(2) && undC.checking['rabbit']) goRabbit();
 }, 1000)
 
 let notiL = []
@@ -2209,41 +2248,45 @@ function genename(len = 14) {
     return name;
 }
 
-async function goRabbit(num = 0){
+async function setRabbit(num = 0){
     if(!num) num = arrayGacha([1,2,3],[80,17,3]);
 
     for(let i = 0; i < num; i++){
-        let src = 'assets/images/elses/rabbit';
-        let D = document.createElement('img');
-        D.className = 'rabbit';
-        D.src = `${src}[1].png`;
-        let wid = window.innerWidth;
-        document.querySelector('body').appendChild(D);
-        let tek = () => D.style.left = `${wid}px`;
-
-        let nowMai = 1;
-        let maxMai = 8;
-        setInterval(async function(){
-            nowMai += 1;
-            D.src = `${src}[${nowMai}].png`;
-
-            if(nowMai == 3 || nowMai == 4) wid -= 10;
-            tek();
-
-            if(nowMai >= maxMai) nowMai = 0;
-        }, 80)
-
-        
-        while (wid + 100 > 0) await delay(100);
-
-        D.remove();
+        goRabbit();
+        await delay(500);
     }
+}
+async function goRabbit(){
+    let src = 'assets/images/elses/rabbit';
+    let D = document.createElement('img');
+    D.className = 'rabbit';
+    D.src = `${src}[1].png`;
+    let wid = window.innerWidth;
+    document.querySelector('body').appendChild(D);
+    let tek = () => D.style.left = `${wid}px`;
+
+    let nowMai = 1;
+    let maxMai = 8;
+    setInterval(async function(){
+        nowMai += 1;
+        D.src = `${src}[${nowMai}].png`;
+
+        if(nowMai == 3 || nowMai == 4) wid -= 10;
+        tek();
+
+        if(nowMai >= maxMai) nowMai = 0;
+    }, 80)
+
+    
+    while (wid + 100 > 0) await delay(100);
+
+    D.remove();
 }
 
 //#endregion
 
 function start(){
-    messageTextArea.value += `hello! no name!`;
+    commanC.logD.value += `hello! no name!`;
     connect();
     
     inv_make();
@@ -2271,23 +2314,89 @@ async function gameloop(){
     if(loop) requestAnimationFrame(gameloop);
 }
 
-let secrates = [
+let secrates = [ // セクラテス
     {
         ind:0,
         name:'koppepan',
         arr:['k','o','p','p','e','p','a','n'],
+        limit:3,
         func: async function(){
-            await goRabbit(10);
+            nicoText('なんにも起こらない＝ヨーン');
         }
     },
     {
         ind:0,
         name:'conami',
         arr:['arrowup','arrowup','arrowdown','arrowdown','arrowleft','arrowright','arrowleft','arrowright','a','b'],
+        limit:'n',
         func: async function(){
-            await goRabbit(100);
+            await setRabbit(67);
         }
-    }
+    },
+    {
+        ind:0,
+        name:'set',
+        arr:['s','e','t'],
+        limit:'n',
+        func: async function(){
+            undF.open()
+        }
+    },
+    {
+        ind:0,
+        name:'re',
+        arr:['r','e'],
+        limit:1,
+        func: async function(){
+            let img = document.createElement('img');
+            img.id = 'hakaisatsu';
+            img.src = 'assets/images/systems/hakai[1].png'
+            img.dataset.phase = 1;
+            document.querySelector('body').appendChild(img);
+
+            setTimeout(() => {
+                img.remove();
+                this.ind = 0;
+                this.limit = 1;
+            }, 3000)
+
+            return 0;
+        }
+    },
+    {
+        ind:0,
+        name:'rere',
+        arr:['r','e','r','e'],
+        limit:1,
+        func: async function(){
+            let img = document.getElementById('hakaisatsu');
+            if(!img) return;
+
+            img.src = 'assets/images/systems/hakai[2].png'
+            img.dataset.phase = 2;
+
+            setTimeout(() => {
+                img.remove();
+                this.ind = 0;
+                this.limit = 1;
+            }, 3000)
+
+            return 0;
+        }
+    },
+    {
+        ind:0,
+        name:'rerere',
+        arr:['r','e','r','e','r','e'],
+        limit:1,
+        func: async function(){
+            let img = document.getElementById('hakaisatsu');
+            if(!img) return 1;
+            console.log(img.dataset.phase);
+            if(img.dataset.phase != '2') return 1;
+            location.reload();
+        }
+    },
 ]
 document.addEventListener('keydown', async function(e){
     let key = e.key.toLowerCase();
@@ -2295,7 +2404,7 @@ document.addEventListener('keydown', async function(e){
 
 
     //これ以降はinput内では機能しない
-    if(document.activeElement == message) return;
+    if(document.activeElement == commanC.texD) return;
     if(document.activeElement == bigmmC.bodyD) return;
 
     if(key == 'o') objmake();
@@ -2306,10 +2415,11 @@ document.addEventListener('keydown', async function(e){
         // console.log(`必要は${nke}、押されたは${key}！`);
         if(key == nke){
             sec.ind += 1;
-            if(sec.ind == sec.arr.length){
+            if(sec.ind == sec.arr.length && sec.limit){
                 console.log(`ジャンゴ！ ${sec.name}発動！！`);
                 sec.ind = 0;
-                await sec.func();
+                let res = await sec.func();
+                if(!res && sec.limit != 'n') sec.limit -= 1;
             }
         }
         else sec.ind = 0;
