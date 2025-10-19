@@ -64,6 +64,7 @@ body{
     z-index: 254;
 }
 #log .opener{
+    display: none;
     width: 20px;
     height: 100%;
     background-color: rgba(0,0,0,0.9);

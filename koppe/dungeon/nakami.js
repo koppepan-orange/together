@@ -493,6 +493,8 @@ function resizeCanvas() {
 function draw() {
 	let cam = dunC.cam;
 	dunctx.clearRect(0, 0, duncan.width, duncan.height);
+	dunctx.fillStyle = '#271605';
+	dunctx.fillRect(0, 0, duncan.width, duncan.height);
 
 	let startX = Math.floor(cam.sx / dunC.size);
 	let startY = Math.floor(cam.sy / dunC.size);
@@ -569,6 +571,7 @@ function dun_back(){
 
 
 function dun_wall(){
+	console.log('壁つくるよ～ん');
 	// 4x4 のランダム部屋選択
 	let rooms = [];
 	for(let r=0;r<4;r++){
@@ -582,7 +585,7 @@ function dun_wall(){
 		rooms.push(row);
 	}
 
-	console.log(rooms)
+	// console.log(rooms)
 	for(let r = 0; r < 4; r++)for(let c=0;c<3;c++) adjustHoriz(rooms[r][c], rooms[r][c+1]); //横
 	for(let r = 0; r < 3; r++)for(let c=0;c<4;c++) adjustVert(rooms[r][c], rooms[r+1][c]); //縦
   
@@ -677,12 +680,17 @@ document.addEventListener('keyup', e => {
 });
 
 function dun_p_make(){
+	let sh = 4;
 	let ob = {
 		id: dunC.objs.length,
 		side: 'player',
 		name: 'player',
-		x: 7, // グリッド座標
-		y: 7,
+		x: sh, // グリッド座標
+		y: sh,
+		sx: sh * dunC.size, // ピクセル座標
+		sy: sh * dunC.size,
+		px: sh, // 位置の座標
+		py: sh,
 		moving: 0,
 		able: ['move'],
 		img: images['enemies']['蒼白の粘液'],
@@ -695,46 +703,51 @@ async function dun_p_tekiou(){
 	let p = dunC.objs.find(o => o.name == 'player');
 	let cam = dunC.cam;
 	let kaisu = 15;
+	let ippo = dunC.size/kaisu;
 	let tyomateyo = 0;
 	if((keys.w || keys.arrowup) && !p.moving){
+		if(dunC.wall[p.py-1][p.px] || p.py-1 < 0) return;
 		p.moving = 1;
-		let ippo = dunC.size/kaisu;
 		for(let i = 0; i < kaisu; i++){
 			cam.sy -= ippo;
 			draw();
 			await delay(5);
 		}
 		await delay(tyomateyo)
+		p.py = Math.round(p.sy/dunC.size);
 		p.moving = 0;
 	}else if((keys.s || keys.arrowdown) && !p.moving){
+		if(dunC.wall[p.py+1][p.px] || p.py+1 >= dunC.zen) return;
 		p.moving = 1;
-		let ippo = dunC.size/kaisu;
 		for(let i = 0; i < kaisu; i++){
 			cam.sy += ippo;
 			draw();
 			await delay(5);
 		}
 		await delay(tyomateyo)
+		p.py = Math.round(p.sy/dunC.size);
 		p.moving = 0;
 	}else if((keys.a || keys.arrowleft) && !p.moving){
+		if(dunC.wall[p.py][p.px-1] || p.px-1 < 0) return;
 		p.moving = 1;
-		let ippo = dunC.size/kaisu;
 		for(let i = 0; i < kaisu; i++){
 			cam.sx -= ippo;
 			draw()
 			await delay(5);
 		} 
 		await delay(tyomateyo)
+		p.px = Math.round(p.sx/dunC.size);
 		p.moving = 0;
 	}else if((keys.d || keys.arrowright) && !p.moving){
+		if(dunC.wall[p.py][p.px+1] || p.px+1 >= dunC.zen) return;
 		p.moving = 1;
-		let ippo = dunC.size/kaisu;
 		for(let i = 0; i < kaisu; i++){
 			cam.sx += ippo;
 			draw();
 			await delay(5);
 		}
 		await delay(tyomateyo)
+		p.px = Math.round(p.sx/dunC.size);
 		p.moving = 0;
 	}
 }

@@ -1623,7 +1623,7 @@ function map_make(){
     }
     //#endregion
     
-    sendpyTx('printTx,------------------mapmaked-------------------')
+    // sendpyTx('printTx,-------mapmaked--------')
 
     drawGrid();
 

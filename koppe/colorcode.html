@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- <div class="prg">
+        <div class="colorbox">
+            <form id="frm" onsubmit="send();return false">
+            <div style="background: none;">
+                <div class="inputbox">
+                    <p>カラーコード</p>
+                    <span class="sign sign1">#</span>
+                    <input id="init_focus_box" class="inputbox clear_target" name="target_id" type="text" value="" placeholder="f5f5f5" data-listener-added_a4ca22ed="true">
+                </div>
+                <div class="inputbox rgbbox">
+                    <p>RGB</p>
+                    <span class="sign sign1">R</span>
+                    <span class="sign sign2">G</span>
+                    <span class="sign sign3">B</span>
+                    <input class="inputbox clear_target" name="val_r" type="text" value="" placeholder="255">
+                    <input class="inputbox clear_target" name="val_g" type="text" value="" placeholder="255">
+                    <input class="inputbox clear_target" name="val_b" type="text" value="" placeholder="255">
+                </div>
+                <div class="inputbox rgbabox">
+                    <p>RGB(A)</p>
+                    <span class="sign sign1">rgba</span>
+                    <input class="inputbox clear_target" name="val_rgb" type="text" value="" placeholder="255,255,255,1">
+                </div>
+                <div class="inputbox hsvbox">
+                    <p>HSV</p>
+                    <span class="sign sign1">H</span>
+                    <span class="sign sign2">S</span>
+                    <span class="sign sign3">V</span>
+                    <input class="inputbox clear_target" name="val_h" type="text" value="" placeholder="360">
+                    <input class="inputbox clear_target" name="val_s" type="text" value="" placeholder="100">
+                    <input class="inputbox clear_target" name="val_v" type="text" value="" placeholder="100">
+                </div>
+                <div class="inputbox">
+                    <p>&nbsp;</p>
+                    <input style="width: 170px;" class="passwordexe" name="submit_color" type="submit" value="変換する">
+                    <input style="width: 78px; margin-left: 15px;" class="passwordexe" name="submit_clear" type="button" value="クリア" id="btn_clear">
+                </div>
+                <div class="clear"></div>
+            
+            </div></form>
+            <div id="result_area_err" class="result" style="display: none;">
+                <h3>カラーコード、RGB値、HSV値のいずれかを入力して下さい</h3>
+            </div>
+            <div id="result_area" class="result" style="display: none;">
+                <h3>カラーコード変換結果</h3>
+                <div id="result_samplebox" class="rs_left_box" style="background-color: #fff;"></div>
+                <div class="rs_right_box">
+                    <div class="rs_box">
+                        <span class="rs_hd">カラーコード</span>
+                        <input id="rs_hex" type="text" name="result_htpasswd" cols="10" rows="10" wrap="off" onclick="this.focus();this.select()" value="" style="width: 80px;">
+                        <div class="clear"></div>
+                    </div>
+                    <div class="rs_box">
+                        <span class="rs_hd">RGB値</span>
+                        <input id="rs_rgb_r" type="text" name="result_htpasswd" cols="10" rows="10" wrap="off" onclick="this.focus();this.select()" value="">
+                        <input id="rs_rgb_g" type="text" name="result_htpasswd" cols="10" rows="10" wrap="off" onclick="this.focus();this.select()" value="">
+                        <input id="rs_rgb_b" type="text" name="result_htpasswd" cols="10" rows="10" wrap="off" onclick="this.focus();this.select()" value=""><br>
+                        <div class="clear"></div>
+                    </div>
+                    <div class="rs_box">
+                        <span class="rs_hd">RGBA値</span>
+                        <input id="rs_rgba" type="text" wrap="off" onclick="this.focus();this.select()" value="" style="width: 110px;">
+                        <div class="clear"></div>
+                    </div>
+                    <div class="rs_box">
+                        <span class="rs_hd">HSV値</span>
+                        <input id="rs_hsv_h" type="text" name="result_htpasswd" cols="10" rows="10" wrap="off" onclick="this.focus();this.select()" value="">
+                        <input id="rs_hsv_s" type="text" name="result_htpasswd" cols="10" rows="10" wrap="off" onclick="this.focus();this.select()" value="">
+                        <input id="rs_hsv_v" type="text" name="result_htpasswd" cols="10" rows="10" wrap="off" onclick="this.focus();this.select()" value=""><br>
+                        <div class="clear"></div>
+                    </div>
+                </div>
+                <div class="clear"></div>
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+    </div> -->
+
+    <input pattern="^[0-9A-Fa-f]+$" oninvalid="this.setCustomValidity('16進数で入力してください')" oninput="this.setCustomValidity('')" />
+
+    <article class="col-32">
+			<h2>２つの色の中間値を求める</h2>
+			<p>カラー値を RGB 6 桁の hex 文字で入力（<span class="span_hex">000000 ～ FFFFFF</span>）</p>
+			<p>
+				<label>基準色 :
+				<input type="text" id="src_no" value="" size="6" pattern="^[0-9A-Fa-f]+$" class="for_colorno" required /></label>
+				　→　
+				<label>目標色 :
+				<input type="text" id="dst_no" value="" size="6" pattern="^[0-9A-Fa-f]+$" class="for_colorno" required /></label>
+			</p>
+			<div class="clearfix">
+				<p class="color_warning PosLeft" id="warning_msg"></p>
+				<button class="myButton PosRight" id="go_calc"><i class="fa fa-calculator fa-fw"></i>
+				<span class="span_url">SEND</span></button>
+			</div>
+			<table class="border_appear">
+				<thead>
+					<tr><th>0%</th><th>25%</th><th>50%</th><th>75%</th><th>100%</th></tr>
+				</thead>
+				<tr class="tr_color">
+					<td id="d_color1">　</td>
+					<td id="d_color2">　</td>
+					<td id="d_color3">　</td>
+					<td id="d_color4">　</td>
+					<td id="d_color5">　</td>
+				</tr>
+				<tr class="tr_string">
+					<td id="d_string1">-</td>
+					<td id="d_string2">-</td>
+					<td id="d_string3">-</td>
+					<td id="d_string4">-</td>
+					<td id="d_string5">-</td>
+				</tr>
+				<tr class="tr_color">
+					<td id="d_color1w">　</td>
+					<td id="d_color2w">　</td>
+					<td id="d_color3w">　</td>
+					<td id="d_color4w">　</td>
+					<td id="d_color5w">　</td>
+				</tr>
+				<tr class="tr_string">
+					<td id="d_string1w">-</td>
+					<td id="d_string2w">-</td>
+					<td id="d_string3w">-</td>
+					<td id="d_string4w">-</td>
+					<td id="d_string5w">-</td>
+				</tr>
+				<tr class="tr_color">
+					<td id="d_color1k">　</td>
+					<td id="d_color2k">　</td>
+					<td id="d_color3k">　</td>
+					<td id="d_color4k">　</td>
+					<td id="d_color5k">　</td>
+				</tr>
+				<tr class="tr_string">
+					<td id="d_string1k">-</td>
+					<td id="d_string2k">-</td>
+					<td id="d_string3k">-</td>
+					<td id="d_string4k">-</td>
+					<td id="d_string5k">-</td>
+				</tr>
+			
+			</table>
+		</article>	
+
+    <script>
+/* ======= helper: 全角→半角変換（英数字・記号含む） ======= */
+function toOneByteAlphaNumeric(s) {
+  if (s == null) return '';
+  var out = '';
+  for (var i = 0; i < s.length; i += 1) {
+    var cp = s.charCodeAt(i);
+    // 全角スペース U+3000 -> 半角スペース
+    if (cp === 0x3000) {
+      out += ' ';
+      continue;
+    }
+    // 全角ASCII相当（U+FF01..U+FF5E） は 0xFEE0 を引くと半角になる
+    if (cp >= 0xFF01 && cp <= 0xFF5E) {
+      out += String.fromCharCode(cp - 0xFEE0);
+      continue;
+    }
+    out += s.charAt(i);
+  }
+  return out;
+}
+
+/* ======= 入力正規化と検査 ======= */
+function normalizeHex6(raw) {
+  if (raw == null) return '';
+  var s = String(raw).trim();
+  s = toOneByteAlphaNumeric(s);
+  // 先頭の '#' を許容して削除
+  if (s.charAt(0) === '#') s = s.slice(1);
+  // 空白除去
+  s = s.replace(/\s+/g, '');
+  s = s.toUpperCase();
+  // 6桁の16進かどうかをチェック
+  if (/^[0-9A-F]{6}$/.test(s)) {
+    return s;
+  }
+  return '';
+}
+
+/* ======= 16進 <-> 数値 ======= */
+function hex2ToInt(h) {
+  // h は "00" 形式を想定
+  return parseInt(h, 16);
+}
+function toHex2(n) {
+  var v = Math.round(n);
+  if (!isFinite(v)) v = 0;
+  if (v < 0) v = 0;
+  if (v > 255) v = 255;
+  var s = v.toString(16).toUpperCase();
+  if (s.length === 1) s = '0' + s;
+  return s;
+}
+
+/* ======= チャネル単位の線形補間（sRGB空間での単純補間） ======= */
+function lerpChannelHex(aHex2, bHex2, t) {
+  var a = hex2ToInt(aHex2);
+  var b = hex2ToInt(bHex2);
+  var v = Math.round(a + (b - a) * t);
+  return toHex2(v);
+}
+function lerpHexColor(hexA, hexB, t) {
+  // hexA, hexB は "RRGGBB"
+  var ar = hexA.slice(0, 2), ag = hexA.slice(2, 4), ab = hexA.slice(4, 6);
+  var br = hexB.slice(0, 2), bg = hexB.slice(2, 4), bb = hexB.slice(4, 6);
+  return lerpChannelHex(ar, br, t) + lerpChannelHex(ag, bg, t) + lerpChannelHex(ab, bb, t);
+}
+
+/* ======= 文字色（白/黒）を判定する補助 ======= */
+function getContrastingTextColor(hex) {
+  // 簡易的に相対的輝度を計算して白か黒を返す
+  var r = hex2ToInt(hex.slice(0,2)) / 255;
+  var g = hex2ToInt(hex.slice(2,4)) / 255;
+  var b = hex2ToInt(hex.slice(4,6)) / 255;
+  // sRGB ガンマ補正近似
+  function lin(c) {
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  }
+  var L = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+  // 閾値は 0.5 近辺（保守的に 0.5 を採用）
+  return L > 0.5 ? '#000000' : '#FFFFFF';
+}
+
+/* ======= DOM要素IDリスト（HTMLに合わせる） ======= */
+var IDS_MAIN = ['d_color1','d_color2','d_color3','d_color4','d_color5'];
+var IDS_MAIN_STRING = ['d_string1','d_string2','d_string3','d_string4','d_string5'];
+var IDS_WHITE = ['d_color1w','d_color2w','d_color3w','d_color4w','d_color5w'];
+var IDS_WHITE_STRING = ['d_string1w','d_string2w','d_string3w','d_string4w','d_string5w'];
+var IDS_BLACK = ['d_color1k','d_color2k','d_color3k','d_color4k','d_color5k'];
+var IDS_BLACK_STRING = ['d_string1k','d_string2k','d_string3k','d_string4k','d_string5k'];
+
+/* ======= パーセンテージ配列 ======= */
+var PERCENTS = [0.0, 0.25, 0.5, 0.75, 1.0];
+
+/* ======= UI 更新の仕事をする関数（名前付き） ======= */
+function updateColorCellsFor(hexSrc, hexDst) {
+  var i;
+  for (i = 0; i < PERCENTS.length; i += 1) {
+    var t = PERCENTS[i];
+    // 基準 -> 目標
+    var mid = lerpHexColor(hexSrc, hexDst, t);
+    setCellBackgroundAndString(IDS_MAIN[i], IDS_MAIN_STRING[i], mid);
+    // 基準 -> 白
+    var midW = lerpHexColor(hexSrc, 'FFFFFF', t);
+    setCellBackgroundAndString(IDS_WHITE[i], IDS_WHITE_STRING[i], midW);
+    // 基準 -> 黒
+    var midK = lerpHexColor(hexSrc, '000000', t);
+    setCellBackgroundAndString(IDS_BLACK[i], IDS_BLACK_STRING[i], midK);
+  }
+}
+
+/* ======= セルへの反映ヘルパー ======= */
+function setCellBackgroundAndString(cellId, stringId, hex) {
+  var el = document.getElementById(cellId);
+  var elStr = document.getElementById(stringId);
+  if (el) {
+    el.style.backgroundColor = '#' + hex;
+    // テキスト色は背景に対して読みやすい色にする
+    el.style.color = getContrastingTextColor(hex);
+  }
+  if (elStr) {
+    elStr.textContent = hex;
+  }
+}
+
+/* ======= クリックハンドラ（名前付き） ======= */
+function onClickGoCalc(event) {
+  var warning = document.getElementById('warning_msg');
+  if (warning) warning.textContent = '';
+  var srcInput = document.getElementById('src_no');
+  var dstInput = document.getElementById('dst_no');
+  if (!srcInput || !dstInput) {
+    if (warning) warning.textContent = '必要な要素が見つかりません';
+    return;
+  }
+
+  var srcRaw = srcInput.value;
+  var dstRaw = dstInput.value;
+  var srcHex = normalizeHex6(srcRaw);
+  if (srcHex === '') {
+    if (warning) warning.textContent = '基準色の書式が不正です';
+    return;
+  }
+  var dstHex = normalizeHex6(dstRaw);
+  if (dstHex === '') {
+    if (warning) warning.textContent = '目標色の書式が不正です';
+    return;
+  }
+
+  updateColorCellsFor(srcHex, dstHex);
+}
+
+/* ======= 初期化関数（名前付き） ======= */
+function initColorLerp() {
+  var btn = document.getElementById('go_calc');
+  if (!btn) return;
+  // イベント登録は名前付き関数を参照するのみ
+  btn.addEventListener('click', onClickGoCalc);
+
+  // Enterで計算したければ input の keydown を扱う（名前付き）
+  var srcInput = document.getElementById('src_no');
+  var dstInput = document.getElementById('dst_no');
+  if (srcInput) srcInput.addEventListener('keydown', onInputKeydown);
+  if (dstInput) dstInput.addEventListener('keydown', onInputKeydown);
+}
+
+/* ======= Enter 押下で実行するためのハンドラ ======= */
+function onInputKeydown(ev) {
+  var key = ev.key || ev.keyCode;
+  if (key === 'Enter' || key === 13) {
+    // ボタンのクリック処理を呼ぶ
+    onClickGoCalc(ev);
+    // フォーム送信等を防ぐ
+    ev.preventDefault();
+    return false;
+  }
+}
+
+/* ======= DOM準備が整ったら初期化を呼ぶ（名前付き関数参照） ======= */
+document.addEventListener('DOMContentLoaded', initColorLerp);
+    </script>
+</body>
+</html>
