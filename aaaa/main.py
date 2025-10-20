@@ -18,9 +18,22 @@ csvdata={}
 cemicaldata=[]
 kakikae_list=[]
 tem={}
-
+imgg={}
 
 gui={}
+img_mini={}
+
+os_listdir=os.listdir("./assets/images/items")
+
+for axzxz in os_listdir:
+    try:
+        imggg=Image.open(f"./assets/images/items/{axzxz}").convert("RGBA")
+        #alpha = imggg.getchannel("A")
+        #imggg = imggg.convert("RGB").convert("P", palette=Image.ADAPTIVE, colors=255)
+        imgg["assets/images/items/"+str(axzxz)]=imggg
+        img_mini[str(axzxz)] = imggg.resize((50, 50))
+    except Exception as e:
+        print(e)
 
 
 
@@ -623,13 +636,13 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                         #print(int(index[1]/2),int(index[2]-((yw-byw)/2)))
                         #print(root["inventry_root_"+str(name)])
                         #print(imgg[str(name)+"assets/images/items/melt_"+str(a)+".png"].crop((0,0,index[1],yw-byw)))
-                        img[str(name)+"assets/images/items/melt_"+str(a)+".png"]=ImageTk.PhotoImage(imgg[str(name)+"assets/images/items/melt_"+str(a)+".png"].crop((0,0,index[1],yw-byw)),master=root["inventry_root_"+str(name)])
+                        img[str(name)+"assets/images/items/melt_"+str(a)+".png"]=ImageTk.PhotoImage(imgg["assets/images/items/melt_"+str(a)+".png"].crop((0,0,index[1],yw-byw)),master=root["inventry_root_"+str(name)])
                         canvas["inventry_root_"+str(name)].lower(canvas["inventry_root_"+str(name)].create_image(int(index[1]/2),int(index[2]-((yw-byw)/2)), image=img[str(name)+"assets/images/items/melt_"+str(a)+".png"],tag="item"))
                 if write:
                     for a,b in index[6].items():
                         if b == 0:
                             continue
-                        air=imgg[str(name)+"assets/images/items/air_"+str(a)+".png"].crop((0,0,index[1],(index[2]-yw)))
+                        air=imgg["assets/images/items/air_"+str(a)+".png"].crop((0,0,index[1],(index[2]-yw)))
                         air.putalpha(int(b/10))
                         #print(air)
                         img[str(name)+"assets/images/items/air_"+str(a)+".png"]=ImageTk.PhotoImage(air,master=root["inventry_root_"+str(name)])
@@ -642,6 +655,10 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                 filled = {}
                 num=0
                 for i in index[0]:
+                    try:
+                        i[4]
+                    except Exception:
+                        print(inventry)
                     #囧 print(i)
                     #print(await change_yuuten(csvdata[i[4]][0],csvdata[i[4]][5],inventry2[name][4],csvdata[i[4]][8],csvdata[i[4]][7]))
                     #print(inventry2[name][3])
@@ -960,7 +977,7 @@ def thermometer_move(name):
 def out(e,name):
     canvas["inventry_root_"+str(name)].delete('have')
 
-imgg={}
+
 async def open_inventry(name:str):
     global img
     global imgg
@@ -968,14 +985,9 @@ async def open_inventry(name:str):
         await asyncio.sleep(0)
         #print((name,type(name)))
         root["inventry_root_"+str(name)]=tk.Tk()
-        for axzxz in os.listdir("./assets/images/items"):
+        for axzxz in os_listdir:
             try:
-                imggg=Image.open(f"./assets/images/items/{axzxz}").convert("RGBA")
-                #alpha = imggg.getchannel("A")
-                #imggg = imggg.convert("RGB").convert("P", palette=Image.ADAPTIVE, colors=255)
-                imgg[str(name)+"assets/images/items/"+str(axzxz)]=imggg
-                imggg = imggg.resize((50, 50))
-                img[str(name)+"assets/images/items/"+str(axzxz)]=ImageTk.PhotoImage(imggg,master=root["inventry_root_"+str(name)])
+                img[str(name)+"assets/images/items/"+str(axzxz)]=ImageTk.PhotoImage(img_mini[axzxz],master=root["inventry_root_"+str(name)])
             except Exception as e:
                 print(e)
         root["inventry_root_"+str(name)].geometry(f"{str(int(inventry[name][1]))}x{str(int(inventry[name][2]))}+100+100")
