@@ -1,3 +1,29 @@
+let Style = {
+    button: {
+        solid: '#000000',
+        back: '#ffffff',
+    },
+    text: {
+        main: '#222222',
+        sub: '#666666',
+    },
+    notice: {
+        border: '#ffffff'
+    },
+    font: {
+        family: 'hangyaku'
+    },
+    tekiou: function() {
+        for (let section in this) {
+            if (section == 'apply') continue;
+            for (let key in this[section]) {
+            document.documentElement.style
+                .setProperty(`--${section}-${key}`, this[section][key]);
+            }
+        }
+    }
+}
+
 let IranMikans = {
     'koppepan':{
         name:'koppepan',

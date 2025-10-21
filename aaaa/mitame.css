@@ -229,7 +229,8 @@ textarea{
 }
 
 :root{
-    --txwaku: #6bb9ff
+    --txwaku: #6bb9ff;
+    --font-family: hangyaku
 }
 #titleArea{
     display: block;
@@ -301,7 +302,7 @@ textarea{
     /* height: 100vh; */
     padding: 40px;
     background: #f0f8ff;
-    font-family: hangyaku;
+    font-family: var(--font-family);    
 }
 
 #rainbt{

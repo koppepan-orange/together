@@ -1146,6 +1146,10 @@ let fontF = {
         fontC.ing = 0;
         fontD.style.display = 'none';
         fontF.change(fontC.font);
+    },
+    change: (name) => {
+        Style.font.family = name;
+        Style.tekiou()
     }
 }
 document.addEventListener('keydown', event => {
@@ -1536,6 +1540,8 @@ Object.keys(canI.imagesNames).forEach(type => {
         };
         img.onerror = () => {
             console.error(`Image assets/images/${type}/${id} failed to load.`);
+            img.src = `assets/images/systems/error.png`;
+            canI.imagesLoaded++;
         };
         if(!canC.imgs[type]) canC.imgs[type] = {};
         canC.imgs[type][id] = img;

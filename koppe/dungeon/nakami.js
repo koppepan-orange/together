@@ -430,7 +430,11 @@ Object.keys(imageNames).forEach(belong => {
 				start();
 			}
 		};
-		img.onerror = () => console.error(`Image ${belong}/${num} failed to load.`);
+		img.onerror = () => {
+			console.error(`Image ${belong}/${num} failed to load.`);
+			imageNamesL++;
+            img.src = `assets/images/systems/error.png`;
+		};
 		if(!images[belong]) images[belong] = {};
 		images[belong][num] = img;
 	});
@@ -471,7 +475,8 @@ let dunC = {
 	back: [],
 	wall: [],
 };
-dunC.load = () => {
+let dunF = {};
+dunF.load = () => {
 	for(let y = 0; y < dunC.zen; y++){
 		dunC.back[y] = [];
 		dunC.wall[y] = [];
@@ -480,6 +485,10 @@ dunC.load = () => {
 			dunC.wall[y][x] = 0;
 		}
 	}
+
+	let cam = dunC.cam;
+	cam.sx =  dunC.size*7
+	cam.sy =  dunC.size*7
 }
 function resizeCanvas() {
 	let wid = window.innerWidth / 2;
@@ -496,15 +505,18 @@ function draw() {
 	dunctx.fillStyle = '#271605';
 	dunctx.fillRect(0, 0, duncan.width, duncan.height);
 
-	let startX = Math.floor(cam.sx / dunC.size);
-	let startY = Math.floor(cam.sy / dunC.size);
-	let endX = Math.ceil((cam.sx + duncan.width) / dunC.size);
-	let endY = Math.ceil((cam.sy + duncan.height) / dunC.size);
+	let startX = Math.floor((cam.sx - duncan.width/2	) / dunC.size);
+	let startY = Math.floor((cam.sy - duncan.height/2) / dunC.size);
+	let endX   = Math.ceil((cam.sx + duncan.width/1) / dunC.size);
+	let endY   = Math.ceil((cam.sy + duncan.height/1) / dunC.size);
 
-	startX = Math.max(0, startX);
+	startX = Math.max(0, startX); //最小:0
 	startY = Math.max(0, startY);
 	endX = Math.min(dunC.zen - 1, endX);
-	endY = Math.min(dunC.zen - 1, endY);
+	endY = Math.min(dunC.zen - 1, endY); //	最大:canvas-1
+
+	// console.log(`(${startX}, ${startY}) (${endX}, ${endY})`);
+
 
 	for(let y = startY; y <= endY; y++){
 		for(let x = startX; x <= endX; x++){
@@ -524,10 +536,11 @@ function draw() {
 	}
 
 	dunC.objs.forEach(obj => {
-		if(obj.name == 'player') obj.sx = dunC.size*7 + cam.sx, obj.sy = dunC.size*7 + cam.sy;
-
 		let ox = obj.sx - cam.sx;
 		let oy = obj.sy - cam.sy;
+
+		if(obj.name == 'player') ox = dunC.size*7, oy = dunC.size*7;
+		
 		dunctx.drawImage(obj.img, ox, oy, dunC.size, dunC.size);
 	});
 }
@@ -689,8 +702,6 @@ function dun_p_make(){
 		y: sh,
 		sx: sh * dunC.size, // ピクセル座標
 		sy: sh * dunC.size,
-		px: sh, // 位置の座標
-		py: sh,
 		moving: 0,
 		able: ['move'],
 		img: images['enemies']['蒼白の粘液'],
@@ -706,7 +717,7 @@ async function dun_p_tekiou(){
 	let ippo = dunC.size/kaisu;
 	let tyomateyo = 0;
 	if((keys.w || keys.arrowup) && !p.moving){
-		if(dunC.wall[p.py-1][p.px] || p.py-1 < 0) return;
+		if(!keys.shift && (dunC.wall[p.y-1][p.x] || p.y-1 < 0)) return;
 		p.moving = 1;
 		for(let i = 0; i < kaisu; i++){
 			cam.sy -= ippo;
@@ -714,21 +725,11 @@ async function dun_p_tekiou(){
 			await delay(5);
 		}
 		await delay(tyomateyo)
-		p.py = Math.round(p.sy/dunC.size);
+		p.y = Math.round(cam.sy/dunC.size);
 		p.moving = 0;
-	}else if((keys.s || keys.arrowdown) && !p.moving){
-		if(dunC.wall[p.py+1][p.px] || p.py+1 >= dunC.zen) return;
-		p.moving = 1;
-		for(let i = 0; i < kaisu; i++){
-			cam.sy += ippo;
-			draw();
-			await delay(5);
-		}
-		await delay(tyomateyo)
-		p.py = Math.round(p.sy/dunC.size);
-		p.moving = 0;
-	}else if((keys.a || keys.arrowleft) && !p.moving){
-		if(dunC.wall[p.py][p.px-1] || p.px-1 < 0) return;
+	}
+	if((keys.a || keys.arrowleft) && !p.moving){
+		if(!keys.shift && (dunC.wall[p.y][p.x-1] || p.x-1 < 0)) return;
 		p.moving = 1;
 		for(let i = 0; i < kaisu; i++){
 			cam.sx -= ippo;
@@ -736,10 +737,23 @@ async function dun_p_tekiou(){
 			await delay(5);
 		} 
 		await delay(tyomateyo)
-		p.px = Math.round(p.sx/dunC.size);
+		p.x = Math.round(cam.sx/dunC.size);
 		p.moving = 0;
-	}else if((keys.d || keys.arrowright) && !p.moving){
-		if(dunC.wall[p.py][p.px+1] || p.px+1 >= dunC.zen) return;
+	}
+	if((keys.s || keys.arrowdown) && !p.moving){
+		if(!keys.shift && (dunC.wall[p.y+1][p.x] || p.y+1 >= dunC.zen)) return;
+		p.moving = 1;
+		for(let i = 0; i < kaisu; i++){
+			cam.sy += ippo;
+			draw();
+			await delay(5);
+		}
+		await delay(tyomateyo)
+		p.y = Math.round(cam.sy/dunC.size);
+		p.moving = 0;
+	}
+	if((keys.d || keys.arrowright) && !p.moving){
+		if(!keys.shift && (dunC.wall[p.y][p.x+1] || p.x + 1 >= dunC.zen)) return;
 		p.moving = 1;
 		for(let i = 0; i < kaisu; i++){
 			cam.sx += ippo;
@@ -747,7 +761,7 @@ async function dun_p_tekiou(){
 			await delay(5);
 		}
 		await delay(tyomateyo)
-		p.px = Math.round(p.sx/dunC.size);
+		p.x = Math.round(cam.sx/dunC.size);
 		p.moving = 0;
 	}
 }
@@ -762,7 +776,7 @@ async function dun_p_tekiou(){
 
 function start(){
 	resizeCanvas();
-	dunC.load();
+	dunF.load();
 	dun_back();
 	dun_wall();
 	dun_p_make();

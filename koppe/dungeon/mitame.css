@@ -174,15 +174,15 @@ body{
     position: absolute;
     inset: 0;
     pointer-events: none;
-  
-    /* 中心は透明 → 外へ向かって暗く */
+  /*
+    /* 中心は透明 → 外へ向かって暗く 
     background: radial-gradient(circle at 50% 50%, 
         rgba(0, 0, 0, 0) var(--clear-diameter),
         rgba(0, 0, 0, 0.60) var(--fade-soft),
         rgba(0, 0, 0, 0.85) var(--fade-strong), 
         rgb(0 0 0) 100%
     );
-
+ */
 
 }
   
