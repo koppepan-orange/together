@@ -8,37 +8,30 @@
         canvas {
             border: 1px solid black;
         }
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
     </style>
 </head>
 <body>
     <canvas id="gameCanvas" width="300" height="300"></canvas> <!-- 描画サイズを広げました -->
     <br><br><br><br>
-    <img id="N" src="../aaaa/assets/images/elses/rabbit.png" width="300">
+    <div class="column">
+        <img src="../aaaa/assets/images/elses/rabbit.png" width="300">
+        <img src="fried_potatoes.png" width="120">
+        <img src="../aaaa/assets/images/elses/kani.png" width="120">
+    </div>
 
     <script>
-        // 画像をロードする
-        const spriteSheet = new Image();
-        spriteSheet.src = 'sheet.png';  // 画像パスを指定
-
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         let images = {}
         function delay(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
-        // スプライトシートからキャラクターを描画する関数
-        function drawSprite(frameX, frameY, frameWidth, frameHeight, x, y ,mx ,my) {
-            console.log(spriteSheet.width, spriteSheet.height); 
-            ctx.clearRect(0, 0, canvas.width, canvas.height); 
-            ctx.drawImage(spriteSheet, frameX, frameY, frameWidth, frameHeight, x, y, mx, my); 
-        }
 
-        // 画像がロードされたらスプライトのサイズを確認してから描画
-        spriteSheet.onload = function(){
-            drawSprite(...images.player.front,0,0,300,300);
-        }
-
-
-        const rabirabi = new Image();
-        rabirabi.src = '../aaaa/assets/images/elses/rabbit.png';  // 画像パスを指定
+        const rabbit = new Image();
+        rabbit.src = '../aaaa/assets/images/elses/rabbit.png';
 
         images.rabbit = {};
         for(let i=0;i<10;i++){
@@ -46,15 +39,96 @@
             images.rabbit[i] = [widd*i,0,widd,widd];
         }
 
-        addEventListener('keydown', async(event) => {
-            if(event.key != 'z') return;
-            for(i=0;i<10;i++){
+        const potatoe = new Image();
+        potatoe.src = 'fried_potatoes.png';
+
+        images.potatoe = {};
+        for(let i=0;i<4;i++){
+            let widd = 1280;
+            images.potatoe[i] = [widd*i,0,widd,widd];
+        }
+
+        const kani3 = new Image();
+        kani3.src = '../aaaa/assets/images/elses/kani.png';
+
+        images.kani3 = [];
+        for(let i=0;i<4;i++){
+            images.kani3[i] = {};
+            for(let i2=0;i2<4;i2++){
+                let widd = 552;
+                images.kani3[i][i2] = [widd*i2,widd*i,widd,widd];
+            }
+        }
+        
+        async function atohanagarede(name, sueue, tyomateyo, y = 'uso'){
+            let imageTudoy = images[name];
+            if(y != 'uso') imageTudoy = images[name][y];
+            // console.log(imageTudoy);
+
+            for(i=0;i<sueue;i++){
                 ctx.clearRect(0, 0, canvas.width, canvas.height); 
-                ctx.drawImage(rabirabi, ...images.rabbit[i], 0, 0, canvas.width, canvas.height); 
-                await delay(80);
+                ctx.drawImage(eval(name), ...imageTudoy[i], 0, 0, canvas.width, canvas.height); 
+                await delay(tyomateyo);
             }
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            return 0;
+        }
+        async function syuturyoku(name, x, y = 'uso'){
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let image = images[name][x];
+            if(y != 'uso') image = images[name][y][x];
+            // console.log(image);
+            // console.log(name, y, x)    
+
+            ctx.drawImage(eval(name), ...image, 0, 0, canvas.width, canvas.height);
+
+            return 0;
+        }
+
+        let keys = {};
+        document.addEventListener('keydown', e => {
+            let key = e.key.toLowerCase();
+            if(e.key == ' ') key = 'space';
+            keys[key] = true;
+        });
+        document.addEventListener('keyup', e => {
+            let key = e.key.toLowerCase();
+            if(e.key == ' ') key = 'space';
+            keys[key] = false;
+        });
+
+        let looping = 0;
+        addEventListener('keydown', async(event) => {
+            let key = event.key.toLowerCase();
+            if(key == 'z') await atohanagarede('rabbit', 10, 80);
+            
+            if(key == 'p') await atohanagarede('potatoe', 4, 400);
+
+            let lsls = [
+                {key: 'w', y: 0},
+                {key: 'a', y: 1},
+                {key: 's', y: 2},
+                {key: 'd', y: 3},
+            ];
+            if(lsls.find(a => a.key == key) && !looping){
+                let y = lsls.find(a => a.key == key).y;
+
+                looping = 1;
+                let ed = 0;
+                do{
+                    syuturyoku('kani3', ed, y);
+                    ed += 1;
+                    if(ed > 3) ed = 0;
+
+                    await delay(200);
+                } while(keys[key]);
+                looping = 0;
+                
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
         })
+        
     </script>
 </body>
 </html>

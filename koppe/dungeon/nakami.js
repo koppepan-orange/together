@@ -435,8 +435,8 @@ Object.keys(imageNames).forEach(belong => {
 		};
 		img.onerror = () => {
 			console.error(`Image ${belong}/${num} failed to load.`);
-			imageNamesL++;
             img.src = `assets/images/systems/error.png`;
+			imageNamesL++;
 		};
 		if(!images[belong]) images[belong] = {};
 		images[belong][num] = img;
@@ -456,6 +456,7 @@ soundsNames.forEach(num => {
 	}, {once: true});
 	sound.onerror = () => {
 		console.error(`Sound ${num} failed to load.`);
+		soundsLoaded++;
 	};
 	sounds[num] = sound;
 }); 
@@ -488,10 +489,6 @@ dunF.load = () => {
 			dunC.wall[y][x] = 0;
 		}
 	}
-
-	let cam = dunC.cam;
-	cam.sx =  dunC.size*7
-	cam.sy =  dunC.size*7
 }
 function resizeCanvas() {
 	let wid = window.innerWidth / 2;
@@ -508,10 +505,12 @@ function draw() {
 	dunctx.fillStyle = '#271605';
 	dunctx.fillRect(0, 0, duncan.width, duncan.height);
 
-	let startX = Math.floor((cam.sx - duncan.width/2	) / dunC.size);
-	let startY = Math.floor((cam.sy - duncan.height/2) / dunC.size);
-	let endX   = Math.ceil((cam.sx + duncan.width/1) / dunC.size);
-	let endY   = Math.ceil((cam.sy + duncan.height/1) / dunC.size);
+	let n = dunC.size*7;
+	// let n = 0;
+	let startX = Math.floor((cam.sx + n - duncan.width/2) / dunC.size);
+	let startY = Math.floor((cam.sy + n - duncan.height/2) / dunC.size);
+	let endX   = Math.ceil((cam.sx + n + duncan.width/2) / dunC.size);
+	let endY   = Math.ceil((cam.sy + n + duncan.height/2) / dunC.size);
 
 	startX = Math.max(0, startX); //最小:0
 	startY = Math.max(0, startY);
@@ -520,29 +519,28 @@ function draw() {
 
 	// console.log(`(${startX}, ${startY}) (${endX}, ${endY})`);
 
-
 	for(let y = startY; y <= endY; y++){
 		for(let x = startX; x <= endX; x++){
 			let code = dunC.back[y][x];
 			let img = images['maps'][code];
 			let px = x * dunC.size - cam.sx;
 			let py = y * dunC.size - cam.sy;
-			if(img) dunctx.drawImage(img, px, py, dunC.size, dunC.size);
-			else dunctx.drawImage(images['systems']['error'], px, py, dunC.size, dunC.size);
+			dunctx.drawImage(img, px, py, dunC.size, dunC.size);
 
 			// wall
 			let imgn = dunC.wall[y][x];
 			img = images['maps'][imgn];
-			if(img) dunctx.drawImage(img, px, py, dunC.size, dunC.size);
-			else dunctx.drawImage(images['systems']['error'], px, py, dunC.size, dunC.size);
+			dunctx.drawImage(img, px, py, dunC.size, dunC.size);
 		}
 	}
+
+	dunctx.drawImage(images['systems']['error'], cam.sx, cam.sy, dunC.size, dunC.size);
 
 	dunC.objs.forEach(obj => {
 		let ox = obj.sx - cam.sx;
 		let oy = obj.sy - cam.sy;
 
-		if(obj.name == 'player') ox = dunC.size*7, oy = dunC.size*7;
+		// if(obj.name == 'player') ox = dunC.size*7, oy = dunC.size*7;
 		
 		dunctx.drawImage(obj.img, ox, oy, dunC.size, dunC.size);
 	});
@@ -724,11 +722,12 @@ async function dun_p_tekiou(){
 		p.moving = 1;
 		for(let i = 0; i < kaisu; i++){
 			cam.sy -= ippo;
+			p.sy -= ippo;
 			draw();
 			await delay(5);
 		}
 		await delay(tyomateyo)
-		p.y = Math.round(cam.sy/dunC.size);
+		p.y -= 1;
 		p.moving = 0;
 	}
 	if((keys.a || keys.arrowleft) && !p.moving){
@@ -736,11 +735,12 @@ async function dun_p_tekiou(){
 		p.moving = 1;
 		for(let i = 0; i < kaisu; i++){
 			cam.sx -= ippo;
+			p.sx -= ippo;
 			draw()
 			await delay(5);
 		} 
 		await delay(tyomateyo)
-		p.x = Math.round(cam.sx/dunC.size);
+		p.x -= 1;
 		p.moving = 0;
 	}
 	if((keys.s || keys.arrowdown) && !p.moving){
@@ -748,11 +748,12 @@ async function dun_p_tekiou(){
 		p.moving = 1;
 		for(let i = 0; i < kaisu; i++){
 			cam.sy += ippo;
+			p.sy += ippo;
 			draw();
 			await delay(5);
 		}
 		await delay(tyomateyo)
-		p.y = Math.round(cam.sy/dunC.size);
+		p.y += 1;
 		p.moving = 0;
 	}
 	if((keys.d || keys.arrowright) && !p.moving){
@@ -760,11 +761,12 @@ async function dun_p_tekiou(){
 		p.moving = 1;
 		for(let i = 0; i < kaisu; i++){
 			cam.sx += ippo;
+			p.sx += ippo;
 			draw();
 			await delay(5);
 		}
 		await delay(tyomateyo)
-		p.x = Math.round(cam.sx/dunC.size);
+		p.x += 1;
 		p.moving = 0;
 	}
 }
@@ -784,6 +786,10 @@ function start(){
 	dun_wall();
 	dun_p_make();
 	
+	let cam = dunC.cam;
+	cam.sx =  dunC.size*7
+	cam.sy =  dunC.size*7
+
 	gameloop();
 }
 
