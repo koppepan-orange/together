@@ -546,6 +546,22 @@ function cocGacha(code = 0){
 
 //#endregion
 
+let keys = {}
+document.addEventListener('keydown', e => {
+   let key = e.key.toLowerCase();
+   if(e.key == ' ') key = 'space';
+   keys[key] = true;
+});
+document.addEventListener('keyup', e => {
+   let key = e.key.toLowerCase();
+   if(e.key == ' ') key = 'space';
+   keys[key] = false;
+});
+
+let clicking = false;
+document.addEventListener('mousedown', () => clicking = true);
+document.addEventListener('mouseup', () => clicking = false);
+
 //#region reads
 let allScripts = {};
 async function loadScriptFile(src){
@@ -903,7 +919,7 @@ bigmmC.jougeL = [
     },
     {
         name:'pressure',
-        num:1000,
+        num:3000,
         img:'pressuregauge_pre'
     }
 ];
@@ -1063,7 +1079,7 @@ undC.checks = [
     },
     {
         name:'follow',
-        kitei:1,
+        kitei:0,
         pro:3,
         func: () => {
             makeNotice();
@@ -1071,7 +1087,7 @@ undC.checks = [
     },
     {
         name:'rabbit',
-        kitei:1,
+        kitei:0,
         pro:1,
         func: () => {
             setRabbit();
@@ -1082,6 +1098,7 @@ undF.load = () => {
     for(let ch of undC.checks){
         let div = document.createElement('div');
         div.className = 'check';
+        div.dataset.cl = ch.kitei ? 0 : 1;
 
         function clcl(){
             if(div.dataset.cl == 1) div.dataset.cl = 0;
@@ -1102,7 +1119,7 @@ undF.load = () => {
 
         undC.checkD.appendChild(div);
 
-        undC.checking[ch.name] = ch.kitei ? 1 : 0;
+        undC.checking[ch.name] = ch.kitei ? 0 : 1;
         clcl();
     }
 }
@@ -1146,10 +1163,6 @@ let fontF = {
         fontC.ing = 0;
         fontD.style.display = 'none';
         fontF.change(fontC.font);
-    },
-    change: (name) => {
-        Style.font.family = name;
-        Style.tekiou()
     }
 }
 document.addEventListener('keydown', event => {
@@ -1218,7 +1231,7 @@ function inv_open(code = null){
     if(code == 1) invC.openD.classList.add('tog'), invC.areaD.classList.add('tog');
     if(code == 0) invC.openD.classList.remove('tog'), invC.areaD.classList.remove('tog');
 }
-invC.openD.addEventListener('click', connect);
+invC.openD.addEventListener('click', inv_open);
 
 function inv_make(){
     for(let i = 0; i < 5; i++){
@@ -1376,7 +1389,7 @@ function inv_pick(cell, px, py){
     document.body.appendChild(pickItem);
     pickItem.style.pointerEvents = 'none';
 
-    let name = pickItem.dataset.item
+    let name = pickItem.dataset.item;
     let num = pickItem.dataset.num || 1;
     
     sendpyTx(`item_pick_${name}_${num}`);
@@ -1406,16 +1419,14 @@ function inv_pick_decr(){
 
 document.addEventListener('mousemove', e => {
     if(pickItem){
-        pickItem.style.display = 'none';
+        pickItem.style.opacity = 1;
         pickItem.style.left = e.pageX - pickItem.offsetWidth/2 + 'px';
         pickItem.style.top  = e.pageY - pickItem.offsetHeight/2 + 'px';
         inv_tekiou();
-
-
     }
 });
-window.addEventListener('mouseleave', () => {
-    if(pickItem) pickItem.style.display = 'none';  
+document.addEventListener('mouseleave', () => {
+    if(pickItem) pickItem.style.opacity = 0;
 })
 
 
@@ -1489,7 +1500,8 @@ let canC = {
         drawGrid()
     },
     resize: () => {
-        let wid =  window.innerWidth/2;
+        // let wid =  window.innerWidth/2;
+        let wid =  360;
         canV.width = wid;
         canV.height = wid;
         canC.size = wid / canC.mas;
@@ -1504,21 +1516,6 @@ canC.ctx.clearRect(0, 0, canV.width, canV.height);
 window.addEventListener('resize', canC.resize);
 
 
-let keys = {}
-document.addEventListener('keydown', e => {
-   let key = e.key.toLowerCase();
-   if(e.key == ' ') key = 'space';
-   keys[key] = true;
-});
-document.addEventListener('keyup', e => {
-   let key = e.key.toLowerCase();
-   if(e.key == ' ') key = 'space';
-   keys[key] = false;
-});
-
-let clicking = false;
-document.addEventListener('mousedown', () => clicking = true);
-document.addEventListener('mouseup', () => clicking = false);
 
 let canI = {
     imagesLoaded: 0,
@@ -1540,8 +1537,6 @@ Object.keys(canI.imagesNames).forEach(type => {
         };
         img.onerror = () => {
             console.error(`Image assets/images/${type}/${id} failed to load.`);
-            img.src = `assets/images/systems/error.png`;
-            canI.imagesLoaded++;
         };
         if(!canC.imgs[type]) canC.imgs[type] = {};
         canC.imgs[type][id] = img;
@@ -1661,6 +1656,7 @@ function objmake(){
             y: y,
             yx: x,//*canC.size,
             yy: y,//*canC.size
+            moving: 0
         }
 
         canC.objs.push(ob);
@@ -1673,6 +1669,8 @@ function move(id, code, x, y){
     let harbor = canC.mas*canC.size;
     let ob = canC.objs[id];
     let yosouX = x, yosouY = y;
+
+    if(ob.moving) return nicoText('移動中なのでキャンセルed');
 
     if(code == 'add'){
         yosouX = ob.sx + x, yosouY = ob.sy + y;
@@ -1693,6 +1691,8 @@ async function gomove(id, fyx, fyy){
     let ob = canC.objs[id];
 
     ob.yx = fyx, ob.yy = fyy;
+
+    ob.moving = 1;
 
     let go = [];
     if(fyx != ob.sx) go.push({k:'sx', o:fyx});
@@ -1726,6 +1726,8 @@ async function gomove(id, fyx, fyy){
     nicoText('移動完了ed')
 
     if(ob.name =='player') pmoved();
+
+    ob.moving = 0;
 }
 async function pmoved(){
     let ob = canC.objs[0];
@@ -1939,6 +1941,17 @@ window.__ghost = {
         return {WINDOW_MS, MIN_MOVE_PX, REQUIRED_DIR_CHANGES, COOLDOWN_MS};
     }
 };
+//#endregion
+
+//#region battle
+let batD = document.getElementById('battle');
+let batC = {
+    now: 0,
+}
+let batF = {} //tyotto yokunai kamo
+
+//あとはbattle.jsに記述
+
 //#endregion
 
 //#region bullet festabal

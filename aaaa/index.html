@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html>
+
+
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <title>debug-room!!</title>
@@ -75,6 +75,17 @@
       <textarea class="log" rows="10" cols="50"></textarea>
     </div>
 
+    <div id="battle">
+      <div class="turn"></div>
+      <div class="enemies"></div>
+      <div class="players"></div>
+      <div class="commands">
+        <button class="button s1">act</button>   
+        <button class="button s2">magic</button>   
+        <button class="button s3">tool</button>   
+        <button class="button s4">run</button>
+      </div>
+    </div>
     
     <div id="ghost">
       <div class="bubble" id="bubble">
@@ -102,7 +113,8 @@
   </div>
 
 
-  <script src="nakami.js" defer></script>
   <script src="data.js" defer></script>
+  <script src="nakami.js" defer></script>
+  <script src="battle.js" defer></script>
 </body>
 </html>

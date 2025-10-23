@@ -419,7 +419,7 @@ let images = {};
 let imageNames = {
    'maps':['0','a','b','c','w0000','w0001','w0010','w0011','w0100','w0101','w0110','w0111','w1000','w1001','w1010','w1011','w1100','w1101','w1110','w1111'],
    'enemies':['翠嵐の風刃','蒼白の粘液','燐光の妖花','黄昏の穿影','燦爛する緑夢','紫苑の花姫'],
-   'charas':['greenslime','mechanic','clown','magodituono','wretch'],
+   'charas':['greenslime','mechanic','clown','magodituono','wretch','cameraman','cameraman_g'],
    'systems':['error','star1','star2','star3'],
 }
 let imageNamesT = Object.keys(imageNames).map(a => imageNames[a].length).reduce((a, b) => a + b);
@@ -534,7 +534,7 @@ function draw() {
 		}
 	}
 
-	dunctx.drawImage(images['systems']['error'], cam.sx, cam.sy, dunC.size, dunC.size);
+	dunctx.drawImage(images['charas']['cameraman'], cam.sx, cam.sy, dunC.size, dunC.size);
 
 	dunC.objs.forEach(obj => {
 		let ox = obj.sx - cam.sx;

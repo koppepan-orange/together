@@ -64,8 +64,9 @@ input[type="range"]::-moz-range-thumb {
     aspect-ratio: 1/1;
     position: fixed;
     top: -10vh;
-    left: -10vh;
-    z-index: 254314;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 21299999999;
     pointer-events: none;
 }
 
@@ -229,8 +230,7 @@ textarea{
 }
 
 :root{
-    --txwaku: #6bb9ff;
-    --font-family: hangyaku
+    --txwaku: #6bb9ff
 }
 #titleArea{
     display: block;
@@ -288,6 +288,8 @@ textarea{
 
 /**/
 #commands{
+    margin-top: 50px;
+    margin-left: 20px;
     display: block;
 }
 #commands .log{
@@ -302,7 +304,7 @@ textarea{
     /* height: 100vh; */
     padding: 40px;
     background: #f0f8ff;
-    font-family: var(--font-family);    
+    font-family: hangyaku;
 }
 
 #rainbt{
@@ -336,7 +338,7 @@ textarea{
 }
 
 #bigmashmaro{
-    z-index: 4;
+    z-index: 3;
 }
 #bigmashmaro .kitekey{
     display: block;
@@ -481,7 +483,7 @@ textarea{
     justify-content: center;
     align-items: center;
     gap: 2px;
-    width: 7vw;
+    width: 50px;
     height: 23vh;
     padding: 2px;
     background: #bebebe;
@@ -489,7 +491,7 @@ textarea{
     border-left: none;
     position: fixed;
     top: 50%;
-    left: calc(-7vw - 3px);
+    left: calc(-50px - 4px);
     transform: translateY(-50%);
     transition: left 1.0s ease;
     box-sizing: border-box;
@@ -516,7 +518,7 @@ textarea{
     z-index: inherit;
 }
 #sideL.tog .garara{
-    left: calc(100% - 1px);
+    left: calc(100% - 2px);
 }
 #sideL .garara .row{
     width: 75%;
@@ -558,7 +560,7 @@ textarea{
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    width: 51%;
+    width: 450%;
     height: 80%;
     padding: 20px 5px;
     background: linear-gradient(to top, #391d00fc 0%, #391d00fc 60%, #4f2c07fc 100%);
@@ -650,15 +652,15 @@ textarea{
 }
 #inventory{
     display: block;
-    width: 55%;
+    width: 700px;
     aspect-ratio: 9/5;
     padding: 10px;
     position: fixed;
     top: 5px;
     left: 5px;
-    z-index: 3;
     box-sizing: border-box;
     pointer-events: none;
+    z-index: 4;
 }
 #inventory .row{
     gap: var(--inv_colG)
@@ -672,6 +674,7 @@ textarea{
     overflow: hidden;
     z-index: 5;
     box-sizing: border-box;
+    pointer-events: all !important;
 }
 #inventory .opener.tog{
     background: #2b2b2b;
@@ -760,9 +763,10 @@ textarea{
 
 #canvas{
     display: block;
-    margin: 50px auto;
-    background: #ffffff;
     border: 2px solid #000000;
+    margin: 50px auto;
+    box-sizing: border-box;
+    z-index: 0;
 }
 #mapmake{
     width: 100px;
@@ -774,6 +778,16 @@ textarea{
     right: 20px;
     transform: translateY(-50%);
     cursor: pointer;
+}
+
+#battle{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    height: 50%;
+    /* clip-path: polygon(); */
 }
 
 .jamerP.A{
@@ -1004,4 +1018,296 @@ textarea{
     left: 100%;
     transition: left 0.08s linear;
     z-index: 4;
+}
+
+/* こっからbattle */
+
+
+#players{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 150px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-sizing: border-box;
+}
+.players{
+    display: block;
+    width: 140px;
+    height: 187px;
+    padding: 5px;
+    flex-direction: column;
+    overflow-x: hidden;
+    text-align: left;
+    position: relative;
+}
+/* .players .effects{} */
+.players .main{
+    margin-top: 5px;
+    display: flex;
+    flex-direction: row;
+}
+.players .main .skill{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid #5085ff; /*これは属性ごとに変わるようにしたい*/
+    background-color: #a7c0ff;
+}
+.players .main .skill .back{
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+}
+.players .main .img{
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    object-position: top;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 60%, 0% 60%);
+    opacity: 0.7;
+}
+.players .border{
+    margin-top: -40px; /*初登場！負のマージン！！*/ 
+    border: 1px solid #222;
+    border-radius: 5px;
+    padding: 3px;
+}
+.players .border .name{
+    max-width: 100px;
+    overflow-x: scroll;
+    white-space: nowrap;
+}
+.players .border .level{
+    max-width: 40px;
+    overflow-x: scroll;
+    white-space: nowrap;
+}
+.players .border .hp .num{
+    font-size:10px;
+}
+.players .border .hp .bar{
+    width: 90%;
+    height: 10px;
+    background-color: #2b2b2b;
+    border: 1px solid #dedede;
+}
+.players .border .hp .bar .inner{
+    width: 100%;
+    height: 100%;
+    background-color: #a3ffa3;
+}
+.players .border .mp .num{
+    font-size:10px;
+}
+.players .border .mp .bar{
+    width: 90%;
+    height: 10px;
+    background-color: #2b2b2b;
+    border: 1px solid #dedede;
+}
+.players .border .mp .bar .inner{
+    width: 100%;
+    height: 100%;
+    background-color: #799fff;
+}
+
+
+#enemies{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 150px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-sizing: border-box;
+}
+.enemies{
+    display: block;
+    width: 140px;
+    max-width: 140px;
+    height: 200px;
+    max-height: 200px;
+    padding: 5px;
+    flex-direction: column;
+    overflow-x: hidden;
+    text-align: left;
+}
+.enemies .border{
+    border: 1px solid #222;
+    border-radius: 5px;
+}
+.enemies .border .name{
+    max-width: 100px;
+    height: 20px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.enemies .border .name .txt{
+    display: inline-block;
+    font-size: 16px;
+    animation: scroll 10s linear infinite;
+}
+.enemies .border .level{
+    max-width: 40px;
+    overflow-x: scroll;
+    white-space: nowrap;
+}
+.enemies .border .hp .num{
+    font-size:10px;
+}
+.enemies .border .hp .bar{
+    width: 90%;
+    height: 10px;
+    background-color: #2b2b2b;
+    border: 1px solid #dedede;
+}
+.enemies .border .hp .bar .inner{
+    width: 100%;
+    height: 100%;
+    background-color: #a3ffa3;
+}
+.enemies .border .mp .num{
+    font-size:10px;
+}
+.enemies .border .mp .bar{
+    width: 90%;
+    height: 10px;
+    background-color: #2b2b2b;
+    border: 1px solid #dedede;
+}
+.enemies .border .mp .bar .inner{
+    width: 100%;
+    height: 100%;
+    background-color: #799fff;
+}
+.enemies .img{
+    max-width: 100%;
+    max-height: 200px;
+}
+
+.effects{
+    display: flex;
+    width: 100%;
+    height: 35px;
+    padding-bottom: 5px;
+    overflow: hidden;
+}
+.buffs{
+    width: 20px;
+    height: 30px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.buffs .top{
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid #ff5858;
+}
+.buffs .bottom{
+    width: 20px;
+    height: 20px;
+    background: #ff5858 center/cover no-repeat;
+    background-color: #ff5858 !important;
+}
+.debuffs{
+    width: 50px;
+    height: 75px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.debuffs .top{
+    width: 50px;
+    height: 50px;
+    background: #5858ff center/cover no-repeat;
+    background-color: #5858ff !important;
+}
+.debuffs .bottom{
+    width: 0;
+    height: 0;
+    border-left: 25px solid transparent;
+    border-right: 25px solid transparent;
+    border-top: 25px solid #5858ff;
+}
+.handles{
+    width: 50px;
+    height: 75px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.handles .top{
+    position: absolute;
+    width: 50px;
+    height: 25px;
+    background: #ffef74;
+    transform: rotate(45deg);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+.handles .top::before {
+    content: "";
+    position: absolute;
+    width: 50px;
+    height: 25px;
+    background: #ffef74;
+    transform: rotate(90deg);
+}
+.handles .bottom{
+    width: 50px;
+    height: 50px;
+    background: #ffef74 center/cover no-repeat;
+}
+
+#UIs{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+#UIs .commands{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: fit-content;
+    padding: 5px;
+}
+#UIs .commands .button{
+    width: 100px;
+    height: 80px;
+    text-align: center;
+}
+
+
+
+
+.turrets{
+    display: block;
+    width: auto;
+    height: 100px;
+    padding: 5px;
+    border: 1px solid #222;
+    border-radius: 5px;
+    overflow: hidden;
+    margin: 5px 0;
+    text-align: left;
 }
