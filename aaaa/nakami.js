@@ -1947,6 +1947,10 @@ window.__ghost = {
 let batD = document.getElementById('battle');
 let batC = {
     now: 0,
+    s1B: batD.querySelector('.s1'),
+    s2B: batD.querySelector('.s2'),
+    s3B: batD.querySelector('.s3'),
+    s4B: batD.querySelector('.s4')
 }
 let batF = {} //tyotto yokunai kamo
 
