@@ -4,6 +4,16 @@ let phase = 0;
 let bar = {};
 let acted = 0;
 
+function cm(cam = '指定なし', me = '指定なし'){
+    let who = 0;
+    if(cam == '指定なし') cam = 'players';
+
+    if(me != '指定なし') who = humans.find(a => a.cam == cam && a.id == me);
+    else who = humans.filter(a => a.cam == cam);
+    
+    return who;
+}
+
 //#region みちとのそーぐー
 async function encount(){
     let enemiesen = random(1,1);
@@ -50,18 +60,19 @@ async function nextTurn(who = 0){
     // console.log(`${turn}たーんめ`);
 
     phase = 0;
-    if(!who == 0){
+    if(who){
         for(let buff of who.buffs){
             let data = Buffs.find(a => a.name = buff.name);
             //アンコールの動き
             if(hask(data, 'luck')){//luck
-                if(isCrit('luck', data.luck)){
+                if(isCrit(data.luck)){
                     addlog('当たりが出たらもう一本！');
                     return playerturn();
                 }
             }
         }
         
+        /*
         for(let key in who.buffs){
             who.buffs[key].time -= 1; // -1する
             if(who.buffs[key].time <= 0){
@@ -69,6 +80,12 @@ async function nextTurn(who = 0){
                 who.buffs.splice(index, 1)
             }
         }
+        */
+        for (let i = who.buffs.length - 1; i >= 0; i--) {
+            who.buffs[i].time -= 1;
+            if(who.buffs[i].time <= 0) who.buffs.splice(i, 1);
+    }
+
         tekiou();
     }
 
@@ -93,15 +110,15 @@ async function nextTurn(who = 0){
     acted += 1;
     if(acted >= bar.me.length){
         turn += 1;
-        const combined = humans.filter(a => a.status && b.hp > 0)// オブジェクトをリストに変換して合体
+        const combined = humans.filter(a => a.status && a.hp > 0)// オブジェクトをリストに変換して合体
         .sort((a, b) => {// 降順でソート
-            if(b.speed == a.speed){
+            if(b.spd == a.spd){
                 if(a.cam == b.cam){
                     return a.me - b.me;  // 同じcamならmeの小さい方が優先
                 }
                 return a.cam == 'players' ? -1 : 1;  // camが'p'なら優先
             }
-            return b.speed - a.speed;  // 速度の高い順に並べる
+            return b.spd - a.spd;  // 速度の高い順に並べる
         });
         bar = {
             cam: combined.map(c => c.cam),
@@ -111,9 +128,9 @@ async function nextTurn(who = 0){
         acted = 0;
     } 
 
-    tcam = bar.cam[acted]
-    let tme
-    are = humans[tcam][nowturn];
+    let tcam = bar.cam[acted]
+    let tme = bar.me[acted]
+    are = cm(tcam, tme);
 
     let dots = {}; //DamegeOverTimeのdot
     for(let buff of are.buffs){
@@ -135,7 +152,7 @@ async function nextTurn(who = 0){
         }
     
         if(buff.name == 'onslime'){
-            if(isCrit('onslime', buff.value)){
+            if(isCrit(buff.value)){
                 buffremove(are, 'onslime');
                 addlog('なんとかスライムを取り払った!!');
             }else{
@@ -149,7 +166,7 @@ async function nextTurn(who = 0){
             nextTurn(are); return;
         }
         if(hask(data, 'palsy')){
-            if(!isCrit('palsy', data.palsy)) continue;
+            if(!isCrit(data.palsy)) continue;
             data.name != 'stan'
             ? addlog(`${are.name}は麻痺している..`)
             : addlog(`${are.name}はスタンしている....`);
@@ -157,7 +174,7 @@ async function nextTurn(who = 0){
             return 1;
         }
         if(hask(data, 'freeze')){
-            if(!isCrit('freeze', data.freeze)){
+            if(!isCrit(data.freeze)){
                 await addtext(`氷が溶けた!`);
                 buffremove(are,'freeze');
             }else{
@@ -173,7 +190,7 @@ async function nextTurn(who = 0){
         case 'players':
             playerturn(are);
             break;
-        case 'enemies':top 
+        case 'enemies': 
             enemyturn(are);
             break;
     }
@@ -182,6 +199,7 @@ async function nextTurn(who = 0){
 
 //#region playerturn
 async function playerturn(who = 0){
+    //back目的なら空欄、そうでなければwhoが必須
     jump:{
         if(!who) break jump;
         let nss = Skills.filter(a => a.type == 'ns');
@@ -195,6 +213,8 @@ async function playerturn(who = 0){
     
         addtext('あなたのターンです！');
         playerturn();
+
+        return;
     }
 
     phase = 1;
@@ -337,9 +357,9 @@ function LetsTargetSelect(one){
             ]
 
             if(code == 2){ //拡散-3
-                let zin = humans[tcam];
-                let pnum = (zin[me-1]?.status??0) ? me - 1 : null;
-                let nnum = (zin[me+1]?.status??0) ? me + 1 : null;
+                let zin = humans.filter(a => a.cam == tcam && a.status);
+                let pnum = (zin[tme-1]?.status??0) ? tme - 1 : null;
+                let nnum = (zin[tme+1]?.status??0) ? tme + 1 : null;
                 
                 let cn = 1;
                 if(pnum) cn += 1;
@@ -348,16 +368,16 @@ function LetsTargetSelect(one){
                 let cams = Array(cn).fill(tcam);
                 
                 target = [
-                    [me-1,me,me+1],
+                    [tme-1,tme,tme+1],
                     cams
                 ];
             }
             if(code == 3){// 拡散-5
-                let zin = humans[tcam];
-                let pnum = (zin[me-1]?.status??0 == 1) ? me - 1 : null;
-                let p2num = (zin[me-2]?.status??0 == 1) ? me - 2 : null;
-                let nnum = (zin[me+1]?.status??0 == 1) ? me + 1 : null;
-                let n2num = (zin[me+2]?.status??0 == 1) ? me + 2 : null;
+                let zin = humans.filter(a => a.cam == tcam && a.status);
+                let pnum = (zin[tme-1]?.status??0 == 1) ? tme - 1 : null;
+                let p2num = (zin[tme-2]?.status??0 == 1) ? tme - 2 : null;
+                let nnum = (zin[tme+1]?.status??0 == 1) ? tme + 1 : null;
+                let n2num = (zin[tme+2]?.status??0 == 1) ? tme + 2 : null;
                 
                 let cn = 1;
                 if(pnum) cn += 1;
@@ -368,12 +388,12 @@ function LetsTargetSelect(one){
                 let cams = Array(cn).fill(tcam);
                 
                 target = [
-                    [me-2,me-1,me,me+1,me+2],
+                    [tme-2,tme-1,tme,tme+1,tme+2],
                     cams
                 ];
             }
             if(code == 4){ //相手陣営全員
-                let nums = humans[tcam].filter(a => a.status);
+                let nums = cm(tcam).filter(a => a.cam == tcam && a.status);
                 let cams = Array(nums.length).fill(tcam); //fillは全ての値を同じ値にするやつ。同数にするために使用されがち
                 target = [
                     nums,
@@ -381,9 +401,9 @@ function LetsTargetSelect(one){
                 ];
             }
             if(code == 5){ //全員
-                let tnums = humans[tcam].filter(a => a.status);
+                let tnums = cm(tcam).filter(a => a.status);
                 let gyaku = tcam == 'players' ? 'enemies' : 'players';
-                let nums = humans[gyaku].filter(a => a.status);
+                let nums = cm(gyaku).filter(a => a.status);
 
                 let awase = [...tnums, ...nums];
                 
@@ -407,7 +427,7 @@ function LetsTargetSelect(one){
                 let c = cs[i];
                 let n = ns[i];
                 console.log(`humans[${c}][${n}]を狙います！`);
-                let cn = humans[c][n];
+                let cn = cm(c, n);
                 // console.log(cn);
                 whoes.push(cn);
             }
@@ -522,8 +542,8 @@ let clowngambling = ['0','0','2','2','2','4'];
 // スキル予約関数
 let skillQueue = [];
 async function skillReserve(cam,me){
-    if(humans[cam][me].ep == 100){
-        x = humans[cam][me].ex;
+    if(cm(cam, me).ep == 100){
+        x = cm(cam, me).ex;
         skillQueue.push({cam:cam,me:me,skill:x});
         skillReset(cam,me);
         console.log(`スキル予約済み: ${cam} ${me} -> ${x}  現在キューは次に表示します;`);
@@ -551,27 +571,27 @@ function skillReset(who){
 function turretPlace(cam){
     if(!document.querySelector(`#${cam}t`)){
         let newDiv = makeNewPlayer('t')
-        humans[cam].t.kazu = 0;
-        humans[cam].t.maxhp = 0;
-        humans[cam].t.hp = 0;
+        cm(cam).t.kazu = 0;
+        cm(cam).t.maxhp = 0;
+        cm(cam).t.hp = 0;
         document.querySelector(`#${cam}`).appendChild(newDiv);
     }
-    humans[cam].t.status = 1;
-    humans[cam].t.kazu += 1;
-    humans[cam].t.maxhp += 15;
-    humans[cam].t.hp += 15;
-    humans[cam].t.name = `Turret x${humans[cam].t.kazu}`;
+    cm(cam).t.status = 1;
+    cm(cam).t.kazu += 1;
+    cm(cam).t.maxhp += 15;
+    cm(cam).t.hp += 15;
+    cm(cam).t.name = `Turret x${cm(cam).t.kazu}`;
     tekiou()
     document.querySelector(`#${cam}t`).style.display = 'block'
     document.querySelector(`#${cam}t`).style.backgroundColor = '#f7f7f7'
 }
 function turretBreak(cam){
-    humans[cam].t.status = 0;
-    humans[cam].t.kazu -= 1;
-    if(humans[cam].t.kazu <= 0){
-        humans[cam].t.kazu = 0;
-        humans[cam].t.maxhp = 0;
-        humans[cam].t.hp = 0;
+    cm(cam).t.status = 0;
+    cm(cam).t.kazu -= 1;
+    if(cm(cam).t.kazu <= 0){
+        cm(cam).t.kazu = 0;
+        cm(cam).t.maxhp = 0;
+        cm(cam).t.hp = 0;
         document.querySelector(`#${cam}t`).remove();
     }
 }
@@ -611,7 +631,7 @@ function isCrit(crl, crr){
 }
 
 async function damage(who, ares, val, props = []){
-    let hasp = (name) => {return prop.includes(name)}
+    let hasp = (name) => {return props.includes(name)}
     if(!Array.isArray(ares)) ares = [ares];
 
     if(val.endsWith('%')){
@@ -707,7 +727,7 @@ async function damage(who, ares, val, props = []){
 }
 
 async function heal(who, ares, val, props = []){
-    let hasp = (name) => {return prop.includes(name)}
+    let hasp = (name) => {return props.includes(name)}
     let hasa = (whi, name) => whi.attr.includes(name);
     if(!Array.isArray(ares)) ares = [ares];
 
@@ -722,7 +742,7 @@ async function heal(who, ares, val, props = []){
     }
     
     for(let are of ares){
-        if(are.attri.includes('undead')){
+        if(are.attr.includes('undead')){
             console.log('アンデッドなので逆回復 =>')
             let res = await damage(who, are, val, props);
             if(res) return 1;
@@ -739,7 +759,6 @@ async function heal(who, ares, val, props = []){
 
 //#region みんな吹っ飛んじゃった？
 async function dead(who, are){
-    let hasp = (name) => {return prop.includes(name)}
     let hasa = (whi, name) => whi.attr.includes(name);
 
     let cam = who.cam;
