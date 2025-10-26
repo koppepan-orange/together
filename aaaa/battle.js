@@ -4,15 +4,62 @@ let phase = 0;
 let bar = {};
 let acted = 0;
 
+let eneBas = {
+    maxhp: 50,
+    atk: 10,
+    def: 0,
+    matk: 10,
+    mdef: 0,
+    maxmp: 20,
+    crl: 3,
+    crr: 0,
+    crd: 1.5,
+    spd: 25
+}
+
 function cm(cam = '指定なし', me = '指定なし'){
     let who = 0;
     if(cam == '指定なし') cam = 'players';
 
-    if(me != '指定なし') who = humans.find(a => a.cam == cam && a.id == me);
+    if(me != '指定なし') who = humans.find(a => a.cam == cam && a.me == me);
     else who = humans.filter(a => a.cam == cam);
     
     return who;
 }
+
+//#region ピのせーぞー
+function makePlayer(code, id){
+    //code 0 == Charas, 1 == Friends
+    let pd = 0;
+    if(!code) pd = Charas.find(a => a.id == id);
+    else pd = Friends.find(a => a.name == id);
+
+    if(!pd) return logadd(`codeが[${code}]の${id}はいないらしい`);
+
+    let p = {};
+    let statuses = Object.keys(eneBas);
+    let wretch = Charas.find(a => a.id == 'wretch');
+    statuses.forEach(statu => p[statu] = wretch[statu]);
+    statuses.forEach(statu => p[statu] = pd[statu]); //変更点だけ、らしい。
+    p.hp = p.maxhp;
+    p.mp = p.maxmp;
+
+    p.cam = 'players';
+    p.me = humans.filter(a => a.cam == 'players').length;
+    p.lv = 1;
+    p.exp = 0;
+    p.sp = 0;
+
+    p.slash = ed.slash??[{name:'slash'},{name:'double slash'},{name:'slash of light'}];
+    p.magic = ed.magic??[{name:'heal'},{name:'power'},{name:'shell'}];
+    p.tool = ed.tool??['aspirin','throw knife','redcard'];
+
+
+    Style.button.solid = data.buttonsolid;
+    Style.button.back = data.buttonback;
+    Style.tekiou();
+}
+//#endregion
 
 //#region みちとのそーぐー
 async function encount(){
@@ -32,24 +79,46 @@ async function encount(){
 }
 
 function makeEnemy(){
-    let ed = arraySelect(Enemies);
-
     let e = { //うつわ
-        name: ed.name,
-        maxhp: ed.maxhp,
-        atk: ed.atk,
-        def: ed.def,
-        matk: ed.matk,
-        mdef: ed.mdef,
-        maxmp: ed.maxmp,
-        crl: ed.crl,
-        crr: ed.crr,
-        crd: ed.crd,
-        spd: ed.spd,
-    }; 
+        maxhp: eneBas.maxhp,
+        atk: eneBas.atk,
+        def: eneBas.def,
+        matk: eneBas.matk,
+        mdef: eneBas.mdef,
+        maxmp: eneBas.maxmp,
+        crl: eneBas.crl,
+        crr: eneBas.crr,
+        crd: eneBas.crd,
+        spd: eneBas.spd,
+    };
 
-    e.id = humans.filter(a => a.cam == 'enemies');
+    let ed = arraySelect(Enemies);
+    let statuses = Object.keys(e);
+    statuses.forEach(statu => {
+        if(ed[statu].startsWith('+') || ed[statu].startsWith('-')){
+            let num = +(ed[statu].slice(1));
+            if(ed[statu].startsWith('-')) num *= -1;
+            e[statu] += num;
+        }
+        if(ed[statu].startsWith('=')){
+            let num = +(ed[statu].slice(1));
+            e[statu] = num;
+        }
+    })
+
+    e.hp = e.maxhp;
+    e.mp = e.maxmp;
+
+    e.name = ed.name;
     e.cam = 'enemies';
+    e.me = humans.filter(a => a.cam == 'enemies');
+    e.status = 1; // 1:生存 0:死亡
+    
+    e.attr = ed.attr??[];
+    e.buffs = [];
+
+    e.weapon = {id: ed.weapon??'fist'};
+    e.shield = {id: ed.shield??'none'};
 
     return e;
 }
@@ -62,7 +131,7 @@ async function nextTurn(who = 0){
     phase = 0;
     if(who){
         for(let buff of who.buffs){
-            let data = Buffs.find(a => a.name = buff.name);
+            let data = Buffs.find(a => a.name == buff.name);
             //アンコールの動き
             if(hask(data, 'luck')){//luck
                 if(isCrit(data.luck)){
@@ -150,14 +219,21 @@ async function nextTurn(who = 0){
             if(!dots[dot]) dots[dot] = 0;
             dots[dot] += val;
         }
+        Object.keys(dots).forEach( key => {
+            let val = dots[key];
+            are.hp -= val;
+            if(are.hp <= 0){
+                return dead(0, are);
+            }
+        })
     
         if(buff.name == 'onslime'){
             if(isCrit(buff.value)){
                 buffremove(are, 'onslime');
                 addlog('なんとかスライムを取り払った!!');
             }else{
-                addlog('スライムが邪魔して動けない!!');//今思ったけどこれやばいのでは...?
-                nextTurn();
+                addlog('スライムが邪魔して動けない!!');
+                nextTurn(are);
                 return;
             }; 
         }
@@ -197,7 +273,7 @@ async function nextTurn(who = 0){
 }
 //#endregion
 
-//#region playerturn
+//#region ピのたーん
 async function playerturn(who = 0){
     //back目的なら空欄、そうでなければwhoが必須
     jump:{
@@ -224,9 +300,9 @@ async function playerturn(who = 0){
     batC.s4B.textContent = 'run';
 };
 //#endregion
-//#region playerの選択
+//#region ピのせんたく
 batC.s1B.addEventListener('click', async function(){
-    let who = humans.find(a => a.cam == 'players' && a.id == 0);
+    let who = humans.find(a => a.cam == 'players' && a.me == 0);
     switch(phase){
         case 1:
             phase = 2;
@@ -248,7 +324,7 @@ batC.s1B.addEventListener('click', async function(){
 })
 
 batC.s2B.addEventListener('click', async function(){
-    let who = humans.find(a => a.cam == 'players' && a.id == 0);
+    let who = humans.find(a => a.cam == 'players' && a.me == 0);
     switch(phase){
         case 1:
             phase = 3;
@@ -270,7 +346,7 @@ batC.s2B.addEventListener('click', async function(){
 })
 
 batC.s3B.addEventListener('click', async function(){
-    let who = humans.find(a => a.cam == 'players' && a.id == 0);
+    let who = humans.find(a => a.cam == 'players' && a.me == 0);
     switch(phase){
         case 1:
             phase = 4;
@@ -292,7 +368,7 @@ batC.s3B.addEventListener('click', async function(){
 })
 
 batC.s4B.addEventListener('click', async function(){
-    let who = humans.find(a => a.cam == 'players' && a.id == 0);
+    let who = humans.find(a => a.cam == 'players' && a.me == 0);
     switch(phase){
         case 1:
             dassyutsu();
@@ -330,8 +406,8 @@ function LetsTargetSelect(one){
         let pcolor = '#f7f7f7';
 
         let arrs = [
-            ...humans.filter(a => a.cam == 'players').map(a => `players${a.id}`), 
-            ...humans.filter(a => a.cam == 'enemies').map(a => `enemies${a.id}`),
+            ...humans.filter(a => a.cam == 'players').map(a => `players${a.me}`), 
+            ...humans.filter(a => a.cam == 'enemies').map(a => `enemies${a.me}`),
         ];
 
         let target = [];
@@ -374,8 +450,8 @@ function LetsTargetSelect(one){
             }
             if(code == 3){// 拡散-5
                 let zin = humans.filter(a => a.cam == tcam && a.status);
-                let pnum = (zin[tme-1]?.status??0 == 1) ? tme - 1 : null;
                 let p2num = (zin[tme-2]?.status??0 == 1) ? tme - 2 : null;
+                let pnum = (zin[tme-1]?.status??0 == 1) ? tme - 1 : null;
                 let nnum = (zin[tme+1]?.status??0 == 1) ? tme + 1 : null;
                 let n2num = (zin[tme+2]?.status??0 == 1) ? tme + 2 : null;
                 
@@ -438,10 +514,9 @@ function LetsTargetSelect(one){
         }
 
         arrs.forEach(a => {
-            let div = document.getElementById(a);
-            div.removeEventListener('click', handleClick)
+            let div = document.querySelector(`.${a}`);
             div.addEventListener('click', handleClick);
-            div.style.backgroundColor = color;
+            div.classList.add('sele')
         });
     });
 }
@@ -449,7 +524,7 @@ function LetsTargetSelect(one){
 
 
 //#endregion
-//#region playerの斬撃
+//#region ピのざんげき
 async function Slash(who, num){
     disappear();
     let sl = who.slash[num]
@@ -470,14 +545,14 @@ async function Slash(who, num){
 
         let result = await data.process(who, are);
         if(result) return 1;
-        NextTurnis(who);
+        nextTurn(who);
     }else{
         await addtext('not enough mp...');
         playerturn();
     }
 }
 //#endregion
-//#region playerの魔法
+//#region ピのまほー
 async function Magic(who, num){    
     disappear();
     let mg = who.magic[num]
@@ -497,7 +572,7 @@ async function Magic(who, num){
         await addtext(`${who.name}の${name}！`);
         let result = await data.process(who, are);
         if(result) return 1;
-        NextTurnis(who);
+        nextTurn(who);
     }else{
         await addtext('not enough mp...');
         playerturn();
@@ -505,7 +580,7 @@ async function Magic(who, num){
 }
 
 //#endregion
-//#region playerの道具
+//#region ピのどーぐ
 async function Tool(who, num){
     disappear();
     let tl = who.tool[num]
@@ -525,14 +600,14 @@ async function Tool(who, num){
         
         let result = await data.process(who, are);
         if(result) return 1;
-        NextTurnis(who);
+        nextTurn(who);
     }else{
         await addtext('not enough tool...');
         playerturn();
     }
 }
 //#endregion
-//#region playerのskill
+//#region ピのすきる
 
 /*
 let Splithp = 0;
@@ -612,12 +687,17 @@ function turretAllClear(){
 
 //#endregion
 
-
 //#region だめーじとかぎゃくだめーじとか
-function isCrit(crl, crr){
+function isCrit(crl, crr = 0){
+    if(typeof crl == 'string' && isNaN(+crl)) return logadd(`isCritのcrlが →${crl}← 。さすがにおかしい。直せや〜〜`);
+    if(typeof crr == 'string' && isNaN(+crr)) return logadd(`isCritのcrrが →${crr}← 。さすがにおかしい。直せや〜〜2`);
+
+    crl = +crl;
+    crr = +crr;
+
     //crl, crrはそれぞれ整数。
-    if(crr == 'ab') return addlog('確定抵抗！'), 0;
-    if(crl == 'ab') return addlog('確定！'), 1;
+    if(crr == 'ab') return logadd('確定抵抗！'), 0;
+    if(crl == 'ab') return logadd('確定！'), 1;
     
     let kei = crl - crr;
     if(kei < 0) kei = 0;
@@ -757,7 +837,176 @@ async function heal(who, ares, val, props = []){
 }
 //#endregion
 
-//#region みんな吹っ飛んじゃった？
+//#region じょーたいいじょ〜
+async function buffadd(who, ares, buff, kind, time, val){ //誰のバフ/デバフか,バフ/デバフの名前,効果時間,効果量
+    // console.log(`buffadd:: ${buff}, ${kind}, ${time}, ${val}`);
+    let newbuff = buffMold(buff, kind, time, val);
+    let data = Buffs.find(e => e.name == buff);
+
+    // console.log(ares)
+
+    let hasa = (dare, name) => dare.ables.includes(name);
+
+    if(!Array.isArray(ares)) ares = [ares];
+
+    for(let are of ares){
+        console.log(`buffadd:: ${who.name} => ${are.name}に${val}の${buff}を${time}付与`);
+
+        let isPush = 1;
+        switch(kind){
+            case 'turn':{
+                //すでにある場合の処理
+                let hasbuffIndex = are.buffs.findIndex(e => e.name == buff && e.value == val);
+                if(hasbuffIndex >= 0){
+                    are.buffs[hasbuffIndex].time += time;
+                    isPush = 0;
+                }
+                tekiou();
+                break;
+            };
+
+            case 'stack':{
+                let hasbuffIndex = are.buffs.findIndex(e => e.name == buff);
+                if(hasbuffIndex >= 0){
+                    are.buffs[hasbuffIndex].time += time;
+                    are.buffs[hasbuffIndex].value = data.lv[time];
+                    isPush = 0;
+                }
+                tekiou();
+                break;
+            };
+        }
+
+        //whoがデバフ延長を持っているなら〜的な処理をここで。
+
+        if(kind == 'turn') are.buffs.push(newbuff);
+    }
+}
+function buffMold(buff, kind, time, val){
+    if(!buff || !kind || !time || !val) console.error('要素が足りないぜ！！！', buff, kind, time, val);
+    let data = Buffs.find(e => e.name == buff);
+    if(!data) console.error(buff,'←これ存在しないらしいっすよ〜？')
+
+    if(data.mode == 'free') val = {[data.agemono]: val};
+    if(data.mode == 'fixe') val = data.lvs[val]??null;
+    console.log(`[${data.mode}]${buff} val:`,val,` time:${time}`);
+
+    let newbuff = {};
+
+    switch(kind){
+        case 'turn':{
+            newbuff = {
+                type: data.type,
+                kind: kind,
+                name: buff,
+                time: time,
+                value: val,
+                data: data,
+            };
+            break;
+        }
+
+        case 'stack':{
+            newbuff = {
+                type: data.type,
+                kind: kind,
+                name: buff,
+                time: time,
+                value: data.lv[time],
+                data: data,
+            };
+            break;
+        }
+    }
+    console.log(newbuff)
+
+    return newbuff;
+}
+function buffremove(who, buff){
+    //誰のバフ/デバフか,バフ/デバフの名前
+    if(!buffhas(who, buff)) return 0;
+
+    let i = who.buffs.findIndex(e => e.name == buff)
+    who.buffs.splice(i,1);
+    tekiou();
+    return 1;
+}
+function buffclear(who, code){
+    switch(code){
+        case 'all':
+            who.buffs = [];
+            break;
+        case 'turn':
+            who.buffs = who.buffs.filter(e => e.kind != 'turn');
+            break;
+        case 'stack':
+            who.buffs = who.buffs.filter(e => e.kind != 'stack');
+            break;
+        case 'buffs':
+            who.buffs = who.buffs.filter(e => e.type == 'buffs');
+            break;
+        case 'debuffs':
+            who.buffs = who.buffs.filter(e => e.type == 'debuffs');
+            break;
+        case 'handles':
+            who.buffs = who.buffs.filter(e => e.type == 'handles');
+            break;
+        case 'uniques':
+            who.buffs = who.buffs.filter(e => e.type == 'uniques');
+            break;
+        default:
+            console.console('codeが違ったからとりあえず同名消したけど、よかった？');
+            who.buffs = who.buffs.filter(e => e.name == code);
+    }
+    tekiou();
+}
+function buffhas(who, buff){
+    if(who.buffs.find(b => b.name === buff)) return 1;
+
+    return 0;
+}
+function buffKeisan(dare, buff, code){
+    console.log(`Keisan:: [${code}]${buff.name} val:${buff.value} time:${buff.time}`);
+    let data = Buffs.find(a => a.name == buff.name);
+    
+    let val = 0;
+    if(data.mode == 'free'){
+        if(!hask(buff.value, code)) return 0;
+        val = buff.value[code];
+    }
+    if(data.mode == 'fixe'){
+        if(!hask(data.lvs[buff.value], code)) return 0;
+        val = data.lv[buff.value][code];
+    }
+
+    // =+1 =-14 +24% -50%
+    let dochi = val.slice(0,1); // =
+    if(dochi != '=') dochi = '+';
+    else val = val.slice(1);
+    let puma = val.slice(0,1); // + -
+    if(puma != '+' && puma != '-') puma = '+';
+    val = val.slice(1);
+    if(val.endsWith('%')){
+        val = val.slice(0,-1);
+        val = +dare[code]*(val/100);
+    }
+    else val = +val;
+
+    if(!val) return 1;
+    
+    if(puma == '-') val = -val;
+
+    switch(dochi){
+        case '=': dare[code]  = val; break;
+        case '+': dare[code] += val; break;
+    }
+
+    return 0
+}
+//#endregion
+
+
+//#region みんなふっとんじゃった〜？
 async function dead(who, are){
     let hasa = (whi, name) => whi.attr.includes(name);
 
@@ -771,7 +1020,7 @@ async function dead(who, are){
     are.hp = 0;
     are.stt = 0; //通常-1, 死-0
     let dom = batC[`${tcam}D`];
-    let dom2 = dom.querySelector(`.h${are.id}`);
+    let dom2 = dom.querySelector(`.h${are.me}`);
     dom2.classList.add('dead');
 
     //あれ？みんな死んじゃった？
