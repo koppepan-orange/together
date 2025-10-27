@@ -1,7 +1,7 @@
 let humans = [];
 let turn = 0;
 let phase = 0;
-let bar = {};
+let bar = {me:[], cam:[]};
 let acted = 0;
 
 let eneBas = {
@@ -14,7 +14,8 @@ let eneBas = {
     crl: 3,
     crr: 0,
     crd: 1.5,
-    spd: 25
+    spd: 25,
+    maxep: 100,
 }
 
 function cm(cam = '指定なし', me = '指定なし'){
@@ -27,6 +28,158 @@ function cm(cam = '指定なし', me = '指定なし'){
     return who;
 }
 
+//#region tekiou
+function tekiou(){
+    for(let human of humans){
+        let cam = human.cam;
+        let chokkin = cam.substring(0,1);
+        let div0 = batC[`${chokkin}D`];
+        let div = div0.querySelector(`.${cam}${human.me}`);
+
+        let hd = 0;
+        if(cam == 'enemies') hd = Enemies.find(a => a.name == human.name);
+        if(cam == 'players'){
+            hd = Charas.find(a => a.name == human.name);
+            if(!hd) hd = Friends.find(a => a.name == human.name);
+        }
+
+
+        console.log(`${cam}${human.me}`)
+        console.log(human)
+        console.log(hd)
+
+        div.querySelector('.name').textContent = human.name;
+        div.querySelector('.lv').textContent = `Lv.${human.lv}`;
+        div.querySelector('.img').src = `assets/images/charas/${hd.img}.png`;
+        div.querySelector('.skill .liquid').style.height = `${human.ep/human.maxep*100}%`;
+
+        let hpZ = div.querySelector('.hpZ');
+        hpZ.querySelector('.text').textContent = `${human.hp}/${human.maxhp}`;
+        hpZ.querySelector('.bar .inner').style.width = `${human.hp/human.maxhp*100}%`;
+
+        let mpZ = div.querySelector('.mpZ');
+        mpZ.querySelector('.text').textContent = `${human.mp}/${human.maxmp}`;
+        mpZ.querySelector('.bar .inner').style.width = `${human.mp/human.maxmp*100}%`;
+    }   
+}
+//#endregion
+
+//#region どむさんのようそづくり～
+function makeHuman(cam, me){
+    let hD = document.createElement('div');
+    hD.className = `human ${cam}${me}`;
+
+    let img = document.createElement('img');
+    img.className = 'img';
+    img.src = `assets/images/systems/error.png`;
+    hD.appendChild(img);
+
+    let skill = document.createElement('div');
+    skill.className = 'skill';
+     let back = document.createElement('img');
+     back.className = 'back';
+     back.src = `assets/images/systems/error.png`;
+     skill.appendChild(back);
+     let liquid = document.createElement('div');
+     liquid.className = 'liquid';
+     skill.appendChild(liquid);
+    hD.appendChild(skill);
+
+    let waku = document.createElement('div');
+    waku.className = 'waku';
+
+    let plate = document.createElement('div');
+    plate.className = 'plate';
+
+    let name = document.createElement('div');
+    name.className = 'name';
+    plate.appendChild(name);
+    let lv = document.createElement('div');
+    lv.className = 'lv';
+    plate.appendChild(lv);
+
+    waku.appendChild(plate);
+
+    let hpZ = document.createElement('div');
+    hpZ.className = 'hp';
+    
+    let hpt = document.createElement('div');
+    hpt.className = 'text';
+    hpZ.appendChild(hpt);
+    let hpb = document.createElement('div');
+    hpb.className = 'bar';
+     let hpbi = document.createElement('div');
+     hpbi.className = 'inner';
+     hpb.appendChild(hpbi);
+    hpZ.appendChild(hpb);
+    
+    waku.appendChild(hpZ);
+    
+    let mpZ = document.createElement('div');
+    mpZ.className = 'mp';
+    
+    let mpt = document.createElement('div');
+    mpt.className = 'text';
+    mpZ.appendChild(mpt);
+    let mpb = document.createElement('div');
+    mpb.className = 'bar';
+    mpZ.appendChild(mpb);
+
+    waku.appendChild(mpZ);
+
+    hD.appendChild(waku);
+
+    return hD;
+}
+//#endregion
+
+//#region きゃらのせんたく〜
+async function sele(){
+    let id = 'errored!!'
+    id = await new Promise((mis) => {
+        function clicked(ev){
+            let div = ev.target;
+            // console.log(div)
+            
+            let name = div.classList[1];
+            console.log(name);
+            
+            //batC.seleD内要素全消し
+            while(batC.seleD.firstChild){
+                batC.seleD.removeChild(batC.seleD.firstChild);
+            }
+
+            mis(name)
+        }
+        
+        let chas = Charas.filter(a => a.able);
+        // console.log(chas)
+        for(let data of chas){
+            // console.log(data)
+            let div0 = document.createElement('div');
+            div0.className = `slsl ${data.id}`;
+            
+            let span = document.createElement('span');
+            span.textContent = data.name;
+            div0.appendChild(span);
+
+            let img = document.createElement('img');
+            img.src = `assets/images/charas/${data.img}.png`;
+            div0.appendChild(img);
+            
+            div0.addEventListener('click', clicked);
+            batC.seleD.appendChild(div0);
+        }
+        batC.seleD.classList.add('tog')
+    })
+    
+    let p = makePlayer(0, id);
+    humans.push(p);
+
+
+}
+//#endregion
+
 //#region ピのせーぞー
 function makePlayer(code, id){
     //code 0 == Charas, 1 == Friends
@@ -38,44 +191,31 @@ function makePlayer(code, id){
 
     let p = {};
     let statuses = Object.keys(eneBas);
-    let wretch = Charas.find(a => a.id == 'wretch');
-    statuses.forEach(statu => p[statu] = wretch[statu]);
     statuses.forEach(statu => p[statu] = pd[statu]); //変更点だけ、らしい。
     p.hp = p.maxhp;
     p.mp = p.maxmp;
+    p.ep = 0;
 
     p.cam = 'players';
     p.me = humans.filter(a => a.cam == 'players').length;
+    p.id  = id;
+    p.name = pd.name;
     p.lv = 1;
     p.exp = 0;
     p.sp = 0;
 
-    p.slash = ed.slash??[{name:'slash'},{name:'double slash'},{name:'slash of light'}];
-    p.magic = ed.magic??[{name:'heal'},{name:'power'},{name:'shell'}];
-    p.tool = ed.tool??['aspirin','throw knife','redcard'];
+    p.slash = p.slash??[{name:'slash'},{name:'double slash'},{name:'slash of light'}];
+    p.magic = p.magic??[{name:'heal'},{name:'power'},{name:'shell'}];
+    p.tool = p.tool??['aspirin','throw knife','redcard'];
 
-
-    Style.button.solid = data.buttonsolid;
-    Style.button.back = data.buttonback;
+    Style.button.solid = pd.buttonsolid;
+    Style.button.back = pd.buttonback;
     Style.tekiou();
-}
-//#endregion
 
-//#region みちとのそーぐー
-async function encount(){
-    let enemiesen = random(1,1);
-
-    for(let i = 0; i < enemiesen; i++){
-        let e = makeEnemy();
-        humans.push(e);
-    }
-
-    let iran = ['うわっ！', '嗚呼、'];
-    let iran2= ['きた！なんだって～？！', '来たり']
-    let ran = random(0, iran.length-1);
-    await addtext(`${iran[ran]}${enemiesen}人飛び出して${iran2[ran]}`);
-
-    await nextTurn();
+    let div = makeHuman('players', p.me);
+    batC.pD.appendChild(div);
+    
+    return p;
 }
 
 function makeEnemy(){
@@ -111,17 +251,40 @@ function makeEnemy(){
 
     e.name = ed.name;
     e.cam = 'enemies';
-    e.me = humans.filter(a => a.cam == 'enemies');
+    e.me = humans.filter(a => a.cam == 'enemies').length;
     e.status = 1; // 1:生存 0:死亡
     
     e.attr = ed.attr??[];
     e.buffs = [];
+    e.lasts = [];
 
     e.weapon = {id: ed.weapon??'fist'};
     e.shield = {id: ed.shield??'none'};
 
+    let div = makeHuman('enemies', e.me);
+    batC.eD.appendChild(div);
+
     return e;
 }
+//#endregion
+
+//#region みちとのそーぐー
+async function encount(){
+    let enemiesen = random(1,1);
+
+    for(let i = 0; i < enemiesen; i++){
+        let e = makeEnemy();
+        humans.push(e);
+    }
+
+    let iran = ['うわっ！', '嗚呼、'];
+    let iran2= ['きた！なんだって～？！', '来たり']
+    let ran = random(0, iran.length-1);
+    await addtext(`${iran[ran]}${enemiesen}人飛び出して${iran2[ran]}`);
+
+    await nextTurn();
+}
+
 //#endregion
 
 //#region たーんのまねーじめんと～
@@ -687,6 +850,120 @@ function turretAllClear(){
 
 //#endregion
 
+//#region てきさんのた～ん
+async function enemyturn(who){
+    let data = Enemies.find(a => a.name == who.name);
+    console.log(who)
+
+    for(let buff in who.buffs){
+        buff.time -= 1;
+        if (buff.time <= 0) {
+            delete who.buffs[buff]; //0以下なら消し去る
+        }
+    }
+    tekiou();
+
+    let are;
+    if(data){
+        let act = enemySelectAction(who)
+        let res = await act.process(who);
+        if(res) return 1;
+    }else{
+        await addtext(`${who.name}は何かで攻撃した！`)
+        are = ShallTargetSelect(who, 'phpl');
+        let res = await damage(who, are, 1, 'sh'); //areの後、1の前に"何の倍率か"を入れるべき。基本atkかもだけどfixで固定、とかできそう
+        if(res) return 1;
+    }
+
+    nextTurn(who);
+}
+function enemySelectAction(who){
+    let data = Enemies.find(a => a.name == who.name);
+    let acts = [];
+    let pros = [];
+
+    if(who)
+    if(who.lasts.length != 0){
+        //直前にreを実行していたならば、対応するabを確定実行するやつ
+        who.lasts.forEach(last => {
+            data.acts.forEach(a => {
+                let props = a.props;
+                props.filter(p => p.startsWith('ab') && p.endsWith(last)).forEach(p => {
+                    console.log(a, p)
+                    acts.push(a);
+                    pros.push(a.probable);
+                });
+            })
+        })
+        who.lasts = [];
+    }else{
+        data.acts.forEach(a => {
+            acts.push(a);
+            pros.push(a.probable);
+        })
+    }
+    // console.log(acts);
+    // console.log(pros);
+
+    //reをするとlastを記録
+    let act = arrayGacha(acts, pros);
+    console.log(act);
+    let props = act.prop ?? [];
+    props.forEach(p => {
+        if(p.startsWith('re')){
+            let item = p.slice(0,2);
+            who.lasts.push(item);
+            console.log(`re:: ${item}を記録しました`);
+        }
+    })
+
+    return act;
+}
+function ShallTargetSelect(who, code, both = 0) {
+    console.log(`ShallTarget!!! ${code}(both:${both})`)
+    console.log(`code:: ${code}`)
+    const side = code[0] === 'p' ? 'players' : 'enemies';
+    console.log(`>> ${code}`);
+    const stat = code.includes('hp') ? 'hp' : code.includes('atk') ? 'atk' : 'def';
+    console.log(`>> ${code}`);
+    const mode = code.endsWith('l') ? 'low' : code.endsWith('h') ? 'high' : 'random';
+    console.log(`>> ${code}`);
+    console.log(side, stat, mode);
+
+    const list = cm(side).filter(c => c.status).sort((a, b) => a[stat] - b[stat]);
+    console.log(list);
+
+    if (list.length == 0) return `errored! ${side} is inai desuwa!!`;
+
+    let target;
+    if(mode == 'low')  target = list[0];
+    else if(mode == 'high') target = list[list.length - 1];
+    else target = arraySelect(list);
+
+    const ret = [];
+    if(both == 0) ret.push(target.me);
+    else {
+        const ids = list.map(c => c.me);
+        const i = ids.indexOf(target.me);
+        const adj = [];
+        if (i > 0) adj.push(ids[i - 1]);
+        adj.push(ids[i]);
+        if (i < ids.length - 1) adj.push(ids[i + 1]);
+        ret.push(adj);
+    }
+    console.log(ret)
+
+    let ares = [];
+    for(let num of ret){
+        let are = cm(side, num);
+        ares.push(are);
+    }
+    console.log(ares)
+
+    return ares;
+}
+//#endregion
+
 //#region だめーじとかぎゃくだめーじとか
 function isCrit(crl, crr = 0){
     if(typeof crl == 'string' && isNaN(+crl)) return logadd(`isCritのcrlが →${crl}← 。さすがにおかしい。直せや〜〜`);
@@ -1005,7 +1282,6 @@ function buffKeisan(dare, buff, code){
 }
 //#endregion
 
-
 //#region みんなふっとんじゃった〜？
 async function dead(who, are){
     let hasa = (whi, name) => whi.attr.includes(name);
@@ -1037,3 +1313,8 @@ async function finale(cam){
     nicoText(`${cam}の勝ち`)
 }
 //#endregion
+
+
+
+mapmakeD.addEventListener('click', sele);
+mapmakeD.addEventListener('contextmenu', encount);

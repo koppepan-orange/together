@@ -1,3 +1,23 @@
+let Style = {
+    button: {
+        solid: '#000000',
+        back: '#ffffff',
+    },
+    text: {
+        main: '#222222',
+        sub: '#666666',
+    },
+    notice: {
+        border: '#ffffff'
+    },
+    tekiou: function() {
+        for (let section in this) {
+            if (section == 'apply') continue;
+            for (let key in this[section]) document.documentElement.style.setProperty(`--${section}-${key}`, this[section][key]);
+        }
+    }
+}
+
 let IranMikans = {
     'koppepan':{
         name:'koppepan',
@@ -492,20 +512,22 @@ let Charas = [
         id:'wretch',
         name:'持たざる者',
         img:'wretch',
+        able: 1,
         description:'持たざる者。何もないが、何でもあるとも言える。\n平均的で普遍的。普通の凡才でただの人間。',
         ex:'null',
         ns:'null',
         ps:'null',
         atk:20,
-        def:0,
+        def:0,  
         matk:10,
         mdef:0,
         maxhp:100,
         maxmp:50,
-        critlate:5,
-        critdmg:1.5,
-        critresist:0,
-        speed:50,
+        crl:5,
+        crd:1.5,
+        crr:0,
+        spd:50,
+        maxep:100,
         buttonsolid:'#000000',
         buttonback:'#999999',
     },
@@ -514,6 +536,7 @@ let Charas = [
         id:'color_slime',
         name:'color_slime',
         img:'color_slime_green',
+        able: 0,
         description:'スライム。...まだできてないから使わない方が吉',
         ex:'null',
         ns:'null',
@@ -524,10 +547,11 @@ let Charas = [
         mdef:0,
         maxhp:100,
         maxmp:50,
-        critlate:0,
-        critdmg:1.5,
-        critresist:'absolute',
-        speed:35,
+        crl:0,
+        crd:1.5,
+        crr:'absolute',
+        spd:35,
+        maxep:100,
         buttonsolid:'#000000',
         buttonback:'#999999',
     },
@@ -536,6 +560,7 @@ let Charas = [
         id:'mechanic',
         name:'アミー',
         img:'mechanic',
+        able: 1,
         description:'メカニック。工具を用いて割となんでも作れる。\nそのせいか助手には大きく慕われている。\n打たれ弱いので繊細にね',
         ex:'placeturret',
         ns:'throwwrench',
@@ -546,10 +571,11 @@ let Charas = [
         mdef:20,
         maxhp:25,
         maxmp:30,
-        critlate:7,
-        critdmg:2.0,
-        critresist:0,
-        speed:65,
+        crl:7,
+        crd:2.0,
+        crr:0,
+        spd:65,
+        maxep:100,
         buttonsolid:'#ff7373',
         buttonback:'#fcffc0',
     },
@@ -558,6 +584,7 @@ let Charas = [
         id:'clown',
         name:'週末の道化師',
         img:'clown',
+        able: 1,
         description:'ピエロさん。ランダム要素多め。\n',
         ex:'trickyvaiavles',
         ns:'gambler',
@@ -568,10 +595,11 @@ let Charas = [
         mdef:0,
         maxhp:100,
         maxmp:50,
-        critlate:9,
-        critdmg:3.0,//...ちょまってこれ大丈夫かな
-        critresist:10,
-        speed:40,
+        crl:9,
+        crd:3.0,//...ちょまってこれ大丈夫かな
+        crr:10,
+        spd:40,
+        maxep:100,
         buttonsolid:'#ffacf9',
         buttonback:'#acf8ff',
     },
@@ -580,6 +608,7 @@ let Charas = [
         id:'magodituono',
         name:'スオーノ・フルマイン',
         img:'magodituono',
+        able: 0,
         description:'雷電魔術師。"帯電"を用いて戦う\n将軍ではない。誰だ将軍って言ったやつは',
         ex:'lightningstorm',
         ns:'elecbarrier',
@@ -590,10 +619,11 @@ let Charas = [
         mdef:20,
         maxhp:40,
         maxmp:100,
-        critlate:5,
-        critdmg:2.0,
-        critresist:5,
-        speed:60,
+        crl:5,
+        crd:2.0,
+        crr:5,
+        spd:60,
+        maxep:100,
         buttonsolid:'#7f1184',
         buttonback:'#5f4894',
     },
@@ -651,13 +681,13 @@ let Buffs = [
         lvs:[
             {
                 power:'+1.0',
-                speed:'+20.0',
-                critlate:'-5.0'
+                spd:'+20.0',
+                crl:'-5.0'
             },
             {
                 power: '+1.5',
-                speed: '+25.0',
-                critlate: '+-6.5'
+                spd: '+25.0',
+                crl: '+-6.5'
             }
         ],
         max:2
@@ -1420,7 +1450,7 @@ let Equips = {
             ap:0,
             ce:1,
             combatEffect:{ //攻撃前の効果
-                    critlate: 70,
+                    crl: 70,
             }
         },
         {
@@ -1445,7 +1475,7 @@ let Equips = {
             ap:0,
             ce:1,
             combatEffect:{
-                    critdmg: 4.0,
+                    crd: 4.0,
             }
         },
         {
@@ -1459,7 +1489,7 @@ let Equips = {
             ap:0,
             ce:1,
             combatEffect:{
-                    critlate: 10,
+                    crl: 10,
             }
         },
 
@@ -1526,7 +1556,7 @@ let Equips = {
             ap:0,
             ce:1,
             combatEffect:{
-                    critlate: 60
+                    crl: 60
             }
         },
     ],
@@ -2365,10 +2395,10 @@ let Enemies = [
         maxmp:'0',
         matk:'0',
         mdef:'-30',
-        critlate:'=absolute',
-        critdmg:'=0',
-        critresist:'=absolute',
-        speed:'40',
+        crl:'=absolute',
+        crd:'=0',
+        crr:'=absolute',
+        spd:'40',
         acts:[
             {
                 name:'粘液飛ばし',
@@ -2405,10 +2435,10 @@ let Enemies = [
         maxmp:'0',
         matk:'+0',
         mdef:'+0',
-        critlate:'+30',
-        critdmg:'+0.5',
-        critresist:'+0',
-        speed:'75',
+        crl:'+30',
+        crd:'+0.5',
+        crr:'+0',
+        spd:'75',
         acts:[
             {
                 name:'体当たり',
@@ -2445,10 +2475,10 @@ let Enemies = [
         maxmp:'=0',
         matk:'+0',
         mdef:'+0',
-        critlate:'+0',
-        critdmg:'+0',
-        critresist:'+0',
-        speed:'60',
+        crl:'+0',
+        crd:'+0',
+        crr:'+0',
+        spd:'60',
         acts:[
             {
                 name:'消滅',
@@ -2501,10 +2531,10 @@ let Enemies = [
         maxmp:'=0',
         matk:'+0',
         mdef:'+15',
-        critlate:'+0',
-        critdmg:'+0.5',
-        critresist:'+10',
-        speed:'50',
+        crl:'+0',
+        crd:'+0.5',
+        crr:'+10',
+        spd:'50',
         acts:[
             {
                 name:'しびれごな',
@@ -2553,10 +2583,10 @@ let Enemies = [
         maxmp:'0',
         matk:'+0',
         mdef:'+0',
-        critlate:'+0',
-        critdmg:'+0.5',
-        critresist:'+10',
-        speed:'50',
+        crl:'+0',
+        crd:'+0.5',
+        crr:'+10',
+        spd:'50',
         acts:[
             {
                 name:'急襲',
@@ -2603,7 +2633,7 @@ let Prefixes = [
         name:'ギャンブラーな',
         rare:1,
         effects:{
-            critlate: '+4',
+            crl: '+4',
             maxhp: '=200%'
         }
     },
@@ -2612,7 +2642,7 @@ let Prefixes = [
         name:'守りが固い',
         rare:2,
         effects:{
-            critresist: '+5',
+            crr: '+5',
             maxhp: '=125%',
             atk: '=30%',
             def: '=150%',
@@ -2623,8 +2653,8 @@ let Prefixes = [
         name:'心眼持ちの',
         rare:3,
         effects:{
-            critlate: '=100',
-            critdmg: '=120',
+            crl: '=100',
+            crd: '=120',
             atk: '=30%',
         }
     },

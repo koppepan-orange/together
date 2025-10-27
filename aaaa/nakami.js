@@ -1633,6 +1633,7 @@ function map_make(){
 let mapmakeD = document.getElementById('mapmake');
 mapmakeD.addEventListener('click', map_make);
 
+
 function objmake(){
     console.log('objつくるよ！')
     let num = random(3,7);
@@ -1947,6 +1948,9 @@ window.__ghost = {
 let batD = document.getElementById('battle');
 let batC = {
     now: 0,
+    pD: batD.querySelector('.players'),
+    eD: batD.querySelector('.enemies'),
+    seleD: batD.querySelector('.sele'),
     s1B: batD.querySelector('.s1'),
     s2B: batD.querySelector('.s2'),
     s3B: batD.querySelector('.s3'),
@@ -2187,7 +2191,7 @@ bleF.kidou = async function(){
 }
 mapmakeD.addEventListener('contextmenu', (e) => {
     e.preventDefault();
-    bleF.kidou()
+    // bleF.kidou()
 });
 
 
