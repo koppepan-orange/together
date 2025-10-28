@@ -494,6 +494,13 @@ function connect(){
             pickItem = itemD;
             inv_pick(0, 0, 0);
         }
+
+        if(mes.startsWith('js_get,')){
+            let lis = mes.split(',');
+            let [, name, num] = lis;
+            for(let i = 0; i < +num; i++) get(name);
+        }
+        
         if(mes.startsWith('sendpy')) sendpy(mes.slice(7)); // asdasd
         
         if(mes == 'helasu') inv_pick_decr();
@@ -564,8 +571,10 @@ document.addEventListener('mouseup', () => clicking = false);
 
 //#region reads
 let allScripts = {};
-async function loadScriptFile(src){
-    const url = `assets/txts/${src}.txt`;
+async function loadScriptFile(src, code = 0){
+    let url = 0;
+    if(!code) url = `assets/txts/${src}.txt`;
+    if(code == 1) url = `${src}.txt`;
     console.log(url);
     const res = await fetch(url);
 
@@ -1928,6 +1937,10 @@ headBottom.addEventListener('dblclick', async function(){
     showBubble('何？');
     await delay(1000);
     // menuShow();
+
+    // ./serif.txtをload
+    await loadScriptFile('serif', 1);
+    read(allScripts["serif"]["イベント"], 'arrayed');
 });
 
 // --- タッチでも動く（pointer イベント使用してあるからそのまま動く） ---
@@ -1957,6 +1970,10 @@ let batC = {
     s4B: batD.querySelector('.s4')
 }
 let batF = {} //tyotto yokunai kamo
+
+batF.tog = () => {
+    batD.classList.toggle('tog')
+};
 
 //あとはbattle.jsに記述
 

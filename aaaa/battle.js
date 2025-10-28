@@ -44,20 +44,20 @@ function tekiou(){
         }
 
 
-        console.log(`${cam}${human.me}`)
-        console.log(human)
-        console.log(hd)
+        // console.log(`${cam}${human.me}`)
+        // console.log(human)
+        // console.log(hd)
 
         div.querySelector('.name').textContent = human.name;
         div.querySelector('.lv').textContent = `Lv.${human.lv}`;
         div.querySelector('.img').src = `assets/images/charas/${hd.img}.png`;
         div.querySelector('.skill .liquid').style.height = `${human.ep/human.maxep*100}%`;
 
-        let hpZ = div.querySelector('.hpZ');
+        let hpZ = div.querySelector('.hp');
         hpZ.querySelector('.text').textContent = `${human.hp}/${human.maxhp}`;
         hpZ.querySelector('.bar .inner').style.width = `${human.hp/human.maxhp*100}%`;
 
-        let mpZ = div.querySelector('.mpZ');
+        let mpZ = div.querySelector('.mp');
         mpZ.querySelector('.text').textContent = `${human.mp}/${human.maxmp}`;
         mpZ.querySelector('.bar .inner').style.width = `${human.mp/human.maxmp*100}%`;
     }   
@@ -101,7 +101,7 @@ function makeHuman(cam, me){
     waku.appendChild(plate);
 
     let hpZ = document.createElement('div');
-    hpZ.className = 'hp';
+    hpZ.className = 'hp status';
     
     let hpt = document.createElement('div');
     hpt.className = 'text';
@@ -116,13 +116,16 @@ function makeHuman(cam, me){
     waku.appendChild(hpZ);
     
     let mpZ = document.createElement('div');
-    mpZ.className = 'mp';
+    mpZ.className = 'mp status';
     
     let mpt = document.createElement('div');
     mpt.className = 'text';
     mpZ.appendChild(mpt);
     let mpb = document.createElement('div');
     mpb.className = 'bar';
+     let mpbi = document.createElement('div');
+     mpbi.className = 'inner';
+     mpb.appendChild(mpbi);
     mpZ.appendChild(mpb);
 
     waku.appendChild(mpZ);
@@ -196,6 +199,7 @@ function makePlayer(code, id){
     p.mp = p.maxmp;
     p.ep = 0;
 
+    p.status = 1;
     p.cam = 'players';
     p.me = humans.filter(a => a.cam == 'players').length;
     p.id  = id;
@@ -208,6 +212,23 @@ function makePlayer(code, id){
     p.magic = p.magic??[{name:'heal'},{name:'power'},{name:'shell'}];
     p.tool = p.tool??['aspirin','throw knife','redcard'];
 
+    p.buffs = [];
+    p.attr = [];
+
+    if(!code){
+        p.ex = pd.ex;
+        p.ns = pd.ns;
+        p.ps = pd.ps;
+        p.ts = pd.ts;
+    }
+    else{
+        p.e = pd.e;
+        p.s = pd.s;
+        p.n = pd.p;
+        p.p = pd.p;
+        p.t = pd.t;
+    }
+
     Style.button.solid = pd.buttonsolid;
     Style.button.back = pd.buttonback;
     Style.tekiou();
@@ -219,21 +240,12 @@ function makePlayer(code, id){
 }
 
 function makeEnemy(){
-    let e = { //うつわ
-        maxhp: eneBas.maxhp,
-        atk: eneBas.atk,
-        def: eneBas.def,
-        matk: eneBas.matk,
-        mdef: eneBas.mdef,
-        maxmp: eneBas.maxmp,
-        crl: eneBas.crl,
-        crr: eneBas.crr,
-        crd: eneBas.crd,
-        spd: eneBas.spd,
-    };
+    let e = {} //うつわ
+    let statuses = Object.keys(eneBas);
+    statuses.forEach(statu => e[statu] = eneBas[statu]);
 
     let ed = arraySelect(Enemies);
-    let statuses = Object.keys(e);
+    console.log(ed)
     statuses.forEach(statu => {
         if(ed[statu].startsWith('+') || ed[statu].startsWith('-')){
             let num = +(ed[statu].slice(1));
@@ -248,7 +260,9 @@ function makeEnemy(){
 
     e.hp = e.maxhp;
     e.mp = e.maxmp;
+    e.ep = 0;
 
+    e.status = 1;
     e.name = ed.name;
     e.cam = 'enemies';
     e.me = humans.filter(a => a.cam == 'enemies').length;
@@ -264,6 +278,8 @@ function makeEnemy(){
     let div = makeHuman('enemies', e.me);
     batC.eD.appendChild(div);
 
+    console.log(e)
+
     return e;
 }
 //#endregion
@@ -275,7 +291,10 @@ async function encount(){
     for(let i = 0; i < enemiesen; i++){
         let e = makeEnemy();
         humans.push(e);
+        console.log(cm('enemies', i))
     }
+
+    batF.tog();
 
     let iran = ['うわっ！', '嗚呼、'];
     let iran2= ['きた！なんだって～？！', '来たり']
@@ -363,6 +382,7 @@ async function nextTurn(who = 0){
     let tcam = bar.cam[acted]
     let tme = bar.me[acted]
     are = cm(tcam, tme);
+    console.log(are)
 
     let dots = {}; //DamegeOverTimeのdot
     for(let buff of are.buffs){
@@ -442,7 +462,7 @@ async function playerturn(who = 0){
     jump:{
         if(!who) break jump;
         let nss = Skills.filter(a => a.type == 'ns');
-        let datans = nss.find(a => a.id == who.ns.id);
+        let datans = nss.find(a => a.id == who.ns);
         if(who.ns.process != undefined && (turncount % datans.cool) == 0){
             await data.process(who);
             await delay(1000)
@@ -469,9 +489,9 @@ batC.s1B.addEventListener('click', async function(){
     switch(phase){
         case 1:
             phase = 2;
-            batC.s1B.textContent = who.slash[1].name;
-            batC.s2B.textContent = who.slash[2].name;
-            batC.s3B.textContent = who.slash[3].name;
+            batC.s1B.textContent = who.slash[0].name;
+            batC.s2B.textContent = who.slash[1].name;
+            batC.s3B.textContent = who.slash[2].name;
             batC.s4B.textContent = 'back';
             break;
         case 2:
@@ -491,9 +511,9 @@ batC.s2B.addEventListener('click', async function(){
     switch(phase){
         case 1:
             phase = 3;
-            batC.s1B.textContent = who.magic[1].name;
-            batC.s2B.textContent = who.magic[2].name;
-            batC.s3B.textContent = who.magic[3].name;
+            batC.s1B.textContent = who.magic[0].name;
+            batC.s2B.textContent = who.magic[1].name;
+            batC.s3B.textContent = who.magic[2].name;
             batC.s4B.textContent = 'back';
             break;
         case 2:
@@ -513,9 +533,9 @@ batC.s3B.addEventListener('click', async function(){
     switch(phase){
         case 1:
             phase = 4;
-            batC.s1B.textContent = who.tool[1].name;
-            batC.s2B.textContent = who.tool[2].name;
-            batC.s3B.textContent = who.tool[3].name;
+            batC.s1B.textContent = who.tool[0].name;
+            batC.s2B.textContent = who.tool[1].name;
+            batC.s3B.textContent = who.tool[2].name;
             batC.s4B.textContent = 'back';
             break;
         case 2:
@@ -562,38 +582,46 @@ async function dassyutsu(){
     await addtext('うまく逃げ切れた！');
 }
 
-function LetsTargetSelect(one){
-    let code = one??1; //1:通常(1人) 2:選んだところと左右 3:選んだ陣営全体
+function LetsTargetSelect(code = 1){
+    //1:通常(1人) 2:選んだところと左右 3:選んだところと左右2人ずつ 4:選んだ陣営全員 5:全員
     return new Promise((resolve) => {
         let color = '#fff450';
-        let pcolor = '#f7f7f7';
+        let pcolor= '#f7f7f7';
 
         let arrs = [
-            ...humans.filter(a => a.cam == 'players').map(a => `players${a.me}`), 
+            ...humans.filter(a => a.cam == 'players').map(a => `players${a.me}`),
             ...humans.filter(a => a.cam == 'enemies').map(a => `enemies${a.me}`),
         ];
 
         let target = [];
         function handleClick(event) {
             let div = event.target;
-            if(div && !arrs.includes(`${div.className}`)) div = div.parentElement;
+            let tcam = div.className.substring(0, 7);
+            let tme = +div.className.substring(7);
+
+            if(div && !arrs.includes(`${tcam}${tme}`)) div = div.parentElement;
             if(!div) return;
 
-            let tcam = div.dataset.cam;
-            let tme = +(div.dataset.me);
+            console.log(div)
+
+            console.log(tcam, tme)
 
             arrs.forEach(a => {
-                let div0 = batC[a.substring(0, 7)];
+                console.log(a)
+                let div0 = batC[`${a.substring(0, 1)}D`];
+                console.log(div0)
                 let div = div0.querySelector(`.${a}`);
                 
                 div.removeEventListener('click', handleClick);
-                div.classList.remove('sele')
+                div.classList.remove('sl')
             });
 
             target = [
                 tme,
                 tcam
             ]
+
+            console.log(target);
 
             if(code == 2){ //拡散-3
                 let zin = humans.filter(a => a.cam == tcam && a.status);
@@ -656,11 +684,13 @@ function LetsTargetSelect(one){
                 ];
             }
 
+            console.log(target);
+
             let cs = target[1];
              if(typeof cs == 'string') cs = [cs]
             let ns = target[0];
              if(typeof ns == 'string' || typeof ns == 'number') ns = [ns]
-            // console.log(cs, ns)
+            console.log(cs, ns)
             let whoes = [];
             for(let i = 0; i < cs.length; i++){
                 let c = cs[i];
@@ -679,12 +709,10 @@ function LetsTargetSelect(one){
         arrs.forEach(a => {
             let div = document.querySelector(`.${a}`);
             div.addEventListener('click', handleClick);
-            div.classList.add('sele')
+            div.classList.add('sl')
         });
     });
 }
- 
-
 
 //#endregion
 //#region ピのざんげき
@@ -922,13 +950,12 @@ function enemySelectAction(who){
 function ShallTargetSelect(who, code, both = 0) {
     console.log(`ShallTarget!!! ${code}(both:${both})`)
     console.log(`code:: ${code}`)
-    const side = code[0] === 'p' ? 'players' : 'enemies';
-    console.log(`>> ${code}`);
+    const side = code[0] == 'p' ? 'players' : 'enemies';
+    console.log(`>> ${side}`);
     const stat = code.includes('hp') ? 'hp' : code.includes('atk') ? 'atk' : 'def';
-    console.log(`>> ${code}`);
+    console.log(`>> ${stat}`);
     const mode = code.endsWith('l') ? 'low' : code.endsWith('h') ? 'high' : 'random';
-    console.log(`>> ${code}`);
-    console.log(side, stat, mode);
+    console.log(`>> ${mode}`);
 
     const list = cm(side).filter(c => c.status).sort((a, b) => a[stat] - b[stat]);
     console.log(list);
@@ -987,9 +1014,11 @@ function isCrit(crl, crr = 0){
     return 0;
 }
 
-async function damage(who, ares, val, props = []){
+async function damage(who, ares, val, type0, props = []){
     let hasp = (name) => {return props.includes(name)}
     if(!Array.isArray(ares)) ares = [ares];
+
+    console.log(who, ares, val, type0, props);
 
     if(val.endsWith('%')){
         let key = props.find(a => a.startsWith("%!"));
@@ -1006,6 +1035,7 @@ async function damage(who, ares, val, props = []){
         let defer = {...are}
         let W = {
             atk:0,
+            matk:0,
             pow:0,
             crl:0,
             crd:0,
@@ -1014,6 +1044,7 @@ async function damage(who, ares, val, props = []){
         let Wk = Object.keys(W);
         let A = {
             def:0,
+            mdef:0,
             she:0,
             cut:0,
             crr:0,
@@ -1051,17 +1082,21 @@ async function damage(who, ares, val, props = []){
             if(prop.startsWith('ig!')) defer[prop.substring(3)] = 0;
             if(prop == 'fixed') atker.power = 1;
         }
+
+        let type, type2;
+        if(type0 == 'sh') type = 'atk', type2 = 'def';
+        if(type0 == 'mg') type = 'matk', type2 = 'mdef';
         
         //計算
         let wep = atker.weapon;
         let weped = Weapons.find(a => a.id == wep.id);
         // (攻撃力+武器攻撃力) * 攻撃倍率
-        let dmg = ((atker.atk+weped.atk)*(atker.power))
+        let dmg = ((atker[type]+weped.atk)*(atker.power))
         
         let shi = defer.shield;
         let shied = Shields.find(a => a.id == shi.id);
         // (防御力+盾防御力) * 防御倍率 + ダメージカット
-        let rer = ((defer.def+shied.def)*(defer.shell)) + defer.cut;
+        let rer = ((defer[type2]+shied.def)*(defer.shell)) + defer.cut;
         
         //crit
         let is = isCrit((atker.crl + weped.crl), (defer.crr + shied.crr));
@@ -1313,8 +1348,6 @@ async function finale(cam){
     nicoText(`${cam}の勝ち`)
 }
 //#endregion
-
-
 
 mapmakeD.addEventListener('click', sele);
 mapmakeD.addEventListener('contextmenu', encount);

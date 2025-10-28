@@ -4,6 +4,7 @@ y=100
 size = 400
 root=tk.Tk()
 root.geometry("2000x2000+0+0")
+root.overrideredirect(True)
 root.attributes("-toolwindow",True)
 root.attributes("-topmost", True) #囧 mostopにしてぇ～～～～
 root.resizable(False, False)
@@ -28,6 +29,7 @@ def c(e):
     root2.focus_force()
     root.geometry(f"{root.winfo_screenwidth()}x{root.winfo_screenheight()}+{0}+{0}")
     root2.attributes("-topmost", True)
+    root2.overrideredirect(True)
     root2.geometry(f"{200}x{200}+{root.winfo_screenwidth()-100}+{-100}")
 
 def d(e):

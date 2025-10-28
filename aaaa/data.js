@@ -517,6 +517,7 @@ let Charas = [
         ex:'null',
         ns:'null',
         ps:'null',
+        ts:[],
         atk:20,
         def:0,  
         matk:10,
@@ -541,6 +542,7 @@ let Charas = [
         ex:'null',
         ns:'null',
         ps:'null',
+        ts:[],
         atk:20,
         def:0,
         matk:10,
@@ -565,6 +567,7 @@ let Charas = [
         ex:'placeturret',
         ns:'throwwrench',
         ps:'solplaceturret',
+        ts:[],
         atk:25,
         def:0,
         matk:20,
@@ -589,6 +592,7 @@ let Charas = [
         ex:'trickyvaiavles',
         ns:'gambler',
         ps:'highsol',
+        ts:[],
         atk:20,
         def:0,
         matk:10,
@@ -613,6 +617,7 @@ let Charas = [
         ex:'lightningstorm',
         ns:'elecbarrier',
         ps:'elecshock',
+        ts:[],
         atk:10,
         def:0,
         matk:30,
@@ -2398,7 +2403,8 @@ let Enemies = [
         crl:'=absolute',
         crd:'=0',
         crr:'=absolute',
-        spd:'40',
+        spd:'=40',
+        maxep:'0',
         acts:[
             {
                 name:'粘液飛ばし',
@@ -2438,7 +2444,8 @@ let Enemies = [
         crl:'+30',
         crd:'+0.5',
         crr:'+0',
-        spd:'75',
+        spd:'=75',
+        maxep:'0',
         acts:[
             {
                 name:'体当たり',
@@ -2478,7 +2485,8 @@ let Enemies = [
         crl:'+0',
         crd:'+0',
         crr:'+0',
-        spd:'60',
+        spd:'=60',
+        maxep:'0',
         acts:[
             {
                 name:'消滅',
@@ -2534,7 +2542,8 @@ let Enemies = [
         crl:'+0',
         crd:'+0.5',
         crr:'+10',
-        spd:'50',
+        spd:'=50',
+        maxep:'0',
         acts:[
             {
                 name:'しびれごな',
@@ -2586,7 +2595,8 @@ let Enemies = [
         crl:'+0',
         crd:'+0.5',
         crr:'+10',
-        spd:'50',
+        spd:'=50',
+        maxep:'0',
         acts:[
             {
                 name:'急襲',
@@ -2595,12 +2605,19 @@ let Enemies = [
                 num:3,
                 process:async function(who){
                     let are = ShallTargetSelect(who,'pdefl');
-                    let res = await qte(1000,['a','d']); //0が失敗, 1が成功
+
+                    let res;
+                    /*
+                    res = await qte(1000,['a','d']); //0が失敗, 1が成功
                     switch(res){
                         case 0:
                             
                     }
                     return 0;
+                    */
+
+                    res = await damage(who, are, 100, 'sh');
+                    return res;
                 }
             },
         ]

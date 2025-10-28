@@ -560,7 +560,7 @@ textarea{
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    width: 450%;
+    width: 450px;
     height: 80%;
     padding: 20px 5px;
     background: linear-gradient(to top, #391d00fc 0%, #391d00fc 60%, #4f2c07fc 100%);
@@ -1014,12 +1014,20 @@ textarea{
 
 
 #battle{
+    display: block;
+    width: fit-content;
+    height: fit-content;
+    padding: 15px 20px;
+    border-radius: 20px 0 0 20px;
+    background: #cecece;
     position: fixed;
-    top: 40%;
+    top: 30%;
+    right: -400px;
+    transition: right 0.5s ease;
+    z-index: 5;
+}
+#battle.tog{
     right: 0;
-    width: 400px;
-    height: 50%;
-    /* clip-path: polygon(); */
 }
 #battle .sele{
     display: flex;
@@ -1034,7 +1042,7 @@ textarea{
     right: -200px;
     transition: right 0.5s ease;
     transform: translateY(-50%);
-    z-index: 5;
+    z-index: inherit;
 }
 #battle .sele.tog{
     right: 0;
@@ -1064,18 +1072,110 @@ textarea{
     z-index: inherit;
 }
 
+/* #battle .column . */
+
+#battle .enemies, #battle .players{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+    height: fit-content;
+}
+
 #battle .human{
-    width: 100px;
+    width: 150px;
     aspect-ratio: 1/1;
+    position: relative;
 }
 #battle .human .img{
     width: 60%;
     aspect-ratio: 1/1;
+    position: absolute;
+    right: 0;
     opacity: 0.95;
     object-fit: cover;
     clip-path: polygon(0% 0%, 100% 0%, 100% 60%, 0% 60%);
+    pointer-events: none;
+}
+#battle .human .waku{
+    width: 98%;
+    height: fit-content;
+    background: #fefefe;
+    padding: 5px;
+    border: 2px solid #010101;
+    border-radius: 10px;
+    position: absolute;
+    top: calc(60% * 0.6);
+    pointer-events: none;
+}
+#battle .human .plate{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 2px;
+    position: relative;
+    pointer-events: none;
+}
+#battle .human .plate .name{
+    font-size: 20px;
+}
+#battle .human .plate .lv{
+    font-size: 18px;
+    margin-right: 10px;
+}
+#battle .human .skill{
+    width: 25%;
+    aspect-ratio: 1/1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
 }
 #battle .human .skill .back{
     width: 100%;
     height: 100%;
+    pointer-events: none;
+}
+#battle .human .waku .status{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    height: fit-content;
+    padding: 3px;
+    box-sizing: border-box;
+    pointer-events: none;
+}
+#battle .human .waku .status .text{
+    font-size: 10px;
+}
+#battle .human .waku .status .bar{
+    width: 100%;
+    height: 10px;
+    background: #888888b9;
+    position: relative;
+    box-sizing: border-box;
+}
+#battle .human .waku .status .bar .inner{
+    height: 96%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+#battle .human .waku .hp .bar .inner{
+    background: #ff8080;
+}
+#battle .human .waku .mp .bar .inner{
+    background: #8080ff;
+}
+
+#battle .button{
+    height: 30px;
+    background: var(--button-back);
+    border: 2px solid var(--button-solid);
 }
