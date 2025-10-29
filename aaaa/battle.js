@@ -22,9 +22,10 @@ function cm(cam = '指定なし', me = '指定なし'){
     let who = 0;
     if(cam == '指定なし') cam = 'players';
 
-    if(me != '指定なし') who = humans.find(a => a.cam == cam && a.me == me);
+    if(me != '指定なし') who = humans.find(a => a.cam == cam && a.me == me)[0];
     else who = humans.filter(a => a.cam == cam);
     
+
     return who;
 }
 
@@ -214,6 +215,9 @@ function makePlayer(code, id){
 
     p.buffs = [];
     p.attr = [];
+    
+    p.weapon = 'none';
+    p.shield = 'none';
 
     if(!code){
         p.ex = pd.ex;
@@ -272,8 +276,8 @@ function makeEnemy(){
     e.buffs = [];
     e.lasts = [];
 
-    e.weapon = {id: ed.weapon??'fist'};
-    e.shield = {id: ed.shield??'none'};
+    e.weapon = ed.shield ?? 'none';
+    e.shield = ed.shield ?? 'none';
 
     let div = makeHuman('enemies', e.me);
     batC.eD.appendChild(div);
@@ -596,8 +600,11 @@ function LetsTargetSelect(code = 1){
         let target = [];
         function handleClick(event) {
             let div = event.target;
-            let tcam = div.className.substring(0, 7);
-            let tme = +div.className.substring(7);
+
+            let lis = div.classList;
+
+            let tcam = lis[1].substring(0, 7);
+            let tme = +lis[1].substring(7);
 
             if(div && !arrs.includes(`${tcam}${tme}`)) div = div.parentElement;
             if(!div) return;
@@ -1020,7 +1027,7 @@ async function damage(who, ares, val, type0, props = []){
 
     console.log(who, ares, val, type0, props);
 
-    if(val.endsWith('%')){
+    if(typeof val == 'string' && val.endsWith('%')){
         let key = props.find(a => a.startsWith("%!"));
         if(key) key = key.substring(2);
         else key = "hp";
@@ -1053,27 +1060,28 @@ async function damage(who, ares, val, type0, props = []){
         let Ak = Object.keys(A);
         
         
-        // [entity, keysArray, targetObj]
+        // [human, keysArray, targetObj]
         const hyous = [
             [who, Wk, atker],
             [are, Ak, defer]
         ];
         
         for (let i = 0; i < hyous.length; i++) {
-            const [entity, keys, target] = hyous[i];
-            for(let buff of entity.buffs){
-                const buffk = Object.keys(buff.effects);
+            const [human, keys, target] = hyous[i];
+            console.log(human, keys, target);
+            for(let buff of human.buffs){
+                let buffk = Object.keys(buff.value);
                 for(let k of keys){
                     if(!buffk.includes(k)) continue;
                     
-                    const v = buff.effects[k];
+                    let v = buff.value[k];
                     if(typeof v !== 'string') continue; // 安全策
                     
                     if(v.startsWith('+') || v.startsWith('-')) target[k] = (target[k] ?? 0) + +v.substring(1);
                     if(v.startsWith('=')){
                         target[k] = +v.substring(1);
                         break; // 元コードと同じ挙動
-                    }
+                    }buffadd()
                 }
             }
         }
@@ -1089,12 +1097,12 @@ async function damage(who, ares, val, type0, props = []){
         
         //計算
         let wep = atker.weapon;
-        let weped = Weapons.find(a => a.id == wep.id);
+        let weped = Equips['weapon'].find(a => a.id == wep);
         // (攻撃力+武器攻撃力) * 攻撃倍率
-        let dmg = ((atker[type]+weped.atk)*(atker.power))
+        let dmg = ((atker[type]+weped.atk) * (atker.power));
         
         let shi = defer.shield;
-        let shied = Shields.find(a => a.id == shi.id);
+        let shied = Equips['shield'].find(a => a.id == shi);
         // (防御力+盾防御力) * 防御倍率 + ダメージカット
         let rer = ((defer[type2]+shied.def)*(defer.shell)) + defer.cut;
         

@@ -100,12 +100,6 @@ async def endrole():
     
     
     
-    
-    
-    
-    
-    
-    
     r[1].after(10,endrolemovey,r[1])
     r[0].after(10,endrolemovey,r[0])
     r[2].after(2000,endrolemovey,r[2])

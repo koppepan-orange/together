@@ -1110,6 +1110,9 @@ textarea{
     top: calc(60% * 0.6);
     pointer-events: none;
 }
+#battle .human.sl .waku{
+    background: #fff56c;
+}
 #battle .human .plate{
     display: flex;
     flex-direction: row;
