@@ -20,10 +20,15 @@ let eneBas = {
 
 function cm(cam = '指定なし', me = '指定なし'){
     let who = 0;
-    if(cam == '指定なし') cam = 'players';
+    if(cam == '指定なし' && me == '指定なし') return humans.find(a => a.cam == 'players' && a.me == 0);
+    
+    if(me == '指定なし') return humans.filter(a => a.cam == cam);
 
-    if(me != '指定なし') who = humans.find(a => a.cam == cam && a.me == me)[0];
-    else who = humans.filter(a => a.cam == cam);
+    who = humans.find(a => a.cam == cam && a.me == me);
+    if(Array.isArray(who)){
+        console.log('↓findなのにarrayになってるバカがこいつですwww')
+        console.log(who)
+    }
     
 
     return who;
