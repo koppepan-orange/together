@@ -1758,11 +1758,10 @@ async function gomove(id, fyx, fyy){
     }
 
     canC.draw();
-    nicoText('移動完了ed')
+    nicoText('移動完了ed');
+    ob.moving = 0;
 
     if(ob.name =='player') pmoved();
-
-    ob.moving = 0;
 }
 async function pmoved(){
     let ob = canC.objs[0];
@@ -1797,8 +1796,11 @@ async function pmoved(){
         
         canC.draw();
 
-        if(name == 'enemy') return encount();
+        if(name == 'enemy') encount();
     }
+
+    await delay(50)
+    canC.draw()
 }
 
 canV.addEventListener('click', e => {

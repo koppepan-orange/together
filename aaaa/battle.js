@@ -1146,11 +1146,14 @@ async function damage(who, ares, val, type0, props = []){
         if(is) dmg *= (atker.crd + weped.crd);
 
         //実装
-        let damage = Math.floor(dmg - rer);
-        if(damage < 0) damage = 0;
-        if(damage > are.hp) damage = are.hp;
-        are.hp -= damage;
-        addlog(`(${turn}) [${who.cam}]${who.name} ==> [${are.cam}]${are.name} (${damage}ダメージ)`);
+        let dmg2 = Math.floor(dmg - rer);
+        if(dmg2 < 0) dmg2 = 0;
+        if(dmg2 > are.hp) dmg2 = are.hp;
+        are.hp -= dmg2;
+        tekiou();
+        addlog(`(${turn}) [${who.cam}]${who.name} ==> [${are.cam}]${are.name} (${dmg2}ダメージ)`);
+        
+        await delay(1000)
 
         if(are.hp < 0) are.hp = 0;
         if(are.hp == 0 && hasp('mine')) are.hp = 1;
@@ -1194,7 +1197,7 @@ async function heal(who, ares, val, props = []){
 
 //#region じょーたいいじょ〜
 async function buffadd(who, ares, buff, time, val){ //誰のバフ/デバフか,バフ/デバフの名前,効果時間,効果量
-    // console.log(`buffadd:: ${buff}, ${kind}, ${time}, ${val}`);
+    console.log(`buffadd:: ${buff}, ${kind}, ${time}, ${val}`);
     let newbuff = buffMold(buff, time, val);
     let data = Buffs.find(e => e.name == buff);
 
