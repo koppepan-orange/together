@@ -1079,7 +1079,7 @@ textarea{
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 5px;
+    gap: 10px;
     width: 100%;
     height: fit-content;
 }
@@ -1163,9 +1163,10 @@ textarea{
     background: #888888b9;
     position: relative;
     box-sizing: border-box;
+    clip-path: polygon(0% 0%, 100% 0%, 97.5% 100%, 0% 100%)
 }
 #battle .human .waku .status .bar .inner{
-    height: 96%;
+    height: 100%;
     position: absolute;
     top: 0;
     left: 0;
@@ -1178,7 +1179,11 @@ textarea{
 }
 
 #battle .button{
+    margin-top: 5px;
     height: 30px;
     background: var(--button-back);
     border: 2px solid var(--button-solid);
+}
+#battle .button.ed{
+    background: var(--button-aima);
 }

@@ -2,6 +2,7 @@ let Style = {
     button: {
         solid: '#000000',
         back: '#ffffff',
+        aima: '#888888'
     },
     text: {
         main: '#222222',
@@ -323,6 +324,14 @@ let Objects = [
             {name:'larimar', p:25, amo:[2,4]},
         ]
     },
+
+    {
+        name:'enemy',
+        appe:0,
+        dest:1,
+        desc:'敵である',
+        sozai:[]
+    }
 ]
 
 let Rooms = [
@@ -568,7 +577,7 @@ let Charas = [
         ns:'throwwrench',
         ps:'solplaceturret',
         ts:[],
-        atk:25,
+        atk:1000,
         def:0,
         matk:20,
         mdef:20,
@@ -636,21 +645,21 @@ let Charas = [
 
 let Buffs = [
     { //if value < 0, それはデバフ扱い
-        name:'power', //keyと同じものを
+        name:'pow', //keyと同じものを
         jpnm:'攻撃倍率',
         type:'buff', // buff/debuff/handle/unique
         mode:'free', // turn/stack/actは付与時に決定。kindはfixe（Lv依存で値決定）かfree（付与時の引数で値決定）を定める用に。 poison/deadpoisonはfixe、burnもfixe。cheerupはfixe。atkup等能力値上昇系はfree。
                                  // if(data.kind??'fixed')ってすべきかも。あんまないと思うけど
-        agemono:'power',
+        agemono:'pow',
          //turn/actならばvalueが等しいならtimeを増加新を削除、等しくないならば新しいものを追加。stackならばtimeがvalueだからかどうかあがいても加算。同盟が増えるこたぁない。
         description:'攻撃倍率が上がる。やったね！',
     },
     {
-        name:'shell',
+        name:'she',
         jpnm:'防御倍率',
         type:'buff',
         mode:'free',
-        agemono:'shell',
+        agemono:'she',
         description:'防御倍率が上がる。あんまり実感しづらい。',
     },
     {
@@ -685,12 +694,12 @@ let Buffs = [
         description:'応援されている状態。攻撃力と速度が上がり会心率が下がる。\nちょっと緊張しちゃうよね、わかる',
         lvs:[
             {
-                power:'+1.0',
+                pow:'+1.0',
                 spd:'+20.0',
                 crl:'-5.0'
             },
             {
-                power: '+1.5',
+                pow: '+1.5',
                 spd: '+25.0',
                 crl: '+-6.5'
             }
@@ -1118,7 +1127,7 @@ let Slashs = [
                             log.textContent = 'miss! ダメージを与えられない!';
                             await delay(1000);
                     }else{
-                            humans[cam][me].hp -= (humans[cam][me].atk + humans[cam][me].weapon.power);
+                            humans[cam][me].hp -= (humans[cam][me].atk + humans[cam][me].weapon.pow);
                             if(humans[cam][me].hp <= 0){humans[cam][me].hp = 1;};
                             tekiou();
                             log.textContent = humans[cam][me].name+'は混乱して自分を殴った！';
@@ -1153,8 +1162,8 @@ let Magics = [
         lv:1,
         process:async function(who, are){
                 await addtext(`${who.name}はpowerを唱えた！`)
-                await buffadd(who, are,'power','turn',3,1);
-                await letsElseed(are, who, 'magic', 'power'); //読み方はワザップです
+                await buffadd(who, are,'pow','turn',3,1);
+                await letsElseed(are, who, 'magic', 'pow'); //読み方はワザップです
                 //soldatoのシステム応用しつつで
                 return 0;
         }
@@ -1162,12 +1171,12 @@ let Magics = [
     {
         id:'shell',
         name:'shell',
-        description:'防御力が1.25倍になります！\n実感あんまりないけど..',
+        description:'防御力が1.25倍になります！\n実感あんまりないけど',
         mp:5,
         lv:1,
         process:async function(who, are){
                 await addtext(`${who.name}はshellを唱えた!`);
-                await buffadd(who, are,'shell','turn',3,1);
+                await buffadd(who, are,'she','turn',3,1);
                 // await letsElseed(tcam, target, cam, me, 'magic', 'shell'); 
                 return 0;
         }
@@ -1254,7 +1263,7 @@ let Magics = [
         mp:8,
         lv:9,
         process:async function(who, are){
-                await buffadd(who, are,'power','turn' ,3,2)
+                await buffadd(who, are,'pow','turn' ,3,2)
                 return 0
         }
     },
@@ -1265,7 +1274,7 @@ let Magics = [
         mp:8,
         lv:9,
         process:async function(who, are){
-                await buffadd(who, are, 'shellup','turn' ,3,2)
+                await buffadd(who, are, 'she','turn' ,3,2)
                 return 0
         }
     },
@@ -1372,6 +1381,8 @@ let Equips = {
             num:0, //このnumはいらんとおもう、hasEquip( [] )で管理するし
             atk:0,
             matk:0,
+            crl:0,
+            crd:0,
             price:0,
             description:'ないです。素手とか念とか自由に解釈しておk',
             buyable:0,
@@ -1384,6 +1395,8 @@ let Equips = {
             num:0,
             atk:2,
             matk:0,
+            crl:0,
+            crd:0,
             price:10,
             description:'初期装備あるあるの武器。値段に見合わず割と強い',
             buyable:1,//購入可能かどうか
@@ -1397,6 +1410,8 @@ let Equips = {
             num:0,
             atk:4,
             matk:0,
+            crl:0,
+            crd:0,
             price:20,
             description:'木の棒よりも強い。言うなれば気の剣。',
             buyable:1,
@@ -1409,6 +1424,8 @@ let Equips = {
             num:0,
             atk:6,
             matk:0,
+            crl:0,
+            crd:0,
             price:30,
             description:'さあ、剣道しようぜ！！',
             buyable:1,
@@ -1421,6 +1438,8 @@ let Equips = {
             num:0,
             atk:8,
             matk:0,
+            crl:0,
+            crd:0,
             price:50,
             description:'石です。よわよわ',
             buyable:1,
@@ -1433,6 +1452,8 @@ let Equips = {
             num:0,
             atk:10,
             matk:0,
+            crl:0,
+            crd:0,
             price:80,
             description:'岩です。つよつよ',
             buyable:1,
@@ -1445,6 +1466,8 @@ let Equips = {
             num:0,
             atk:12,
             matk:0,
+            crl:0,
+            crd:0,
             price:100,
             description:'岩にセメントつけたら強くなるのって意味わからなくね？',
             buyable:1,
@@ -1457,6 +1480,8 @@ let Equips = {
             num:0,
             atk:20,
             matk:0,
+            crl:0,
+            crd:0,
             price:5,
             description:'薄い紙です。すって相手に切り付けて｢いたっ..｣ってさせる用です',
             buyable:1,
@@ -1472,6 +1497,8 @@ let Equips = {
             num:0,
             atk:'calc,Math.floor(Math.random()*13)+1',
             matk:0,
+            crl:0,
+            crd:0,
             price:7,
             description:'ちょっとした運要素。攻撃方法は切り付けなので弱い',
             buyable:1,
@@ -1484,6 +1511,8 @@ let Equips = {
             num:0,
             atk:25,
             matk:0,
+            crl:0,
+            crd:0,
             price:200,
             description:'持って｢近づいたら*すよ..?｣っていう用。実際*せない',
             buyable:1,
@@ -1499,6 +1528,8 @@ let Equips = {
             num:0,
             atk:40,
             matk:0,
+            crl:0,
+            crd:0,
             price:300,
             description:'つよつよ武器。\n花や骨に向かって振り回しましょう',
             buyable:1,
@@ -1515,6 +1546,8 @@ let Equips = {
             num:0,
             atk:0,
             matk:0,
+            crl:0,
+            crd:0,
             price:150,
             description:'名前意味わからんランキング第1位。\n攻撃時相手の体力を吸い回復する。\n変換効率は80%..水力発電と同じくらい',
             buyable:0,
@@ -1536,6 +1569,8 @@ let Equips = {
             num:0,
             atk:10,
             matk:0,
+            crl:0,
+            crd:0,
             price:150,
             description:'ナギサ様の手好き',
             buyable:0,
@@ -1544,7 +1579,7 @@ let Equips = {
                     addtext(arraySelect(['トリニティの砲撃術は優秀ですから。','お口に合うと良いのですが..']));
                     let result = await damage(cam,me,are,0.4,kind,['unpursuit']);
                     if(result) return 1;
-                    await buffadd(who, are,'shelldown','turn',3,1);
+                    await buffadd(who, are,'she','turn',3,1);
                     return 0;
             },
             ce:0,
@@ -1555,6 +1590,8 @@ let Equips = {
             num:0,
             atk:'calc,Math.floor(Math.random()*100)+1',
             matk:0,
+            crl:0,
+            crd:0,
             price:150,
             description:'大勝負..ってやつ？まじで賭け。がんばえ',
             buyable:1,
@@ -1567,6 +1604,8 @@ let Equips = {
             num:0,
             atk:80,
             matk:0,
+            crl:0,
+            crd:0,
             price:150,
             description:'名前変更予定。',
             buyable:0,
@@ -1584,6 +1623,7 @@ let Equips = {
             num:0,
             def:0,
             mdef:0,
+            crr:0,
             price:0,
             description:'ないです。\n筋肉とでもフォースとでもなんとでも解釈しておk',
             buyable:0,
@@ -1595,6 +1635,7 @@ let Equips = {
             num:0,
             def:0,
             mdef:0,
+            crr:0,
             price:1,
             // description:'大事ですね。\n防御力は関係ありませんが病気にはならない',
             description:'防御力はないです..が、\n精神的な防御力は激高です',
@@ -1607,6 +1648,7 @@ let Equips = {
             num:0,
             def:1,
             mdef:0,
+            crr:0,
             price:5,
             description:'***なのは駄目！！\n死刑！！！！',//コハルなのでセーフ
             buyable:1,
@@ -1618,6 +1660,7 @@ let Equips = {
             num:0,
             def:5,
             mdef:0,
+            crr:0,
             price:20,
             description:'これを使って最初はつるはしを作りましょう',
             buyable:1,
@@ -1629,6 +1672,7 @@ let Equips = {
             num:0,
             def:10,
             mdef:0,
+            crr:0,
             price:30,
             description:'突進してくるあいつ。こいつに手間取ると他のが来てすぐ*ぬので注意',
             buyable:1,
@@ -1640,6 +1684,7 @@ let Equips = {
             num:0,
             def:15,
             mdef:0,
+            crr:0,
             price:50,
             description:'初期装備あるあるⅡですね。多分コスパ最強',
             buyable:1,
@@ -1651,6 +1696,7 @@ let Equips = {
             num:0,
             def:20,
             mdef:0,
+            crr:0,
             price:80,
             description:'辞書とかなのかな。いや六法全書かも',
             buyable:1,
@@ -1662,6 +1708,7 @@ let Equips = {
             num:0,
             def:25,
             mdef:0,
+            crr:0,
             price:100,
             description:'え？木の板と一緒だって？-\n君は知らないのかい...?\n木の板を6つ並べるとドアが3つできるってことを',
             buyable:1,
@@ -1673,6 +1720,7 @@ let Equips = {
             num:0,
             def:30,
             mdef:0,
+            crr:0,
             price:200,
             description:'涼めるのに便利。\nまた武器にもなり、ついでに敵から身を守れる万能装備',
             buyable:1,
@@ -1684,6 +1732,7 @@ let Equips = {
             num:0,
             def:50,
             mdef:0,
+            crr:0,
             price:400,
             description:'ペロロ様の出番です！！\nhifumi daisuki',
             buyable:1,
@@ -1892,7 +1941,7 @@ let Tools = [
         description:'バフを2個ランダムでつける。つよい',
         num:0,
         process:async function(cam,me,are){
-                let rbuffs = ['power','shellup','luck'];
+                let rbuffs = ['pow','she','luck'];
                 rbuffs = arrayShuffle(rbuffs);
                 let buff1 = rbuffs[0];
                 let buff2 = rbuffs[1];
@@ -1909,7 +1958,7 @@ let Tools = [
         description:'デバフを2個つける。割とつよい',
         num:0,
         process:async function(cam,me,are){
-                let rbuffs = ['powerdown','shelldown','poison','burn','freeze'];
+                let rbuffs = ['pow','she','poison','burn','freeze'];
                 rbuffs = arrayShuffle(rbuffs);
                 for(i = 0;i < 2;i++){
                     await buffadd(who, are,rbuffs[i], 'turn' ,3, Math.floor(Math.random()*2)+1);
@@ -2081,8 +2130,8 @@ let Skills = [
                     let [tcam, tme] = await LetsTargetSelect();
                     let result = await damage(cam,me,are,0.2,'sh',4);
                     if(result == 'end'){return 1;}
-                    await buffadd(who, are,'shell',3,1);
-                    await buffadd(who, are,'power', 'turn' ,3,2);
+                    await buffadd(who, are,'she',3,1);
+                    await buffadd(who, are,'pow', 'turn' ,3,2);
                     return 0;
                 }
         },
@@ -2260,118 +2309,6 @@ let obsAll = {
     ],
 }
 
-let Objectdatas = [
-    {
-        id:'none',
-        name:'none',
-        process:async function(){}
-    },
-    {
-        id:'stair',
-        name:'階段',
-        process:async function(){
-            GoNextFloor();
-        }
-    },
-    {
-        id:'door',
-        name:'ドア',
-        process:async function(){
-            NextStage();
-        }
-    },
-    {
-        id:'enemy',
-        name:'敵',
-        w:1, //1 == 1massの意
-        h:1,
-        spd:20,
-        pass:0,
-        process:async function(){
-            EnemyAppear();
-        },
-    },
-    {
-        id:'boss',
-        name:'上司',
-        process:async function(){
-            BossEnemyAppear();
-        }
-    },
-    {
-        id:'fire_on',
-        name:'焚き火',
-        process:async function(){
-            movable = 1;
-            document.querySelector('#overfieldArea').style.display = 'none';
-            document.querySelector('#eventArea').style.display = 'block';
-            document.querySelector('#eventArea').innerHTML = '<button id="CampRest" onclick="Camprest()"></button>\n<button id="CampTrade" onclick="Camptrade()"></button>'
-            log.textContent = '休憩できそうな場所を見つけた！';
-            Camprestper = (Math.floor(Math.random() * 4)+3)/10;
-            document.querySelector('#CampRest').textContent = '朝まで休む(' + Camprestper*100 + '%回復)';//30のときはスキルカード強化みたいなやつあってもいいかも
-            switch(Math.floor(Math.random() * 3)+1){
-                case 1:
-                if(Math.floor(Math.random() * 3)+1) y = 10,document.querySelector('#CampTrade').textContent = '放浪武器商人に話しかける';
-                else    y = 1, document.querySelector('#CampTrade').textContent = '武器商人に話しかける';
-                break;
-                case 2: y = 2; document.querySelector('#CampTrade').textContent = '防具取扱専門家に話しかける'; break;
-                case 3: y = 3; document.querySelector('#CampTrade').textContent = '道具屋24に話しかける'; break;
-            }
-        }
-    },
-    {
-        id:'fire_off',
-        name:'焚き火跡',
-        process:async function(){
-            await addtext(arrayGacha( //この重複感好き
-                ['この焚き火はもう木炭になっている','まだ温かい..この辺りに誰かいるようだ'],
-                [85,15]
-            ));
-        }
-    },
-    {
-        id:'shop_skill',
-        name:'スキルショップ',
-        process:async function(){
-            SkillShopOpen();
-        }
-    },
-    {
-        id:'chest_n',
-        name:'宝箱',
-        process:async function(){
-            OpenChest(1);
-        }
-    },
-    {
-        id:'chest_r',
-        name:'レア宝箱',
-        process:async function(){
-            OpenChest(2);
-        }
-    },
-    {
-        id:'hopebutton',
-        name:'救いのボタン',
-        process:async function(){
-            HopeButtonact();
-        }
-    },
-    {
-        id:'candytray',
-        name:'あめ置き場',
-        process:async function(){
-            Candytake();
-        }
-    },
-    {
-        id:'cookietray',
-        name:'クッキー置き場',
-        process:async function(){
-            Cookietake();
-        }
-    },
-]
 
 let Enemies = [
     {
@@ -2507,7 +2444,7 @@ let Enemies = [
                     await addtext(`${who.name}はローキックしてきた！`)
                     let are = ShallTargetSelect(who,'phpl',0);
                     let result = await damage(who, are, 70, 'sh');
-                    await buffadd(who, are, 'speeddown', 'turn', 2, 1);
+                    await buffadd(who, are, 'speed', 'turn', 2, 1);
                     return result;
                 }
             }

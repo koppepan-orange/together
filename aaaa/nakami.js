@@ -194,6 +194,25 @@ function hoshoku(color) {
 
     return `#${compR}${compG}${compB}`;
 }
+function mixshoku(c1, c2, ratio = 0.5) {
+    const toRGB = c => {
+        c = c.replace('#', '');
+        if (c.length === 3) c = c.split('').map(x => x + x).join('');
+        const n = parseInt(c, 16);
+        return [n >> 16, (n >> 8) & 255, n & 255];
+    };
+  
+    const [r1, g1, b1] = toRGB(c1);
+    const [r2, g2, b2] = toRGB(c2);
+  
+    const r = Math.round(r1 + (r2 - r1) * ratio);
+    const g = Math.round(g1 + (g2 - g1) * ratio);
+    const b = Math.round(b1 + (b2 - b1) * ratio);
+  
+    return (
+        '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('')
+    );
+}
 //#endregion
 //#region log&text
 let textDiv = document.querySelector('#text');
@@ -1492,8 +1511,9 @@ let canC = {
     
         //obj
         //x,y 0~9等の、現在いる"マス"のこと。sx,syは、現在いる位置のこと。yx,yyは、今向かっている位置のこと。
-        for(let ob of canC.objs){
-            if(ob.name == 0) continue;
+        for(let i=0; i < canC.objs.length; i++){
+            let ob = canC.objs[i];
+            if(ob.name == 0) canC.objs.splice(i, 1);
     
             // ob.x = Math.floor(ob.sx/canC.size);
             // ob.y = Math.floor(ob.sy/canC.size);
@@ -1532,7 +1552,7 @@ let canI = {
         'maps':['0', 'a', 'b'],
         'systems':['select', 'error', 'error_nico'],
         'players':['select'],
-        'objects':['tree','tree_apple','tree_kare','stone','stone_kuro','stone_hai','stone_ao','stone_aka','stone_kiro','stone_cha','stone_mido','stone_mizu'],
+        'objects':['tree','tree_apple','tree_kare','stone','stone_kuro','stone_hai','stone_ao','stone_aka','stone_kiro','stone_cha','stone_mido','stone_mizu', 'enemy'],
     },
 }
 canI.imagesTotal = Object.keys(canI.imagesNames).map(a => canI.imagesNames[a].length).reduce((a, b) => a + b);
@@ -1645,10 +1665,15 @@ mapmakeD.addEventListener('click', map_make);
 
 function objmake(){
     console.log('objつくるよ！')
+
+    let obses = Objects.filter(o => o.appe).map(o => o.name);
+    if(batC.now) obses.push(Objects.find(o => o.name == 'enemy').name);
+
     let num = random(3,7);
     for(let i = 0; i < num; i++){
-        let mono = arraySelect(Objects.filter(o => o.appe).map(o => o.name));
+        let mono = arraySelect(obses);
         // console.log(mono);
+
         let x, y;
         do{
             x = random(0, canC.mas-1);
@@ -1767,9 +1792,12 @@ async function pmoved(){
             await get(item);
             await delay(10);
         }
-        
+
         ob3.name = 0;
+        
         canC.draw();
+
+        if(name == 'enemy') return encount();
     }
 }
 
@@ -1971,10 +1999,20 @@ let batC = {
 }
 let batF = {} //tyotto yokunai kamo
 
-batF.tog = () => {
-    batD.classList.toggle('tog')
+batF.open = () => {
+    let p = canC.get();
+    p.moving = 1;
+    
+    batD.classList.add('tog')
+};
+batF.clos = () => {
+    let p = canC.get();
+    p.moving = 0;
+    
+    batD.classList.remove('tog')
 };
 
+// 
 //あとはbattle.jsに記述
 
 //#endregion
