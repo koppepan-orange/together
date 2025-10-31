@@ -334,58 +334,6 @@ let Objects = [
     }
 ]
 
-let Rooms = [
-    [
-        [1,1,1,1,1,1,1,1],
-        [1,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,1],
-        [1,1,1,1,1,1,1,1]
-    ],
-    [
-        [1,1,1,1,1,1,1,1],
-        [1,0,0,0,0,0,0,1],
-        [0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0],
-        [1,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,1],
-        [1,1,1,0,0,0,1,1]
-    ],
-    [
-        [1,1,1,1,1,1,1,1],
-        [1,1,1,1,1,1,1,1],
-        [1,1,0,0,0,1,1,1],
-        [1,1,0,0,0,0,0,0],
-        [1,1,0,0,0,0,0,0],
-        [1,1,0,0,0,1,1,1],
-        [1,1,1,1,1,1,1,1],
-        [1,1,1,1,1,1,1,1]
-    ],
-    [
-        [1,1,1,1,1,1,1,1],
-        [1,0,0,0,0,0,0,1],
-        [1,0,0,1,1,0,0,1],
-        [1,0,1,1,1,1,0,1],
-        [1,0,1,1,1,1,0,1],
-        [1,0,0,1,1,0,0,1],
-        [1,0,0,0,0,0,0,1],
-        [1,1,1,1,1,1,1,1]
-    ],
-    [
-        [1,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,1],
-        [1,0,0,1,1,0,0,1],
-        [1,0,1,1,1,1,0,1],
-        [1,0,1,1,1,1,0,1],
-        [1,0,0,1,1,0,0,1],
-        [1,0,0,0,0,0,0,1],
-        [1,1,1,1,1,1,1,1]
-    ]
-]
 
 let Friends = [
     {
@@ -413,6 +361,31 @@ let Friends = [
         name:'小安見ニーク',
         rare:3,
     },
+    {
+        ruby:'ぼか ろまにあ',
+        name:'暮花ロマニア',
+        rare:3
+    },
+    {
+        ruby:'いきのねおと める',
+        name:'息野音音メル',
+        rare:3
+    },
+    {
+        ruby:'うらばな よだん',
+        name:'裏花夜淡',
+        rare:3
+    },
+    {
+        ruby:'どうゆう じょうきょう',
+        name:'道遊城京',
+        rare:3
+    },
+    {
+        ruby:'えくれあ あるにわーる',
+        name:'エクレア・アルニワール',
+        rare:3
+    },
 
     {
         ruby:'うたかた ありあ',
@@ -428,6 +401,16 @@ let Friends = [
         ruby:'いらつ きき',
         name:'伊辣キキ',
         rare: 2,
+    },
+    {
+        ruby:'みょうえてい',
+        name:'明会帝',
+        rare:2
+    },
+    {
+        ruby:'こくち せんでん',
+        name:'刻池千田',
+        rare:2
     },
         
     {
@@ -470,7 +453,11 @@ let Friends = [
         name:'亡気者ニス',
         rare:1
     },
-    
+    {
+        ruby:'あまね きせき',
+        name:'天音輝石',
+        rare:1
+    },
     
     {
         ruby:'からより はもか',
@@ -513,6 +500,7 @@ let Friends = [
     }
 
 ]
+
 
 // battle
 
@@ -577,7 +565,7 @@ let Charas = [
         ns:'throwwrench',
         ps:'solplaceturret',
         ts:[],
-        atk:1000,
+        atk:25,
         def:0,
         matk:20,
         mdef:20,
@@ -1780,13 +1768,10 @@ let Tools = [
         price:20,
         description:'頭痛薬らしいですね、これ。痛み止め薬とか耐えればいらんくね？とかいったら炎上するかな',
         num:5,
-        process:async function(cam,me,are){
+        process:async function(who, are){
                 await addtext(`おや、頭が痛いって？痛みに効くのはアスピリン！`);
-                x = Math.round(humans[tcam][target].maxhp * 0.2);
-                if((x + humans[tcam][target].hp) > humans[tcam][target].maxhp){x = humans[tcam][target].maxhp - humans[tcam][target].hp;};
-                humans[tcam][target].hp += x;
-                tekiou()
-                await addtext(`体力が${x}回復した!`);
+                await heal(who, are, '20%', ['%!maxhp', 'fixed']);
+
                 return 0;
         }
     },
@@ -1796,13 +1781,9 @@ let Tools = [
         price:40,
         description:'風邪薬。大人とか向けらしいね',
         num:2,
-        process:async function(cam,me,are){
+        process:async function(who,are){
                 await addtext(`早めのパブロン♪`);
-                x = Math.round(humans[tcam][target].maxhp * 0.4);
-                if((x + humans[tcam][target].hp) > humans[tcam][target].maxhp){x = humans[tcam][target].maxhp - humans[tcam][target].hp;};
-                humans[tcam][target].hp += x;
-                tekiou();
-                await addtext(`体力が${x}回復した!`);
+                await heal(who, are, '40%', ['fixed']);
                 return 0;
         }
     },
@@ -1812,13 +1793,9 @@ let Tools = [
         price:60,
         description:'タンパク質を分解し、アミノ酸にする働きのある消化酵素。所属事務所は膵臓。',
         num:0,
-        process:async function(cam,me,are){
+        process:async function(who,are){
                 await addtext(`トリプシンを飲んだ！！え？これは薬じゃないって？`);
-                x = Math.round(humans[tcam][target].maxhp * 0.6);
-                if((x + humans[tcam][target].hp) > humans[tcam][target].maxhp){x = humans[tcam][target].maxhp - humans[tcam][target].hp;};
-                humans[tcam][target].hp += x;
-                tekiou();
-                await addtext(`体力が${x}回復した!`);
+                await heal(who, are, '60%', ['fixed']);
                 return 0;
         }
     },
@@ -1830,10 +1807,12 @@ let Tools = [
         num:0,
         process:async function(who,are){
                 await addtext(`求愛性 孤独 ドク 流るルル`)
-                await heal(who, are, '80%', 'add')
+                await heal(who, are, '80%', ['fixed'])
+
+                //確変（転調）
                 if(probably(70)) return 0;
                 await addtext('愛をもっと')
-                await heal(who, are, '20%', 'add')
+                await heal(who, are, '20%', ['fixed'])
                 return 0;
         }
     },
@@ -1843,9 +1822,9 @@ let Tools = [
         price:100,
         description:'投げつけたい。敵に',
         num:0,
-        process:async function(cam,me,are){
+        process:async function(who,are){
                 await addtext(`なんか一番しょうもないよね、これ\nあ、全回復です`);
-                await heal(who, are, '100%', 'set')
+                await heal(who, are, '100%', ['fixed']);
                 return 0;
         }
     },
@@ -1855,13 +1834,12 @@ let Tools = [
         price:20,
         description:'シンプルに20%ダメージ。十六夜さんが投げるあれ',
         num:5,
-        process:async function(cam,me,are){
+        process:async function(who,are){
                 await addtext('では、ナイフの錆にしてあげましょう');
-                x = Math.ceil(humans[tcam][target].hp*0.2);
-                let result = await damage(cam,me,are,x,'sh',['unpursuit','fixed'])
-                tekiou();
-                await addtext(`${humans[tcam][target].name}に${x}のダメージ！`);
-                if(result == 'end'){return 1};
+                
+                let res = await damage(who,are,'20%','sh',['fixed']);
+                if(res) return 1;
+
                 return 0;
         }
     },
@@ -1871,22 +1849,20 @@ let Tools = [
         price:40,
         description:'黒崎コユキ、きちゃいました！！なんか面白いことないですか？\n(10%,25%,40%からランダム)',
         num:1,
-        process:async function(cam,me,are){
-                x = Math.floor(Math.random() * 3) + 1;
-                switch(x){
-                    case 1:
-                            await addtext('ま、これでいいですよね？');
-                            x = Math.floor(humans[tcam][target].hp*0.10);break;
-                    case 2:
-                            await addtext('結果良ければすべてオッケー！ってね？');
-                            x = Math.floor(humans[tcam][target].hp*0.25);break;
-                    case 3:
-                            await addtext('これぞ醍醐味、ってやつ？');
-                            x = Math.floor(humans[tcam][target].hp*0.40);break;
-                };
-                let result = await damage(cam,me,are,x,'sh',['unpursuit','fixed'])
-                if(result == 'end'){return 1};
-                return 0;
+        process:async function(who,are){
+            let dict = [
+                ['ま、これでいいですよね？', 5],
+                ['結果良ければすべてオッケー！ってね？', 30],
+                ['これぞ醍醐味、ってやつ？', 55]
+            ]
+            
+            let ran = random(0,2);
+            let x = dict[ran][1]
+            await addtext(dict[ran][0]);
+            
+            let res = await damage(who,are,`${x}%`,'sh',['fixed'])
+            if(res) return 1;
+            return 0;
         }
     },
     {
@@ -1895,15 +1871,15 @@ let Tools = [
         price:60,
         description:'殴るついでに燃やす。まじでつよい\nレッドウィンターの問題児にしては上出来すぎる',
         num:0,
-        process:async function(cam,me,are){
-                await addtext('これはちょっと、スパイシーなやつだよ');
-                let result = await damage(cam,me,are,0.8,'mg',['unpursuit'])
-                if(result == 'end'){
-                    await addtext('レッドウィンターの問題児にしては上出来じゃない？');
-                    return 1;
-                };
-                await buffadd(who, are,'burn' ,3,1);
-                return 0;
+        process:async function(who,are){
+            await addtext('これはちょっと、スパイシーなやつだよ');
+            let res = await damage(who,are,'60%','mg',['fixed']);
+            if(res) return 1;
+
+            await addtext('レッドウィンターの問題児にしては上出来じゃない？');
+            if(probability(70)) await buffadd(who, are, 'burn', 3, 1);
+            
+            return 0;
         }
     },
     {
@@ -1912,15 +1888,13 @@ let Tools = [
         price:80,
         description:'ダメージ与える。ゴミ箱に隠れてる人。',
         num:0,
-        process:async function(cam,me,are){
-                await addtext('え、援護します...');
-                let x = Math.ceil(humans[tcam][target].hp*0.6);
-                let result = await damage(cam,me,are,x,'mg',['unpursuit','fixed']);
-                if(result == 'end'){
-                    await addtext('わ、私のことはお気になさらずに...');
-                    return 1;
-                }
-                return 0;
+        process:async function(who,are){
+            await addtext('え、援護します...');
+            
+            let result = await damage(who,are,'70%','sh',['fixed']);
+            if(res) return 1;
+            
+            return 0;
         }
     },
     {
@@ -1929,11 +1903,13 @@ let Tools = [
         price:100,
         description:'エクスプローージョン！！！\n敵を確殺します。嬉しいね',
         num:1,
-        process:async function(cam,me,are){
-                let x = humans[tcam][target].hp;
-                let result = await damage(cam,me,are,x,'mg',['unpursuit',"fixed","penetrate"]);
-                await addtext('爆発オチなんてサイテー！！');
-                return 1;
+        process:async function(who,are){
+            await addtext('爆発オチなんてサイテー！！');
+            
+            let res = await damage(who,are,'100%','mg',["fixed","penetrate"]);
+            if(!res) return this.process(who,are);
+
+            return 1;
         }
     },
     {
@@ -1942,9 +1918,9 @@ let Tools = [
         price:35,
         description:'退場です。帰れ(スキップ)',
         num:3,
-        process:async function(cam,me,are){
-                await buffadd(who, are,'skip' ,1,1);
-                await addtext('カードを仕込みました!')
+        process:async function(who,are){
+                await buffadd(who, are,'skip',1,1);
+                await addtext('カードを仕込みました!');
                 return 0;
         }
     },
@@ -1972,7 +1948,7 @@ let Tools = [
         price:35,
         description:'バフを2個ランダムでつける。つよい',
         num:0,
-        process:async function(cam,me,are){
+        process:async function(who,are){
                 let rbuffs = ['pow','she','luck'];
                 rbuffs = arrayShuffle(rbuffs);
                 let buff1 = rbuffs[0];
@@ -1989,7 +1965,7 @@ let Tools = [
         price:35,
         description:'デバフを2個つける。割とつよい',
         num:0,
-        process:async function(cam,me,are){
+        process:async function(who,are){
                 let rbuffs = ['pow','she','poison','burn','freeze'];
                 rbuffs = arrayShuffle(rbuffs);
                 for(i = 0;i < 2;i++){

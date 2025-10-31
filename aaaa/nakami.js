@@ -273,8 +273,8 @@ async function waitforAddtext(){
     if(textShowing) return console.log('文字表示されたんでスキップ');
     
     let raw = queueAddtext.shift();
-    console.log(`${raw}を送信します`);
-    console.log(`残り: (${len - 1})[${queueAddtext}]`);
+    // console.log(`${raw}を送信します`);
+    // console.log(`残り: (${len - 1})[${queueAddtext}]`);
     await addtext(raw);
 }
 async function addtext(raw){
@@ -501,7 +501,7 @@ function connect(){
             let lis = mes.split(','); //['item', 'pick', name, num];
             let name = lis[2], num = lis[3];
             let data = Items.find(o => o.jpnm == name);
-            console.log(mes, lis, name, num, data);
+            // console.log(mes, lis, name, num, data);
             if(!data) return console.error(`エラー！${name}のdataがねーぜ！！`);
 
             let itemD = document.createElement('img');
@@ -544,30 +544,49 @@ function sendpyTx(text){
     if(connecten) webSocket.send(text);
 };
 
+let cocGachen = {};
 function cocGacha(code = 0){
     let list = [
         Friends.filter(a => a.rare == 1),
         Friends.filter(a => a.rare == 2),
         Friends.filter(a => a.rare == 3),
     ];
-    let sl = 0;
+
     let s = 0;
     let r = random(0,99);
-    if(r < 3) s = 3;
-    if(3 <= r&& r < 20) s = 2;
-    if(20 <= r) s = 1;
+    if(r<3) s = 3;
+    if(3<=r && r<20) s = 2;
+    if(20<=r) s = 1;
     
     if(code) s = code;
+    
+    let item = arraySelect(list[s-1]);
+    let n = `${item.name} [☆ ${s}]`;
+    if(s == 3) n = `ミミミミ   ${n}   ミミミミ`;
+    
+    if(!cocGachen[item.name]) cocGachen[item.name] = 0;
+    cocGachen[item.name ] += 1;
+    
+    return n;
+}
 
-    sl = list[s-1];
-    
-    let item = arraySelect(sl);
-    let n = `${item.name}(${item.ruby}) [☆ ${s}]`;
-    if(s == 3){
-        n = `ミミミミミミミミミ   ${n}   ミミミミミミミミミ`;
+function cocAppe(){
+    let arr0 = Object.keys(cocGachen);
+    let arr = [] 
+    for(let name of arr0){
+        let num = cocGachen[name];
+        let text = `${name}(☆)`;
+
+        let text2 =  1 < num ? text2 = ` ${num-1}凸` : '';
+        
+        let text3 = '';
+        if(10 < num) text3 = '被りすぎだろwww';
+        if(23 < num) text3 = 'な、なんかごめんね？w';
+        if(40 < num) text3 = 'ほんとに..ごめんなさい....';
+        if(99 < num) text3 = '...これあげるよ';
+
+        arr.push([name, cocGachen[name]]);
     }
-    
-    return n
 }
 
 //#endregion
@@ -672,7 +691,7 @@ async function read(gen, type = 'organic'){
                 }
 
                 if(le instanceof Object){
-                    console.log(line)
+                    // console.log(line)
                     console.error('さすがにエラー...もっかい↑これ↑、確認して？')
                 }
             }
@@ -1024,12 +1043,15 @@ sideLC.list = [
         img:'achieve',
         func: () => {
             sideLF.toggle();
+            achF.tog()
         }
     },
     {
         name:'dummy!',
         img:'seafood',
-        func: () => {sideLF.toggle();}
+        func: () => {
+            sideLF.toggle();
+        }
     },
     {
         name:'dummy!!',
@@ -1151,6 +1173,19 @@ undF.load = () => {
         clcl();
     }
 }
+//#endregion
+
+//#region achieve
+let achD = document.getElementById('achieve');
+let achC = {
+    tog: 0,
+}
+let achF = {};
+
+achF.tog = () => {
+    achD.classList.toggle('tog');
+}
+
 //#endregion
 
 //#region fontChange
@@ -2424,6 +2459,20 @@ let secrates = [ // セクラテス
         limit:'n',
         func: async function(){
             undF.open()
+        }
+    },
+    {
+        ind:0,
+        name:'darkness',
+        arr:['d','a','r','k','n','e','s','s'],
+        limit:'n',
+        func: async function(){
+            buffadd(cm(), cm(), 'pow', 2, 1);
+            buffadd(cm(), cm(), 'she', 2, 1);
+            buffadd(cm(), cm(), 'burn', 2, 1);
+            buffadd(cm(), cm(), 'poison', 2, 1);
+            buffadd(cm(), cm(), 'palsy', 2, 1);
+            buffadd(cm(), cm(), 'freeze', 2, 1);
         }
     },
     {

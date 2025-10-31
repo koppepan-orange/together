@@ -610,6 +610,18 @@ textarea{
     z-index: inherit;
 }
 
+#achieve{
+    width: 100vw;
+    height: 12%;
+    background: #794407;
+    position: fixed;
+    top: 10%;
+    right: -100vw;
+    transition: right 1.0s cubic-bezier(0.25, 1.11, 0.76, 1);
+}
+#achieve.tog{
+    right: 0;
+}
 
 #fonts{
     display: none;
@@ -1187,3 +1199,4 @@ textarea{
 #battle .button.ed{
     background: var(--button-aima);
 }
+

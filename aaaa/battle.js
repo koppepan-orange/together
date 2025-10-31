@@ -215,7 +215,7 @@ function makePlayer(code, id){
     p.sp = 0;
 
     p.slash = p.slash??['slash','double slash', 'slash of light'];
-    p.magic = p.magic??['heal', 'pow', 'she'];
+    p.magic = p.magic??['heal', 'power', 'shell'];
     p.tool = p.tool??['aspirin','throw knife','redcard'];
 
     p.buffs = [];
@@ -394,12 +394,12 @@ async function nextTurn(who = 0){
     let tcam = bar.cam[acted]
     let tme = bar.me[acted]
     are = cm(tcam, tme);
-    console.log(are)
+    // console.log(are)
 
     let dots = {}; //DamegeOverTimeのdot
     for(let buff of are.buffs){
         let data = Buffs.find(a => a.name == buff.name)
-        console.log(buff, data)
+        console.log(`「${buff.name}」 (${buff.value.length})[${Object.keys(buff.value)}]`);
 
         if(hask(data, 'dot')){
             // これは hp:'-10'みたいにならなくて、hp:10 で10減る感じ
@@ -413,15 +413,9 @@ async function nextTurn(who = 0){
             
             if(!dots[dot]) dots[dot] = 0;
             dots[dot] += val;
+            console.log(`(${turn})${are.cam}${are.me}に${buff.name}があるって！ | ${dot}に${val}追加`);
         }
-        Object.keys(dots).forEach( key => {
-            let val = dots[key];
-            are.hp -= val;
-            if(are.hp <= 0){
-                return dead(0, are);
-            }
-        })
-    
+        
         if(buff.name == 'onslime'){
             if(isCrit(buff.value)){
                 buffremove(are, 'onslime');
@@ -436,24 +430,39 @@ async function nextTurn(who = 0){
             await addtext(`はい${are.name}、お前スキップ〜〜`);
             nextTurn(are); return;
         }
-        if(hask(data, 'palsy')){
-            if(!isCrit(data.palsy)) continue;
+        if(hask(buff.value, 'palsy')){
+            let val = buff.value.palsy;
+            console.log(`palsy:: ${val}%`);
+            
+            if(!isCrit(val)) continue;
+
             data.name != 'stan'
             ? addlog(`${are.name}は麻痺している..`)
             : addlog(`${are.name}はスタンしている....`);
             nextTurn(are);
             return 1;
         }
-        if(hask(data, 'freeze')){
-            if(!isCrit(data.freeze)){
-                await addtext(`氷が溶けた!`);
-                buffremove(are,'freeze');
-            }else{
+        if(hask(buff.value, 'freeze')){
+            let val = buff.value.freeze;
+            if(isCrit(val)){
                 await addtext(`${are.name}は凍っている...`);
-                nextTurn(are); return;
-            }    
+                nextTurn(are);
+                return;
+            }
+            
+            await addtext(`氷が溶けた！`);
+            buffremove(are,'freeze');    
         }
-    }
+    }    
+    Object.keys(dots).forEach( key => {
+        let val = dots[key];
+        
+        console.log(`(${turn})${are.cam}${are.me}に${key}のダメージ！(val: ${val})`);
+        are.hp -= val;
+
+        if(are.hp <= 0) return dead(0, are);
+    })
+
 
     console.log(`(${turn}) 現在、[${tcam}]${are.name}さんのターンですわ〜！`);
 
@@ -786,6 +795,8 @@ async function Magic(who, num){
     }
 
     let data = Magics.find(a => a.id == name)
+    
+    console.log(name, data);
     if(who.mp >= data.mp){
         let are = await LetsTargetSelect();
 
@@ -912,7 +923,7 @@ function turretAllClear(){
 //#region てきさんのた～ん
 async function enemyturn(who){
     let data = Enemies.find(a => a.name == who.name);
-    console.log(who)
+    // console.log(who)
 
     for(let buff in who.buffs){
         buff.time -= 1;
@@ -1147,6 +1158,8 @@ async function damage(who, ares, val, type0, props = []){
 
         //実装
         let dmg2 = Math.floor(dmg - rer);
+        if(hasp('fixed')) dmg2 = val;
+
         if(dmg2 < 0) dmg2 = 0;
         if(dmg2 > are.hp) dmg2 = are.hp;
         are.hp -= dmg2;
@@ -1172,7 +1185,7 @@ async function heal(who, ares, val, props = []){
     if(val.endsWith('%')){
         let key = props.find(a => a.startsWith("%!"));
         if(key) key = key.substring(2);
-        else key = "hp";
+        else key = "maxhp";
 
         let roka = +val.substring(0, val.length - 1);
         if(isNaN(roka)) roka = 0;
@@ -1197,9 +1210,10 @@ async function heal(who, ares, val, props = []){
 
 //#region じょーたいいじょ〜
 async function buffadd(who, ares, buff, time, val){ //誰のバフ/デバフか,バフ/デバフの名前,効果時間,効果量
-    console.log(`buffadd:: ${buff}, ${kind}, ${time}, ${val}`);
+    console.log(`buffadd:: ${buff}, ${time}, ${val}`);
     let newbuff = buffMold(buff, time, val);
     let data = Buffs.find(e => e.name == buff);
+    let kind = data.kind;
 
     // console.log(ares)
 
@@ -1208,8 +1222,6 @@ async function buffadd(who, ares, buff, time, val){ //誰のバフ/デバフか,
     if(!Array.isArray(ares)) ares = [ares];
 
     for(let are of ares){
-        console.log(`buffadd:: ${who.name} => ${are.name}に${val}の${buff}を${time}付与`);
-        let kind = data.kind;
 
         switch(kind){
             case 'turn':{
@@ -1239,13 +1251,13 @@ async function buffadd(who, ares, buff, time, val){ //誰のバフ/デバフか,
 function buffMold(buff, time, val){
     if(!buff || !time || !val) console.error('要素が足りないぜ！！！', buff, kind, time, val);
     let data = Buffs.find(e => e.name == buff);
-    if(!data) console.error(buff,'←これ存在しないらしいっすよ〜？')
 
+    if(!data) console.error(buff,'←これ存在しないらしいっすよ〜？')
     let kind = data.kind;
 
     if(data.mode == 'free') val = {[data.agemono]: val};
     if(data.mode == 'fixe') val = data.lvs[val]??null;
-    console.log(`[${data.mode}]${buff} val:`,val,` time:${time}`);
+    console.log(`[${data.mode}] ${buff} val:${val} time:${time}`);
 
     let newbuff = {};
 
@@ -1274,7 +1286,7 @@ function buffMold(buff, time, val){
             break;
         }
     }
-    console.log(newbuff)
+    // console.log(newbuff)
 
     return newbuff;
 }
