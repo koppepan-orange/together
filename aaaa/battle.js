@@ -256,7 +256,7 @@ function makeEnemy(){
     statuses.forEach(statu => e[statu] = eneBas[statu]);
 
     let ed = arraySelect(Enemies);
-    console.log(ed)
+    // console.log(ed)
     statuses.forEach(statu => {
         if(ed[statu].startsWith('+') || ed[statu].startsWith('-')){
             let num = +(ed[statu].slice(1));
@@ -290,8 +290,6 @@ function makeEnemy(){
     let div = makeHuman('enemies', e.me);
     batC.eD.appendChild(div);
 
-    console.log(e)
-
     return e;
 }
 //#endregion
@@ -303,7 +301,6 @@ async function encount(){
     for(let i = 0; i < enemiesen; i++){
         let e = makeEnemy();
         humans.push(e);
-        console.log(cm('enemies', i))
     }
 
     batF.open();
@@ -387,7 +384,7 @@ async function nextTurn(who = 0){
             cam: combined.map(c => c.cam),
             me: combined.map(c => c.me)
         };
-        console.log(bar)
+        // console.log(bar)
         acted = 0;
     } 
 
@@ -399,7 +396,7 @@ async function nextTurn(who = 0){
     let dots = {}; //DamegeOverTimeのdot
     for(let buff of are.buffs){
         let data = Buffs.find(a => a.name == buff.name)
-        console.log(`「${buff.name}」 (${buff.value.length})[${Object.keys(buff.value)}]`);
+        console.log(`「${buff.name}」(${Object.keys(buff.value).length})[${Object.keys(buff.value)}]`);
 
         if(hask(data, 'dot')){
             // これは hp:'-10'みたいにならなくて、hp:10 で10減る感じ
@@ -407,13 +404,13 @@ async function nextTurn(who = 0){
 
             let val = 0;
             val = buff.value[dot];
-            if(val.endsWith('%')) val = Math.round(are.maxhp * val.slice(0,-1) / 100);
+            if(typeof val == 'string' && val.endsWith('%')) val = Math.round(are.maxhp * val.slice(0,-1) / 100);
 
             //出血の処理はここへ
             
             if(!dots[dot]) dots[dot] = 0;
             dots[dot] += val;
-            console.log(`(${turn})${are.cam}${are.me}に${buff.name}があるって！ | ${dot}に${val}追加`);
+            console.log(`>> ${are.cam}${are.me}に${buff.name}があるって！ | ${dot}に${val}追加`);
         }
         
         if(buff.name == 'onslime'){
@@ -427,25 +424,25 @@ async function nextTurn(who = 0){
             }; 
         }
         if(buffhas(are,'skip')){
-            await addtext(`はい${are.name}、お前スキップ〜〜`);
+            await addtext(`>> はい${are.name}、お前スキップ〜〜`);
             nextTurn(are); return;
         }
         if(hask(buff.value, 'palsy')){
             let val = buff.value.palsy;
-            console.log(`palsy:: ${val}%`);
+            console.log(`>> palsy:: ${val}%`);
             
             if(!isCrit(val)) continue;
 
             data.name != 'stan'
-            ? addlog(`${are.name}は麻痺している..`)
-            : addlog(`${are.name}はスタンしている....`);
+            ? addlog(`${are.cam}${are.me}は麻痺している..`)
+            : addlog(`${are.cam}${are.me}はスタンしている....`);
             nextTurn(are);
             return 1;
         }
         if(hask(buff.value, 'freeze')){
             let val = buff.value.freeze;
-            if(isCrit(val)){
-                await addtext(`${are.name}は凍っている...`);
+            if(!isCrit(val)){
+                addlog(`${are.name}は凍っている...`);
                 nextTurn(are);
                 return;
             }
@@ -733,7 +730,7 @@ function LetsTargetSelect(code = 1){
              if(typeof cs == 'string') cs = [cs]
             let ns = target[0];
              if(typeof ns == 'string' || typeof ns == 'number') ns = [ns]
-            console.log(cs, ns)
+            // console.log(cs, ns)
             let whoes = [];
             for(let i = 0; i < cs.length; i++){
                 let c = cs[i];
@@ -744,7 +741,7 @@ function LetsTargetSelect(code = 1){
                 whoes.push(cn);
             }
 
-            console.log(whoes);
+            // console.log(whoes);
 
             resolve(whoes);
         }
@@ -825,6 +822,7 @@ async function Tool(who, num){
 
     //今はいいけど、inven(tory)に全部詰め込むことになるならdata.jsのnumじゃなくて簡単関数でinven内の数を求めて、で〜って形にした方がいいかも
     let data = Tools.find(a => a.id == name)
+    console.log(name, data)
     if(data.num > 0){
         data.num -= 1;
 
@@ -952,12 +950,11 @@ function enemySelectAction(who){
     let acts = [];
     let pros = [];
 
-    if(who)
     if(who.lasts.length != 0){
         //直前にreを実行していたならば、対応するabを確定実行するやつ
         who.lasts.forEach(last => {
             data.acts.forEach(a => {
-                let props = a.props;
+                let props = a.prop;
                 props.filter(p => p.startsWith('ab') && p.endsWith(last)).forEach(p => {
                     console.log(a, p)
                     acts.push(a);
@@ -977,32 +974,31 @@ function enemySelectAction(who){
 
     //reをするとlastを記録
     let act = arrayGacha(acts, pros);
-    console.log(act);
+    // console.log(act);
+    console.log(`act: 「${act.name}」(${act.probable}%)`);
     let props = act.prop ?? [];
     props.forEach(p => {
         if(p.startsWith('re')){
-            let item = p.slice(0,2);
+            let item = p.slice(2);
             who.lasts.push(item);
-            console.log(`re:: ${item}を記録しました`);
+            console.log(`ノア「${item}を記録しました」`);
         }
     })
 
     return act;
 }
 function ShallTargetSelect(who, code, both = 0) {
-    console.log(`ShallTarget!!! ${code}(both:${both})`)
-    console.log(`code:: ${code}`)
+    console.log(`ShallTarget::: ${code}(both:${both})`)
+    
     const side = code[0] == 'p' ? 'players' : 'enemies';
-    console.log(`>> ${side}`);
     const stat = code.includes('hp') ? 'hp' : code.includes('atk') ? 'atk' : 'def';
-    console.log(`>> ${stat}`);
     const mode = code.endsWith('l') ? 'low' : code.endsWith('h') ? 'high' : 'random';
-    console.log(`>> ${mode}`);
+    console.log(`>> ${side}, ${stat}, ${mode}]`);
 
     const list = cm(side).filter(c => c.status).sort((a, b) => a[stat] - b[stat]);
-    console.log(list);
+    // console.log(list);
 
-    if (list.length == 0) return `errored! ${side} is inai desuwa!!`;
+    if(list.length == 0) return `errored! ${side} is inai desuwa!!`;
 
     let target;
     if(mode == 'low')  target = list[0];
@@ -1020,14 +1016,14 @@ function ShallTargetSelect(who, code, both = 0) {
         if (i < ids.length - 1) adj.push(ids[i + 1]);
         ret.push(adj);
     }
-    console.log(ret)
+    // console.log(ret)
 
     let ares = [];
     for(let num of ret){
         let are = cm(side, num);
         ares.push(are);
     }
-    console.log(ares)
+    // console.log(ares)
 
     return ares;
 }
@@ -1060,7 +1056,7 @@ async function damage(who, ares, val, type0, props = []){
     let hasp = (name) => {return props.includes(name)}
     if(!Array.isArray(ares)) ares = [ares];
 
-    console.log(`${who.cam}${who.me}`, ares.map(c => `${c.cam}${c.me}`), val, type0, props);
+    // console.log(`${who.cam}${who.me}`, ares.map(c => `${c.cam}${c.me}`), val, type0, props);
 
     if(typeof val == 'string' && val.endsWith('%')){
         let key = props.find(a => a.startsWith("%!"));
@@ -1108,7 +1104,7 @@ async function damage(who, ares, val, type0, props = []){
         
         for (let i = 0; i < hyous.length; i++) {
             const [human, keys, target] = hyous[i];
-            console.log(human, keys, target);
+            // console.log(human, keys, target);
             for(let buff of human.buffs){
                 let buffk = Object.keys(buff.value);
                 for(let k of keys){
@@ -1153,18 +1149,31 @@ async function damage(who, ares, val, type0, props = []){
         console.log(`rer:: (${defer[type2]} + ${shied[type2]}) * (${defer.she}) + (${defer.cut}) = ${rer}`);
         
         //crit
-        let is = isCrit((atker.crl + weped.crl), (defer.crr + shied.crr));
-        if(is) dmg *= (atker.crd + weped.crd);
+        let crit = isCrit((atker.crl + weped.crl), (defer.crr + shied.crr));
+        if(crit){
+            dmg *= (atker.crd + weped.crd);
+            console.log(`(会心ed！) dmg x (${atker.crd} + ${weped.crd})`);
+        }
 
         //実装
         let dmg2 = Math.floor(dmg - rer);
         if(hasp('fixed')) dmg2 = val;
 
-        if(dmg2 < 0) dmg2 = 0;
-        if(dmg2 > are.hp) dmg2 = are.hp;
+        if(dmg2 < 0){
+            console.log(`(負のダメージ) damage = 0`);
+            dmg2 = 0;
+        }
+        if(dmg2 > are.hp){
+            let sa = dmg2 - are.hp;
+            dmg2 = are.hp;
+            console.log(`(体力超過) damage - ${sa}`);
+        }
+        console.log(`==> damage: ${dmg2}`);
+        if(type0 == 'sh') await eFf.slash(are);
         are.hp -= dmg2;
         tekiou();
-        addlog(`(${turn}) [${who.cam}]${who.name} ==> [${are.cam}]${are.name} (${dmg2}ダメージ)`);
+        let criten = crit ? '！' : '';
+        addlog(`(${turn}) [${who.cam}]${who.name} => [${are.cam}]${are.name} (${dmg2}ダメージ${criten})`);
         
         await delay(1000)
 
@@ -1194,7 +1203,8 @@ async function heal(who, ares, val, props = []){
     
     for(let are of ares){
         if(are.attr.includes('undead')){
-            console.log('アンデッドなので逆回復 =>')
+            // console.log('アンデッドなので逆回復 =>')
+            console.log('undead 死んじゃいない =>')
             let res = await damage(who, are, val, props);
             if(res) return 1;
             continue;
@@ -1202,8 +1212,13 @@ async function heal(who, ares, val, props = []){
         
         if(are.attr.includes('musha')) continue; //武者は回復を受けつけない
 
+        addlog(`(${turn}) [${who.cam}]${who.name} ==> [${are.cam}]${are.name} (${val}回復)`);
+        
+        await delay(1000)
+
         are.hp += val;
         if(are.hp > are.maxhp) are.hp = are.maxhp;
+        tekiou();
     }
 }
 //#endregion
@@ -1252,12 +1267,19 @@ function buffMold(buff, time, val){
     if(!buff || !time || !val) console.error('要素が足りないぜ！！！', buff, kind, time, val);
     let data = Buffs.find(e => e.name == buff);
 
-    if(!data) console.error(buff,'←これ存在しないらしいっすよ〜？')
+    if(!data) console.error(`${buff} ←これ存在しないらしいっすよ〜？`);
     let kind = data.kind;
 
+    if(kind == 'fixe' && !data.lvs[val]){
+        console.error(`${buff} ←これ最大レベルが${data.max}なのに、今${val}指定されてますよ〜？`);
+        console.error(`私が調整しておきますから... 感謝してくださいね〜？`);
+        val = data.max;
+    }
+
     if(data.mode == 'free') val = {[data.agemono]: val};
-    if(data.mode == 'fixe') val = data.lvs[val]??null;
-    console.log(`[${data.mode}] ${buff} val:${val} time:${time}`);
+    if(data.mode == 'fixe') val = data.lvs[val-1]??null;
+    console.log(`[${data.mode}] ${buff} time:${time} val↓`);
+    console.log(val);
 
     let newbuff = {};
 
@@ -1370,6 +1392,28 @@ function buffKeisan(dare, buff, code){
     }
 
     return 0
+}
+//#endregion
+
+//#region ヒョギフ大統領の貴重なエヒフ
+let eFf = {};
+eFf.slash = async function(are, props = []){
+    let hasp = (name) => {return props.includes(name)};
+
+    let tcam = are.cam, tme = are.me;
+    let div0 = batC[`${tcam.substring(0,1)}D`];
+    let div = div0.querySelector(`.${tcam}${tme}`);
+
+    let ef = document.createElement('div');
+    ef.className = 'ef slash';
+
+    let img = document.createElement('img');
+    img.src = 'assets/images/elses/slash.gif';
+    ef.appendChild(img);
+    div.appendChild(ef);
+
+    await delay(300);
+    ef.remove();
 }
 //#endregion
 

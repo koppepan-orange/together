@@ -89,7 +89,7 @@ function probability(num){
 function random(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 };
-function fr(num){
+function fl(num){
     let res = num ? 1 : 0;
     return res;
 }
@@ -251,14 +251,6 @@ function colorcheck(rawtext) {
     return text;
 }
 
-// ↓一瞬これにしようとしてた
-// if(textShowing){
-//     queueAddtext.push(text);
-//     while(textShowing){
-//         await delay(10);
-//     }
-// };
-
 let queueAddtext = [];
 let loopAddtext = 0;
 async function waitforAddtext(){
@@ -269,7 +261,7 @@ async function waitforAddtext(){
 
     if(!loopAddtext) return console.log('loopがないんでしゅーりょー');
     requestAnimationFrame(waitforAddtext);
-    
+
     if(textShowing) return console.log('文字表示されたんでスキップ');
     
     let raw = queueAddtext.shift();
@@ -373,13 +365,14 @@ let logOOmoto = document.querySelector('#log');
 let log = document.querySelector('#log .log');
 let logOpener = document.querySelector('#log .opener');
 let log_open = (code) => {
-   if((logOOmoto.style.right == '-300px' || code == 'o') && code != 'c'){
-      logOOmoto.style.right = '0px';
-      logOpener.textContent = '>';
-   }else{
-      logOOmoto.style.right = '-300px';
-      logOpener.textContent = '<';
-   }
+    if((!logOOmoto.classList.contains('tog') || code == 'o') && code != 'c'){
+        logOOmoto.classList.add('tog');
+        logOpener.textContent = '<';
+
+    }else{
+        logOOmoto.classList.remove('tog');
+        logOpener.textContent = '>';
+    }
 }
 logOpener.addEventListener('click', log_open);
 
@@ -433,26 +426,7 @@ document.addEventListener('mousedown', e => {
     document.addEventListener('mouseup', onMouseUp);
 });
 //#endregion 
-//#region 音をロードする機構
-let soundsLoaded = 0;
-let sounds = {};
-// let soundsNames = ['doom'] //増やしたけりゃここに増やしなねs
-let soundsNames = [];
-let totalsounds = soundsNames.length
 
-soundsNames.forEach(num => {
-    let sound = new Audio();
-    sound.preload = 'auto';
-    sound.src = `assets/sounds/${num}.mp3`; 
-    sound.addEventListener('canplaythrough', () => {
-        soundsLoaded++;
-    }, {once: true});
-    sound.onerror = () => {
-        console.error(`Sound ${num} failed to load.`);
-    };
-    sounds[num] = sound;
-}); 
-//#endregion
 
 //#region Re:connection!!
 var webSocket; //ウェブソケット
@@ -544,50 +518,6 @@ function sendpyTx(text){
     if(connecten) webSocket.send(text);
 };
 
-let cocGachen = {};
-function cocGacha(code = 0){
-    let list = [
-        Friends.filter(a => a.rare == 1),
-        Friends.filter(a => a.rare == 2),
-        Friends.filter(a => a.rare == 3),
-    ];
-
-    let s = 0;
-    let r = random(0,99);
-    if(r<3) s = 3;
-    if(3<=r && r<20) s = 2;
-    if(20<=r) s = 1;
-    
-    if(code) s = code;
-    
-    let item = arraySelect(list[s-1]);
-    let n = `${item.name} [☆ ${s}]`;
-    if(s == 3) n = `ミミミミ   ${n}   ミミミミ`;
-    
-    if(!cocGachen[item.name]) cocGachen[item.name] = 0;
-    cocGachen[item.name ] += 1;
-    
-    return n;
-}
-
-function cocAppe(){
-    let arr0 = Object.keys(cocGachen);
-    let arr = [] 
-    for(let name of arr0){
-        let num = cocGachen[name];
-        let text = `${name}(☆)`;
-
-        let text2 =  1 < num ? text2 = ` ${num-1}凸` : '';
-        
-        let text3 = '';
-        if(10 < num) text3 = '被りすぎだろwww';
-        if(23 < num) text3 = 'な、なんかごめんね？w';
-        if(40 < num) text3 = 'ほんとに..ごめんなさい....';
-        if(99 < num) text3 = '...これあげるよ';
-
-        arr.push([name, cocGachen[name]]);
-    }
-}
 
 //#endregion
 
@@ -1051,12 +981,16 @@ sideLC.list = [
         img:'seafood',
         func: () => {
             sideLF.toggle();
+            gacF.tog();
         }
     },
     {
         name:'dummy!!',
         img:'seafood',
-        func: () => {sideLF.toggle();}
+        func: () => {
+            sideLF.toggle();
+            ganF.tog();
+        }
     },
 ]
 
@@ -1064,7 +998,15 @@ sideLF.toggle = async function(){
     sideLC.open = sideLC.open ? 0 : 1;
     sideLD.classList.toggle('tog');
 }
-sideLC.gararaD.addEventListener('click', sideLF.toggle);
+sideLC.gararaD.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    if(sideLC.open) sideLF.toggle();
+    log_open('o');
+});
+sideLC.gararaD.addEventListener('click', (e) => {
+    if(e.button == 2) return;
+    sideLF.toggle();
+});
 
 sideLF.load = () => {
     for(let ic of sideLC.list){
@@ -1196,38 +1138,42 @@ let fontC = {
     font: 'comicsans',
     appe: 0
 }
-let fontF = {
-    load: () => {
-        let arr = Fonts.filter(a => a.able);
-        fontC.max = arr.length;
-        for(let a of arr){
-            let div = document.createElement('div');
-            div.className = 'f';
-            div.setAttribute('data-name', a.name);
-            div.setAttribute('data-description', a.desc);
+let fontF = {};
+fontF.load = () => {
+    let arr = Fonts.filter(a => a.able);
+    fontC.max = arr.length;
+    for(let a of arr){
+        let div = document.createElement('div');
+        div.className = 'f';
+        div.setAttribute('data-name', a.name);
+        div.setAttribute('data-description', a.desc);
 
-            let name = document.createElement('div');
-            name.className = 'name';
-            name.textContent = a.name;
-            div.appendChild(name);
+        let name = document.createElement('div');
+        name.className = 'name';
+        name.textContent = a.name;
+        div.appendChild(name);
 
-            fontD.appendChild(div);
-        };
-    },
-    tekiou: () => {
-        let items = fontD.querySelectorAll('.f');
-        items.forEach(a => {
-            if(a.classList.contains('selected')) a.classList.remove('selected')
-        })
-        items[fontC.now - 1].classList.add('selected')
-        fontC.font = items[fontC.now - 1].getAttribute('data-name');
-    },
-    select: () => {
-        fontC.ing = 0;
-        fontD.style.display = 'none';
-        fontF.change(fontC.font);
-    }
+        fontD.appendChild(div);
+    };
 }
+fontF.tekiou = () => {
+    let items = fontD.querySelectorAll('.f');
+    items.forEach(a => {
+        if(a.classList.contains('selected')) a.classList.remove('selected')
+    })
+    items[fontC.now - 1].classList.add('selected')
+    fontC.font = items[fontC.now - 1].getAttribute('data-name');
+}
+fontF.select = () => {
+    fontC.ing = 0;
+    fontD.style.display = 'none';
+    fontF.change(fontC.font);
+}
+fontF.change = (font) => {
+    Style.font.textarea = font;
+    Style.tekiou();
+}
+
 document.addEventListener('keydown', event => {
     if(event.key == "Shift"){
         if(fontC.ing) return;
@@ -1263,10 +1209,6 @@ let rainB = document.querySelector('#rainbt');
 let rainC = {
     tapend: 0
 }
-rainB.addEventListener('click', () => {
-    let item = cocGacha();
-    sendpyTx(`printTx,${item}`);
-});
 rainB.addEventListener('contextmenu', (e) => {
     e.preventDefault();
     
@@ -1280,6 +1222,24 @@ rainB.addEventListener('contextmenu', (e) => {
     });
 });
 //#endregion rainbow
+
+//#region 金だ、金を持ってこい
+let euro = 0;
+let euroD = document.querySelector('#gamble .euro');
+let euroF = {};
+euroF.tekiou = () => {
+    euroD.textContent = `${euro}€`;
+}
+euroF.add = (num) => {
+    // - も対応
+    euro += num;
+    euroF.tekiou();
+}
+euroF.set = (num) => {
+    euro = num;
+    euroF.tekiou();
+}
+//#endregion
 
 //#region インベン
 let invD = document.querySelector('#inventory');
@@ -1351,7 +1311,10 @@ function inv_data(name = null){
 }
 
 function inv_tekiou(){
-    for(let cell of invC.areaD.children){
+    let arr = Array.from(invC.areaD.children);
+    arr.push(document.querySelector('#salen .cell'));
+
+    for(let cell of arr){
         if(!cell.dataset.num && !cell.dataset.item) cell.innerHTML = '';
         if(!cell.dataset.item) continue;
         let num = +cell.dataset.num;
@@ -1433,6 +1396,8 @@ document.addEventListener('click', e => {
             inv_ock(cell)
             pickItem = null;
             inv_tekiou();
+
+            if(cell.classList.contains('salen')) salF.ocked()
         }
     }
 });
@@ -1496,6 +1461,183 @@ document.addEventListener('mouseleave', () => {
 
 
 //#endregion イシイ
+
+//#region 売るところ
+let salD = document.getElementById('salen');
+let salC = {
+    open: 0,
+    bai: 5,
+    nedan: 0,
+    yaziruD: salD.querySelector('.yazirushi'),
+    payD: salD.querySelector('.payout'),
+    euroD: salD.querySelector('.payout .euro'),
+    XD: salD.querySelector('.x')
+}
+let salF = {};
+
+salF.open = () => {
+    salC.open = fl(salC.open); //flip
+    salD.classList.toggle('tog');
+}
+euroD.addEventListener('click', salF.open);
+salF.clos = () => {
+    salC.open = 0;
+    salD.classList.remove('tog');
+}
+salC.XD.addEventListener('click', salF.clos);
+
+salF.ocked = () => {
+    let cell = salD.querySelector('.cell');
+    let item = cell.dataset.item;
+    let num = +cell.dataset.num;
+
+    let data = Items.find(o => o.jpnm == item);
+    if(!data) return console.error(`${item} ←これ、存在してないらしいっすよ〜？`);
+    let price = data.price * num * salC.bai;
+
+    salC.euroD.textContent = price;
+}
+
+salF.pay = () => {
+    let cell = salD.querySelector('.cell');
+    if(!cell.dataset.item) return nicoText('売るものがありません');
+    let item = cell.dataset.item;
+    let num = +cell.dataset.num;
+
+    let data = Items.find(o => o.jpnm == item);
+    if(!data) return console.error(`${item} ←これ、存在してないらしいっすよ〜？`);
+    let price = data.price * num * salC.bai;
+
+    euroF.add(price);
+    nicoText(`${item}を${num}個、全部で${price}€で売りました`);
+    sounds['money'].currentTime = 0;
+    sounds['money'].play();
+
+    salC.euroD.textContent = '0';
+
+    cell.innerHTML = '';
+    delete cell.dataset.item;
+    delete cell.dataset.num;
+    inv_tekiou();
+}
+salC.payD.addEventListener('click', salF.pay);
+//#endregion
+
+//#region ギャンブル/syudou
+let ganD = document.getElementById('gamble');
+let ganC = {
+    open: 0,
+    now: 'loby',
+    moving: 0,
+    togD: ganD.querySelector('.opener'),
+}
+ganC.basyos = [
+    {
+        name:'loby',
+        can:1
+    },
+    {
+        name:'blacky', //blackjack
+        can:1
+    },
+    {
+        name:'roulette',
+        can:0
+    }
+]
+let ganF = {};
+ganF.tog = () => {
+    ganC.open = fl(ganC.open);
+    ganD.classList.toggle('tog');
+}
+ganC.togD.addEventListener('click', ganF.tog);
+ganF.move = async function(to){
+    if(ganC.moving) return;
+    
+    let from = ganC.now;
+    if(from == to) return;
+
+    ganC.moving = 1;
+
+    let fromD = ganD.querySelector(`.${from}`);
+    let toD = ganD.querySelector(`.${to}`);
+
+    fromD.classList.remove('tog');
+    fromD.classList.add('mae');
+    toD.classList.add('ato');
+    
+    await delay(50);
+    fromD.classList.add('go');
+    toD.classList.add('go');
+
+    await delay(1000);
+    fromD.classList.remove('mae');
+    fromD.classList.remove('go');
+    toD.classList.remove('ato');
+    toD.classList.remove('go');
+
+    toD.classList.add('tog');
+    ganC.moving = 0;
+    ganC.now = to;
+}
+
+//#region loby
+//#endregion
+
+//#region blacky
+let ganDB = ganD.querySelector('.blacky');
+let ganCB = {
+    h:{
+        p:{list:[],D:ganD.querySelector('.p')},
+        d:{list:[],D:ganD.querySelector('.d')},
+    }
+}
+let ganFB = {};
+ganFB.hiku = () => {
+    let val = random(1, 13);
+    let num = val;
+    if(val == 1)  num = 'A';
+    if(val == 10) num = 'X';
+    if(val == 11) num = 'J';
+    if(val == 12) num = 'Q';
+    if(val == 13) num = 'K';
+
+    let arr = ['♡', '♤', '♢', '♧'];
+    let suit = arraySelect(arr);
+
+    let card = {num, val, suit} //表示、実際の値、スート
+
+    return card;
+}
+ganFB.add = (whi, card) => {
+    let div = document.createElement('div');
+    div.className = 'card';
+    div.dataset.id = card.id;
+
+    let num = document.createElement('div');
+     num.className = 'num';
+     num.textContent = card.num;
+     div.appendChild(num);
+
+    let suit = document.createElement('div');
+     suit.className = 'suit';
+     suit.textContent = card.suit;
+     div.appendChild(suit);
+
+    ganCB.h[whi].D.querySelector('.holder').appendChild(div);
+}
+ganFB.draw = (whi) => {
+    let id = ganCB.h[whi].list.length;
+    let card = ganFB.hiku();
+    card.id = id;
+
+    ganFB.add(whi, card);
+
+    ganCB.h[whi].list.push(card);
+}
+//#endregion
+
+//#endregion
 
 //#region canvas
 let canV = document.getElementById('canvas');
@@ -1581,31 +1723,6 @@ window.addEventListener('resize', canC.resize);
 
 
 
-let canI = {
-    imagesLoaded: 0,
-    imagesNames: {
-        'maps':['0', 'a', 'b'],
-        'systems':['select', 'error', 'error_nico'],
-        'players':['select'],
-        'objects':['tree','tree_apple','tree_kare','stone','stone_kuro','stone_hai','stone_ao','stone_aka','stone_kiro','stone_cha','stone_mido','stone_mizu', 'enemy'],
-    },
-}
-canI.imagesTotal = Object.keys(canI.imagesNames).map(a => canI.imagesNames[a].length).reduce((a, b) => a + b);
-Object.keys(canI.imagesNames).forEach(type => {
-    canI.imagesNames[type].forEach(id => {
-        let img = new Image();
-        img.src = `assets/images/${type}/${id}.png`;
-        img.onload = () => {
-            canI.imagesLoaded++;
-            if(canI.imagesLoaded == canI.imagesTotal && soundsLoaded == totalsounds) start();
-        };
-        img.onerror = () => {
-            console.error(`Image assets/images/${type}/${id} failed to load.`);
-        };
-        if(!canC.imgs[type]) canC.imgs[type] = {};
-        canC.imgs[type][id] = img;
-    });
-});
 
 
 
@@ -1819,6 +1936,14 @@ async function pmoved(){
         if(!hask(data, 'sozai')) continue;
 
         let sozais = data.sozai;
+        if(data.kind.includes('stone')){
+            sounds['breakstone'].currentTime = 0;
+            sounds['breakstone'].play();
+        }
+        else if(data.kind.includes('tree')){
+            sounds['breakgrass'].currentTime = 0;
+            sounds['breakgrass'].play();
+        }
         for(let so of sozais){
             if(!probability(so.p)) continue;
             
@@ -1854,6 +1979,72 @@ canV.addEventListener('click', e => {
 
 
 //#endregion canvas
+
+//#region gacha
+let gacD = document.getElementById('gachan');
+let gacC = {
+    open: 0,
+    mawasuD: gacD.querySelector('.hontai .sita .maru')
+}
+let gacF = {};
+gacF.tog = () => {
+    gacC.open = fl(gacC.open);
+    gacD.classList.toggle('tog');
+}
+
+gacC.list = {};
+gacF.roll = (code = 0) => {
+    if(typeof code != 'number') code = 0, console.error('なんかコードが数値じゃなかったんですケド〜？ 0にしておきますね〜♪');
+
+    let list = [
+        Friends.filter(a => a.rare == 1),
+        Friends.filter(a => a.rare == 2),
+        Friends.filter(a => a.rare == 3),
+    ];
+
+    let s = 0;
+    let r = random(0,99);
+    if(r<3) s = 3;
+    if(3<=r && r<20) s = 2;
+    if(20<=r) s = 1;
+    
+    if(code) s = code, console.log(`promocode => ${s}`);
+    
+    console.log(s)
+    let item = arraySelect(list[s-1]);
+    let n = `${item.name} [☆ ${s}]`;
+    // if(s == 3) n = `ミミミミ   ${n}   ミミミミ`;
+    
+    if(!gacC.list[item.name]) gacC.list[item.name] = 0;
+    gacC.list[item.name] += 1;
+    
+    return n;
+}
+gacF.main = () => {
+    let item = gacF.roll();
+    sendpyTx(`printTx,${item}`);
+}
+gacC.mawasuD.addEventListener('click', gacF.main);
+
+gacF.appe = () => {
+    let arr0 = Object.keys(gacC.list);
+    let arr = [] 
+    for(let name of arr0){
+        let num = gacC.list[name];
+        let text = `${name}(☆)`;
+
+        let text2 =  1 < num ? text2 = ` ${num-1}凸` : '';
+        
+        let text3 = '';
+        if(10 < num) text3 = '被りすぎだろwww';
+        if(23 < num) text3 = 'な、なんかごめんね？w';
+        if(40 < num) text3 = 'ほんとに..ごめんなさい....';
+        if(99 < num) text3 = '一周回ってこれはあなたが悪いっすよ';
+
+        arr.push([name, gacC.list[name]]); //名前, 数
+    }
+}
+//#endregion
 
 //#region jamer_popup
 async function popup_dasu(num = 1){
@@ -2404,6 +2595,7 @@ async function goRabbit(){
 
 //#endregion
 
+
 function start(){
     commanC.logD.value += `hello! no name!`;
     connect();
@@ -2429,6 +2621,7 @@ async function gameloop(){
 
     // if(en) objmake();
     mapmakeD.textContent = pickItem?.dataset?.item;
+
 
     if(loop) requestAnimationFrame(gameloop);
 }
@@ -2473,6 +2666,31 @@ let secrates = [ // セクラテス
             buffadd(cm(), cm(), 'poison', 2, 1);
             buffadd(cm(), cm(), 'palsy', 2, 1);
             buffadd(cm(), cm(), 'freeze', 2, 1);
+        }
+    },
+    {
+        ind:0,
+        name:'gamble',
+        arr:['g','a','m','b','l','e'],
+        limit:'n',
+        func: async function(){
+            ganF.tog();
+        }
+    },
+    {
+        ind:0,
+        name:'allover',
+        arr:['a','l','l','o','v','e','r'],
+        limit:'n',
+        func: async function(){
+            bigmmC.kitekeyD.click();
+            batF.open();
+            gacF.tog();
+            achF.tog();
+            salF.open();
+            inv_open(1);
+            sideLF.toggle();
+            undF.open();
         }
     },
     {
@@ -2558,3 +2776,54 @@ document.addEventListener('keydown', async function(e){
         else sec.ind = 0;
     }
 })
+
+
+//#region 音をロードする機構
+let soundsLoaded = 0;
+let sounds = {};
+let soundsNames = ['doom', 'money', 'breakstone', 'breakgrass'] //増やしたけりゃここに増やしなねs
+// let soundsNames = [];
+let totalsounds = soundsNames.length
+
+soundsNames.forEach(num => {
+    let sound = new Audio();
+    sound.preload = 'auto';
+    sound.src = `assets/sounds/${num}.mp3`; 
+    sound.addEventListener('canplaythrough', () => {
+        soundsLoaded++;
+        if(canI.imagesLoaded == canI.imagesTotal && soundsLoaded == totalsounds) start();
+    }, {once: true});
+    sound.onerror = () => {
+        console.error(`Sound ${num} failed to load.`);
+        soundsLoaded++;
+    };
+    sounds[num] = sound;
+}); 
+//#endregion
+//#region 画像の読み込み
+let canI = {
+    imagesLoaded: 0,
+    imagesNames: {
+        'maps':['0', 'a', 'b'],
+        'systems':['select', 'error', 'error_nico'],
+        'players':['select'],
+        'objects':['tree','tree_apple','tree_kare','stone','stone_kuro','stone_hai','stone_ao','stone_aka','stone_kiro','stone_cha','stone_mido','stone_mizu', 'enemy'],
+    },
+}
+canI.imagesTotal = Object.keys(canI.imagesNames).map(a => canI.imagesNames[a].length).reduce((a, b) => a + b);
+for(let type of Object.keys(canI.imagesNames)){
+    for(let id of canI.imagesNames[type]){
+        let img = new Image();
+        img.src = `assets/images/${type}/${id}.png`;
+        img.onload = async function (){
+            canI.imagesLoaded++;
+            if(canI.imagesLoaded == canI.imagesTotal && soundsLoaded == totalsounds) start();
+        };
+        img.onerror = () => {
+            console.error(`Image assets/images/${type}/${id} failed to load.`);
+        };
+        if(!canC.imgs[type]) canC.imgs[type] = {};
+        canC.imgs[type][id] = img;
+    };
+};
+//#endregion

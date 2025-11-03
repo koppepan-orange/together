@@ -1,3 +1,4 @@
+@font-face{src:url('assets/fonts/comicsans.ttf');font-family: comicsans;}
 @font-face{src:url("assets/fonts/hangyaku.ttf");font-family: hangyaku; }
 @font-face{src:url('assets/fonts/kurobara.ttf');font-family: kurobara;}
 @font-face{src:url('assets/fonts/starrysky.otf');font-family: starrysky;}
@@ -19,6 +20,11 @@ html{
     display: flex;
     flex-direction: column;
 }
+.hidden{
+    opacity: 0;
+    pointer-events: none;
+}
+
 img{
     /* 画像をドラッグできないようにするやつ */
     -webkit-user-drag: none;
@@ -59,16 +65,6 @@ input[type="range"]::-moz-range-thumb {
     cursor: pointer;
 }
 
-#hakaisatsu{ /*img*/
-    height: 120vh;
-    aspect-ratio: 1/1;
-    position: fixed;
-    top: -10vh;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 21299999999;
-    pointer-events: none;
-}
 
 .checkbox{
     display: flex;
@@ -100,42 +96,41 @@ input[type="range"]::-moz-range-thumb {
 }
 /*logとtext*/
 #log{
-    display: none;
+    display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-start;
     width: 320px;
-    height: 200px;
-    border: 1px solid #ffffff;
-    background-color: rgba(0,0,0,0);
+    height: 24vh;
+    border: 2px solid #ffffff;
+     border-left: none;
     position: fixed;
-    bottom: 150px;
-    right: -300px;
+    left: -334px;
     color: #fefefe;
     overflow-y: hidden;
-    transition: right 0.3s;
-    z-index: 254;
+    transition: left 1.0s ease;
+    z-index: 10;
+}
+#log.tog{
+    left: 54px;
 }
 #log .opener{
-    width: 20px;
+    width: 30px;
     height: 100%;
-    background-color: rgba(0,0,0,0.9);
-    color: #fefefe;
+    background-color: #000000ef;
     text-align: center;
     cursor: pointer;
-    z-index: 254;
+    z-index: inherit;
 }
 #log .log{
     width: 300px;
     height: 100%;
-    max-height: 200px;
-    overflow-x: hidden;
-    overflow-y: scroll;
-    background-color: rgba(0,0,0,0.8);
-    color: #fefefe;
+    max-height: 100%;
+    overflow-x: hidden; overflow-y: scroll;
+    background-color: #000000de;
     text-align: left;
     font-size: 14px;
     transition: right 0.3s;
-    z-index: 253;
+    z-index: inherit;
 }
 #text{
     display: none;
@@ -186,6 +181,8 @@ input[type="range"]::-moz-range-thumb {
     z-index: 256;
 }
 
+
+
 水色 #f0f8ff, #eaf5ff, #def0ff, #cfe9ff, #b5dcff
 紫色 #f8f6ff, #f5f2ff, #f1edff, #ece8ff, #e9e4ff
 橙色 #fffaf3, #fff7eb, #fff3e2, #fff0d9, #ffeccf
@@ -217,18 +214,8 @@ input[type="range"]::-moz-range-thumb {
     margin-bottom: 5px;
 }
 
-.hidden{
-    opacity: 0;
-    pointer-events: none;
-}
 
-textarea{
-    /* font-family: concolas; */
-    font-family: kurobara;
-    /* font-family: marukoius */
-    /* font-family: kurundeco; */
-}
-
+/* #region titleArea */
 :root{
     --txwaku: #6bb9ff
 }
@@ -285,18 +272,7 @@ textarea{
     cursor: pointer;
     margin: 5px;
 }
-
-/**/
-#commands{
-    margin-top: 50px;
-    margin-left: 20px;
-    display: block;
-}
-#commands .log{
-    color: #001527;
-    font-size: 14px;
-    font-family: misaki;
-}
+/* #endregion */
 
 #mainArea{
     width: calc(100vw - 80px);
@@ -307,6 +283,59 @@ textarea{
     font-family: hangyaku;
 }
 
+/* #region hakaisatsu */
+#hakaisatsu{ /*img*/
+    height: 120vh;
+    aspect-ratio: 1/1;
+    position: fixed;
+    top: -10vh;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 21299999999;
+    pointer-events: none;
+}
+/* #endregion */
+
+/* #region commands */
+#commands{
+    margin-top: 50px;
+    margin-left: 20px;
+    width: 400px;
+    display: block;
+}
+#commands .log{
+    width: 100%;
+    color: #000000;
+    border: 1px solid #2b2b2b;
+    font-size: 14px;
+    font-family: var(--font-textarea);
+}
+#commands .row{
+    margin-bottom: -1px;
+}
+#commands .text{
+    width: calc(85%);
+    height: 22px;
+    border: 1px solid #2b2b2b;
+    font-family: var(--font-textarea);
+    box-sizing: border-box;
+}
+#commands .send{
+    margin-left: -1px;
+    width: calc(15% + 1px);
+    height: 22px;
+    background: #cecece;
+    border: 1px solid #2b2b2b;
+    font-family: hangyaku;
+    box-sizing: border-box;
+}
+#commands .send:hover{
+    background: #6e6e6e;
+    cursor: pointer;
+}
+/* #endregion */
+
+/* #region rain bow */
 #rainbt{
     position: fixed;
     bottom: 0;
@@ -336,7 +365,10 @@ textarea{
     0%   { background-position: 0 0; }
     100% { background-position: -400% 0; }
 }
+/* #endregion */
 
+
+/* #region bigmashmaro */
 #bigmashmaro{
     z-index: 3;
 }
@@ -379,11 +411,12 @@ textarea{
     border: 10px solid #def0ff;
     border-radius: 0 0 0 5px;
     border-top: none;
-    font-size: 20px;
     position: fixed;
     top: -80%;
     right: 10%;
     transition: top 0.5s ease;
+    font-size: 20px;
+    font-family: var(--font-textarea);
     box-sizing: border-box;
     z-index: inherit;
 }
@@ -476,7 +509,9 @@ textarea{
     clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
     z-index: inherit;
 }
+/* #endregion */
 
+/* #region sideL */
 #sideL{
     display: flex;
     flex-direction: column;
@@ -554,7 +589,9 @@ textarea{
     object-fit: cover;
     z-index: inherit;
 }
+/* #endregion */
 
+/* #region underBar */
 #underBar{
     display: flex;
     flex-direction: column;
@@ -609,7 +646,9 @@ textarea{
     transform: translateY(-50%);
     z-index: inherit;
 }
+/* #endregion */
 
+/* #region achieve */
 #achieve{
     width: 100vw;
     height: 12%;
@@ -622,7 +661,9 @@ textarea{
 #achieve.tog{
     right: 0;
 }
+/* #endregion */
 
+/* #region fonts */
 #fonts{
     display: none;
     flex-direction: column;
@@ -656,8 +697,9 @@ textarea{
     text-align: center;
     color: #ffffff;
 }
+/* #endregion */
 
-
+/* #region inventory */
 :root{
     --inv_rowG: 8px;
     --inv_colG: 8px;
@@ -751,28 +793,358 @@ textarea{
 }
 #inventory .area .cell .num{
     color: #ffffff;
-    font-size: 12px;
+    font-size: 16px;
     position: absolute;
     bottom: 2px;
     right: 4px;
     z-index: 201;
 }
 
-#items{
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    position: fixed;
-    top: 70px;
-    right: 20px;
-}
-#items .ite{
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    cursor: pointer;
+.item{
+    z-index: 2138123;
 }
 
+/* #endregion */
+
+/* #region salen */
+#salen{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 250px;
+    aspect-ratio: 1/1;
+    border: 5px solid #ffddaa;
+    border-bottom: none;
+    position: fixed;
+    bottom: -350px;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: bottom 1.0s linear;
+    background: #fff7eb;
+    z-index: 4;
+}
+#salen.tog{
+    bottom: 0px;
+}
+#salen .x{
+    width: 30px;
+    aspect-ratio: 1/1;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+}
+#salen .x .inner{
+    width: 100%;
+    height: 100%;
+    background: #9c5f1d;
+    clip-path: polygon(10% 0%, 50% 40%, 90% 0%, 100% 10%, 60% 50%, 100% 90%, 90% 100%, 50% 60%, 10% 100%, 0% 90%, 40% 50%, 0% 10%);
+}
+#salen .cell{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60.87px;
+    aspect-ratio: 1/1;
+    background: #0000002b;
+    position: relative;
+    pointer-events: all;
+    cursor: pointer;
+    z-index: inherit;
+}
+#salen .cell .num{
+    color: #ffffff;
+    font-size: 16px;
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    z-index: inherit;
+}
+#salen .cell .item{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 90%;
+    height: 90%;
+    background: #ffffff00;
+    cursor: pointer;
+    position: relative;
+    z-index: 5;
+}
+#salen .cell img.item{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: inherit;
+}
+
+#salen .yazirushi{
+    width: 100px;
+    aspect-ratio: 1/1;
+    position: relative;
+    z-index: inherit;
+}
+#salen .yazirushi .tate{
+    width: 10%;
+    height: 70%;
+    background: #ebbb74;
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: inherit;
+}
+#salen .yazirushi .kasa{
+    width: 100%;
+    height: 40%;
+    background: #ebbb74;
+    clip-path: polygon(0% 0%, 50% 50%, 100% 0%, 50% 100%);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: inherit;
+}
+
+#salen .payout{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-self: center;
+    gap: 2px;
+    border: 2px solid #fff7eb;
+    padding: 2px 10px;
+    color: #000000;
+    font-size: 24px;
+    font-family: hangyaku;
+}
+#salen .payout:hover{
+    cursor: pointer;
+    background: #fff3e2;
+    border: 2px solid #ffcd82;
+}
+/* #endregion */
+
+/* #region リヴァーサル/syudou */
+#gamble{
+    width: 600px;
+    aspect-ratio: 2/1;
+    background: #582a2a;
+    border: 10px solid #442020;
+    border-left: none;
+    position: fixed;
+    top: 5%;
+    left: -650px;
+    transition: left 2.0s cubic-bezier(0.55, 0.02, 0.75, 0.5);
+    overflow:hidden;
+    box-sizing: border-box;
+    z-index: 6;
+}
+#gamble.tog{
+    left: 0;
+}
+#gamble .opener{
+    width: 50px;
+    height: calc(100% + 20px);
+    background: #e28b8b;
+    position: absolute;
+    top: -10px;
+    right: -50px;
+    cursor: pointer;
+}
+#gamble .euro{
+    padding: 2px 15px;
+    background: #b5dcff;
+    border: 2px solid #4473ad;
+    border-radius: 15px;
+    font-size: 20px;
+    position: absolute;
+    top: 50px;
+    right: -87.5%;
+    transition: right 2.0s cubic-bezier(0.55, 0.02, 0.75, 0.5);
+    cursor: pointer;
+}
+#gamble .euro:hover{
+    background: #70bcff;
+}
+#gamble.tog .euro{
+    right: -110px;
+}
+
+#gamble .heya{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    box-sizing: border-box;
+    z-index: inherit;
+}
+
+/* #region animationなのでカット */
+:root{
+    --anim-dur: 800ms;
+    --anim-ease: cubic-bezier(.2,.9,.23,1);
+}
+
+#gamble .heya{
+    opacity:0;
+    position:absolute;
+    inset:0;
+    will-change: transform, opacity;
+    transition: transform var(--anim-dur) var(--anim-ease), opacity var(--anim-dur) var(--anim-ease);
+    transform:translateX(0);
+    pointer-events:none;
+}
+#gamble .heya.tog{
+    opacity:1;
+    pointer-events:auto;
+    z-index:3;
+}
+#gamble .heya.ato{
+    opacity:0;
+    transform: translateX(100%);
+    z-index:2;
+}
+#gamble .heya.mae{
+    opacity:1;
+    transform: translateX(0);
+    pointer-events:none;
+    z-index:1;
+}
+#gamble .heya.ato.go{
+    opacity:1;
+    transform: translateX(0);
+    pointer-events:auto;
+}
+#gamble .heya.mae.go {
+    opacity:0;
+    transform: translateX(-100%);
+}
+/* #endregion */
+
+#gamble .loby{
+    background: #36962c;
+}
+
+
+#gamble .blacky{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 15%;
+    background: #ff89a2;
+}
+#gamble .blacky .h{
+    width: 30%;
+    height: 80%;
+    border: 3px solid #ff5252;
+    background: #ffffff;
+}
+#gamble .blacky .h .holder{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: -20px;
+    /* gapはー無理だから諦めていい感じにすることを推奨 */
+
+}
+#gamble .blacky .card{
+    width: 50px;
+}
+.card{
+    aspect-ratio: 2 / 3;
+    background: #ffffff;
+    border: 2px solid #000000;
+    border-radius: 5px;
+    position: relative;
+}
+.card .num{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: hangyaku;
+    font-size: 40px;
+}
+.card .suit{
+    position: absolute;
+    top: 0px;
+    right: 5px;
+    font-size: 18px;
+}
+.card .suit.♡, .card .suit.♢{
+    color: #ff0000;
+}
+.card .suit.♤, .card .suit.♧{
+    color: #000000;
+}
+
+/* #endregion */
+
+/* #region gachan */
+#gachan{
+    width: 120px;
+    height: 163px;
+    padding: 10px 5px;
+    background: #f5f2ff;
+    border: 2px solid #705ea9;
+    border-radius: 0 10px 10px 0;
+    border-left: none;
+    position: fixed;
+    bottom: 10%;
+    left: -120px;
+    transition: left 1.0s ease;
+    box-sizing: border-box;
+    z-index: 4;
+}
+#gachan.tog{
+    left: 0;
+}
+#gachan .hontai{
+    width: 100px;
+    height: 150px;
+    position: relative;
+    box-sizing: border-box;
+}
+#gachan .hontai .kyuu{
+    width: 80%;
+    aspect-ratio: 1 / 1;
+    background: #cfe9ff;
+    border-radius: 50%;
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+}
+#gachan .hontai .sita{
+    width: 80%;
+    height: 90%;
+    background: #ac4a08;
+    clip-path: polygon(40% 0%, 60% 0%, 100% 100%, 0% 100%);
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+}
+#gachan .hontai .sita .maru{
+    width: 30%;
+    aspect-ratio: 1 / 1;
+    background: #d1793f;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 12%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+}
+/* #endregion */
+
+/* #region 素材集めcanvas */
 #canvas{
     display: block;
     border: 2px solid #000000;
@@ -791,7 +1163,9 @@ textarea{
     transform: translateY(-50%);
     cursor: pointer;
 }
+/* #endregion */
 
+/* #region 邪魔者(邪魔する者) */
 .jamerP.A{
     width: 100px;
     aspect-ratio: 1/1;
@@ -833,7 +1207,9 @@ textarea{
     box-sizing: border-box;
     box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
 }
+/* #endregion */
 
+/* #region ghost(デスクトップマスコット)(雪だるま)*/
 :root{
     --size: 180px;
 }
@@ -846,7 +1222,7 @@ textarea{
     bottom: 5%;
     touch-action:none; /* タッチでページスクロールさせない */
 }
-.body{
+#ghost .body{
     position:absolute;
     left:50%;
     top:40%;
@@ -858,7 +1234,7 @@ textarea{
     box-shadow: 0 8px 18px rgba(10,20,40,0.15), inset 0 -6px 12px rgba(0,0,0,0.03);
     z-index:1;
 }
-.head{
+#ghost .head{
     display:flex;
     align-items:center;
     justify-content:center;
@@ -875,20 +1251,20 @@ textarea{
     overflow:visible;
     z-index:3;
 }
-.head .top, .head .bottom {
+#ghost .head .top, #ghost .head .bottom {
     position:absolute;
     left:0;
     width:100%;
     height:50%;
     z-index: 4;
 }
-.head .top {
+#ghost .head .top {
     top:0;
 }
-.head .bottom {
+#ghost .head .bottom {
     bottom:0;
 }
-.eye{
+#ghost .eye{
     position:absolute;
     top:46%;
     width:10%;
@@ -898,13 +1274,13 @@ textarea{
     transform:translateY(-50%);
     z-index:4;
 }
-.eye.left{
+#ghost .eye.left{
     left:38%;
 }
-.eye.right{
+#ghost .eye.right{
     right:38%;
 }
-.bubble{
+#ghost .bubble{
     width: calc(var(--size) * 2 / 3);
     height: calc(var(--size));
     position:absolute;
@@ -923,11 +1299,11 @@ textarea{
     transition: opacity 100ms ease, transform 100ms cubic-bezier(.2,.9,.2,1);
     z-index:10;
 }
-.bubble.show{
+#ghost .bubble.show{
     opacity:1;
     transform:translateX(-50%) scale(1);
 }
-.bubble .sankack{
+#ghost .bubble .sankack{
     height: 10%;
     aspect-ratio: 1/1;
     background: #fffffff2;
@@ -936,8 +1312,9 @@ textarea{
     left:100%;
     clip-path: polygon(0% 0%, 100% 70%, 0% 100%);
 }
+/* #endregion */
 
-
+/* #region bleBack(bullet game) */
 #bleBack{
     display: block;
     margin: 0 auto;
@@ -973,7 +1350,9 @@ textarea{
     87.5%{left: 3vw}
     100%{left: 0; top: 0;}
 }
+/* #endregion */
 
+/* #region notice */
 .notice{
     display: flex;
     flex-direction: row;
@@ -1008,7 +1387,9 @@ textarea{
 .notice.isostagram{background: #ffd2fcee}
 .notice.twitter2{background: #d1e9ffee}
 .notice.tictac{background: #2c2c2cee; color: #ffffffee}
+/* #endregion */
 
+/* #region rabbit */
 .rabbit{
     /* img */
     display: block;
@@ -1021,10 +1402,9 @@ textarea{
     transition: left 0.08s linear;
     z-index: 4;
 }
+/* #endregion */
 
-/* こっからbattle */
-
-
+/* #region battle */
 #battle{
     display: block;
     width: fit-content;
@@ -1084,7 +1464,9 @@ textarea{
     z-index: inherit;
 }
 
-/* #battle .column . */
+#battle .column{
+    gap: 10px;
+}
 
 #battle .enemies, #battle .players{
     display: flex;
@@ -1190,8 +1572,27 @@ textarea{
     background: #8080ff;
 }
 
+#battle .human .ef{
+    width: 150%;
+    aspect-ratio: 1/1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 10;
+}
+#battle .human .ef img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+#battle .commands{
+    margin-top: 10px;
+}
 #battle .button{
-    margin-top: 5px;
     height: 30px;
     background: var(--button-back);
     border: 2px solid var(--button-solid);
@@ -1199,4 +1600,8 @@ textarea{
 #battle .button.ed{
     background: var(--button-aima);
 }
-
+#battle .button:hover{
+    cursor: pointer;
+    filter: brightness(1.2);
+}
+/* #endregion */

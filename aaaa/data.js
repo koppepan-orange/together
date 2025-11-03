@@ -1,4 +1,7 @@
 let Style = {
+    font:{
+        textarea: 'misaki'
+    },
     button: {
         solid: '#000000',
         back: '#ffffff',
@@ -58,127 +61,151 @@ let Items = [
         name:'water',
         jpnm:'水',
         kind:'natural liquid',
+        price:0,
     },
     {
         name:'mebra_log', //amber、琥珀。砂漠の
         jpnm:'メブラの丸太',
         kind:'natural mebra tree log',
+        price:4,
     },
     {
         name:'mebra_plank',
         jpnm:'メブラの板材',
         kind:'natural mebra tree plank',
+        price:1,
     },
     {
         name:'mebra_seed',
         jpnm:'メブラの種子',
         kind:'natural mebra tree seed',
+        price:1,
     },
     {
         name:'stick',
         jpnm:'棒',
         kind:'natural tree',
+        price:1,
     },
     
     {
         name:'apple',
         jpnm:'椎名', //大怒られしそうだなこれ
         kind:'natural fruit tree',
+        price:5,
     },
     {
         name:'apple_bad', //どう使おうねこれ
         jpnm:'Bad Apple!!',
         kind:'natural fruit tree',
+        price:10,
     },
     {
         name:'orange',
         jpnm:'みかん',
         kind:'natural fruit tree',
+        price:4,
     },
     {
         name:'lemon',
         jpnm:'夢ならば',
         kind:'natural fruit tree',
+        price:5,
     },
     {
         name:'kabosu',
         jpnm:'現実です',
         kind:'natural fruit tree',
+        price:5,
     },
 
     {
         name:'stone',
         jpnm:'石',
-        kind:'natural stone'
+        kind:'natural stone',
+        price:1,
     },
     {
         name:'iron',
         jpnm:'鉄',
-        kind:'natural metal magnetic' //magnetic == 磁気。鉄、コバルト、ニッケルしか持たぬ
+        kind:'natural metal magnetic', //magnetic == 磁気。鉄、コバルト、ニッケルしか持たぬ
+        price:10,
     },
     {
         name:'gold',
         jpnm:'金',
-        kind:'natural metal' //金は基本、科学反応しないそうな
+        kind:'natural metal', //金は基本、科学反応しないそうな
+        price:20,
     },
     {
         name:'copper',
         jpnm:'銅',
-        kind:'natural metal' //metal == 金属。金属探知機にでも
+        kind:'natural metal', //metal == 金属。金属探知機にでも
+        price:3,
     },
     {
         name:'aluminium',
         jpnm:'アルミニウム',
-        kind:'natural metal' //金属は必ず電気を通す。これ絶対だからってやつだね（metakはconductor替わりになります）
+        kind:'natural metal', //金属は必ず電気を通す。これ絶対だからってやつだね（metalはconductor替わりになります）
+        price:1,
     },
     {
         name:'titanium',
         jpnm:'チタニウム',
-        kind:'natural metal'
+        kind:'natural metal',
+        price:12,
     },
     {
         name:'uran',
         jpnm:'ウラン',
-        kind:'natural metal'
+        kind:'natural metal',
+        price:40,
     },
     {   
         name:'tsukaretanodeyamerunium',
         jpnm:'ツカレタノデヤメルニウム', //自作金属。どうかしてるぜ
-        kind:'natural metal'
+        kind:'natural metal',
+        price:23,
     },
 
     {
         name:'coal',
         jpnm:'石炭',
-        kind:'natural fuel'
+        kind:'natural fuel',
+        price:8,
     },
 
 
     {
         name:'cobalt',
         jpnm:'コバルト',
-        kind:'natural metal magnetic'
+        kind:'natural metal magnetic',
+        price:13,
     },
     {
         name:'nikkel', //x
         jpnm:'ニッケル',
-        kind:'natural metal magnetic'
+        kind:'natural metal magnetic',
+        price:12,
     },
 
     {
         name:'ruby',
         jpnm:'ルビー',
-        kind:'natural gem'
+        kind:'natural gem',
+        price:50,
     },
     {
         name:'sapphire', //x
         jpnm:'サファイア',
-        kind:'natural gem'
+        kind:'natural gem',
+        price:46,
     },
     {
         name:'larimar   ',
         jpnm:'ラリマール',
-        kind:'natural gem'
+        kind:'natural gem',
+        price:80,
     },
 
     
@@ -186,16 +213,19 @@ let Items = [
         name:'suiso',
         jpnm:'水素',
         kind:'natural gas',
+        price:0,
     },
     {
         name:'helium',
         jpnm:'ヘリウム',
         kind:'natural gas',
+        price:0,
     },
     {
         name:'sanso',
         jpnm:'酸素',
         kind:'natural gas',
+        price:0,
     },
     
 ]
@@ -206,6 +236,7 @@ let Objects = [
         appe:1,
         dest:1, //destroy.
         desc:'木。', //description.
+        kind:'natural tree',
         sozai:[
             {name:'mebra_log', p:100, amo:[5,8]},
             {name:'stick', p:50, amo:[1,4]},
@@ -217,6 +248,7 @@ let Objects = [
         appe:1,
         dest:1,
         desc:'木。\nなんとりんごがついている。',
+        kind:'natural tree',
         sozai:[
             {name:'mebra_log', p:100, amo:[5,8]},
             {name:'stick', p:50, amo:[1,4]},
@@ -228,6 +260,7 @@ let Objects = [
         appe:1,
         dest:1,
         desc:'枯木。',
+        kind:'natural tree',
         sozai:[
             {name:'mebra_log', p:100, amo:[4,7]},
             {name:'stick', p:75, amo:[1,7]},
@@ -238,6 +271,7 @@ let Objects = [
         appe:1,
         dest:1,
         desc:'石。',
+        kind:'natural stone',
         sozai:[
             {name:'stone', p:100, amo:[3,5]},
         ]
@@ -247,6 +281,7 @@ let Objects = [
         appe:1,
         dest:1,
         desc:'石。\n黒色の鉱石が出てくるぞい。',
+        kind:'natural stone ore',
         sozai:[
             {name:'stone', p:100, amo:[1,3]},
             {name:'coal', p:75, amo:[2,4]},
@@ -257,6 +292,7 @@ let Objects = [
         appe:1,
         dest:1,
         desc:'石。\n灰色の鉱石が出てくるぞい。',
+        kind:'natural stone ore',
         sozai:[
             {name:'stone', p:100, amo:[1,3]},
             {name:'aluminium', p:40, amo:[3,6]},
@@ -269,6 +305,7 @@ let Objects = [
         appe:0,
         dest:1,
         desc:'石。\n青色の鉱石が出てくるぞい。',
+        kind:'natural stone ore',
         sozai:[
             {name:'stone', p:100, amo:[1,3]},
             {name:'cobalt', p:35, amo:[]}
@@ -279,6 +316,7 @@ let Objects = [
         appe:1,
         dest:1,
         desc:'石。\n赤色の鉱石が出てくるぞい。',
+        kind:'natural stone ore',
         sozai:[
             {name:'stone', p:100, amo:[1,3]},
             {name:'ruby', p:25, amo:[1,3]},
@@ -289,6 +327,7 @@ let Objects = [
         appe:1,
         dest:1,
         desc:'石。\n黄色の鉱石が出てくるぞい。',
+        kind:'natural stone ore',
         sozai:[
             {name:'stone', p:100, amo:[1,3]},
             {name:'gold', p:50, amo:[3,6]},
@@ -298,6 +337,7 @@ let Objects = [
         name:'stone_cha',
         dest:1,
         desc:'石。\n茶色の鉱石が出てくるぞい。',
+        kind:'natural stone ore',
         sozai:[
             {name:'stone', p:100, amo:[1,3]},
             {name:'copper', p:80, amo:[5,9]},
@@ -308,6 +348,7 @@ let Objects = [
         appe:1,
         dest:1,
         desc:'石。\n鉄色の鉱石が出てくるぞい。',
+        kind:'natural stone ore',
         sozai:[
             {name:'stone', p:100, amo:[1,3]},
             {name:'uran', p:30, amo:[2,5]},
@@ -318,6 +359,7 @@ let Objects = [
         appe:1,
         dest:1,
         desc:'石。\n水色の鉱石が出てくるぞい。',
+        kind:'natural stone ore',
         sozai:[
             {name:'stone', p:100, amo:[1,3]},
             {name:'tsukaretanodeyamerunium', p:40, amo:[4,7]},
@@ -330,6 +372,7 @@ let Objects = [
         appe:0,
         dest:1,
         desc:'敵である',
+        kind:'human',
         sozai:[]
     }
 ]
@@ -677,6 +720,11 @@ let Buffs = [
         mode:'fixe',
         kind:'turn',
         description:'姿を消し、攻撃を受けなくなる。\nしかし範囲攻撃はちゃんと当たる。\nLv1ならば範囲攻撃で解除される。',
+        lvs:[
+            {dod:'ab'},
+            {dod:'ab'}
+        ],
+        max:1
     },
     {
         name:'cheerup',
@@ -1060,7 +1108,8 @@ let Buffs = [
         mode:'fixe',
         kind:'turn',
         description:'スライムがくっついているおかげで行動するとダメージを受けます',
-        //行動時ダメージ(固定)
+        lvs:[],
+        max:1
     },
     {
         name:'letsthrow',
@@ -1168,8 +1217,7 @@ let Magics = [
         mp:4,
         lv:1,
         process:async function(who, are){
-                await addtext(`${who.name}はhealを唱えた！`)
-                await heal(who, are, '20%', 'add')
+                await heal(who, are, '20%')
                 
                 return 0;
         }
@@ -1177,28 +1225,23 @@ let Magics = [
     {
         id:'power',
         name:'power',
-        description:'攻撃力が1.25倍になります。やったね！',
+        description:'攻撃力が1.5倍になります。やったね！',
         mp:5,
         lv:1,
         process:async function(who, are){
-                await addtext(`${who.name}はpowerを唱えた！`)
-                await buffadd(who, are,'pow',3,1);
-                await letsElseed(are, who, 'magic', 'pow'); //読み方はワザップです
-                //soldatoのシステム応用しつつで
-                return 0;
+            await buffadd(who, are,'pow',3,1);
+            return 0;
         }
     },
     {
         id:'shell',
         name:'shell',
-        description:'防御力が1.25倍になります！\n実感あんまりないけど',
+        description:'防御力が1.5倍になります！\n実感あんまりないけど',
         mp:5,
         lv:1,
         process:async function(who, are){
-                await addtext(`${who.name}はshellを唱えた!`);
-                await buffadd(who, are,'she',3,1);
-                // await letsElseed(tcam, target, cam, me, 'magic', 'shell'); 
-                return 0;
+            await buffadd(who, are,'she',3,1);
+            return 0;
         }
     },
     {
@@ -1208,10 +1251,8 @@ let Magics = [
         mp:7,
         lv:3,
         process:async function(who, are){
-                await addtext(`${who.name}はpoisonを唱えた!`);
-                await buffadd(who, are,'poison',4,1);
-                await letsElseed(tcam, target, cam, me, 'buff', 'poison'); 
-                return 0;
+            await buffadd(who, are,'poison',4,1);
+            return 0;
         }
     },
     {
@@ -1221,11 +1262,12 @@ let Magics = [
         mp:3,
         lv:4,
         process:async function(who, are){
-                await addtext(`${humans[cam][me].name}はサンディを唱えた!!`);
-                let result = await damage(who, are,30,'mg',4);//雷 なんかいい感じにしといて fi,aq,th,wi,da,liみたいな
-                if(result) return 1;
-                if(probability(2)) buffadd(who, are, 'hirumi', 1)
-                return 0;
+            let res = await damage(who, are,30,'mg');//雷 なんかいい感じにしといて fi,aq,th,wi,da,liみたいな
+            if(res) return 1;
+
+            if(probability(2)) buffadd(who, are, 'hirumi', 1)
+
+            return 0;
         }
     },
     {
@@ -1235,10 +1277,12 @@ let Magics = [
         mp:4,
         lv:4,
         process:async function(who, are){
-                let result = await damage(who, are,110,'mg',2);//火
-                if(result) return 1;
-                if(probability(10)) await buffadd(who, are,'burn',2,1);
-                return 0;
+            let res = await damage(who, are,110,'mg');//火
+            if(res) return 1;
+
+            if(probability(10)) await buffadd(who, are,'burn',2,1);
+
+            return 0;
         }
     },
     {
@@ -1248,19 +1292,19 @@ let Magics = [
         mp:8,
         lv:6,
         process:async function(who, are){
-                await heal(who, are, '40%', 'add')
-                return 0;
+            await heal(who, are, '40%')
+            return 0;
         }
     },
     {
         id:'luck',
         name:'luck',
-        description:'二回行動人間になれるかも？なやつ。\n欠けた運を施錠しましょう',
+        description:'二回行動人間になれるかも？なやつ。\n欠けた運を施錠しましょう',//それlock lack luckってね
         mp:4,
         lv:7,
         process:async function(who, are){
-                await buffadd(who, are, 'luck', 4, 1);
-                return 0;
+            await buffadd(who, are, 'luck', 4, 1);
+            return 0;
         }
     },
     {
@@ -1270,32 +1314,33 @@ let Magics = [
         mp:8,
         lv:8,
         process:async function(who, are){
+            let res = await damage(who,are,120,'mg');//雷
+            if(res) return 1;
 
-                damage(who, are,120,'mg',4);//雷
-                if(probability(5)) buffadd(who, are,'hirumi' ,1)
-                return 0
+            if(probability(5)) buffadd(who,are,'hirumi',1)
+            return 0
         }
     },
     {
         id:'morepower',
         name:'more power',
-        description:'攻撃力が1.5倍になります。power使ってた人いるんかな',
+        description:'攻撃力が2倍になります。power使ってた人いるんかな',
         mp:8,
         lv:9,
         process:async function(who, are){
-                await buffadd(who, are,'pow' ,3,2)
-                return 0
+            await buffadd(who, are,'pow',3,2)
+            return 0
         }
     },
     {
         id:'moreshell',
         name:'more shell',
-        description:'防御力が1.5倍になります。けどあんまり実感はないよね',
+        description:'防御力が2倍になります。けどあんまり実感はないよね',
         mp:8,
         lv:9,
         process:async function(who, are){
-                await buffadd(who, are, 'she' ,3,2)
-                return 0
+            await buffadd(who, are,'she',3,2);
+            return 0
         }
     },
     {
@@ -1305,31 +1350,33 @@ let Magics = [
         mp:12,
         lv:10,
         process:async function(who, are){
-                await buffadd(who, are,'poison',5,2);
-                return 0;
+            await buffadd(who, are,'poison',5,2);
+            return 0;
         }
     },
     {
         id:'garvan',
         name:'ガーヴァン',
-        description:'\nnotラージャン',
+        description:'魔法攻撃力の230%ダメージ\nnotラージャン',
         mp:10,
         lv:11,
         process:async function(who, are){
-                let result = await damage(who, are,230,'mg',2);//火
-                await buffadd(who, are,'burn',2,2);
-                return result
+            let res = await damage(who,are,230,'mg');//火
+            if(res) return 1;
+
+            await buffadd(who, are,'burn',2,2);
+            return 0;
         }
     },
     {
         id:'thehealest',
         name:'the healest',
-        description:'60%回復。これ以上はない、っていう意味ですね。\nxyzじゃないよ',
+        description:'体力を60%回復。\nこれ以上はない、っていう意味ですね。\nxyzってことじゃないです',
         mp:12,
         lv:12,
         process:async function(who, are){
-                await heal(who, are, '60%', 'add')
-                return 0
+            await heal(who, are, '60%')
+            return 0
         }
     },
     {
@@ -1339,20 +1386,23 @@ let Magics = [
         mp:12,
         lv:14,
         process:async function(who, are){
-                await buffadd(who, are,'luck',5,2);
-                return 0
+            await buffadd(who, are,'luck',5,2);
+            return 0
         }
     },
     {
         id:'merazoma',
         name:'メラゾーマ',
-        description:'ぬわーーっっ!!ってしてやりましょうぜ(炎の大ダメージ)',//対パパス最強にしたいね、これ
+        description:'ぬわーーっっ!!ってしてやりましょうぜ(炎の大ダメージ)',
+        //対パパス最強にしたいね、これ
         mp:12,
         lv:12,
         process:async function(who, are){
-                let result = await damage(who, are, 3.5, 'mg',4);//雷
-                await buffadd(who, are,'burn',3,2);
-                return result
+            let res = await damage(who, are, 350, 'mg');//雷
+            if(res) return 1;
+            
+            await buffadd(who, are,'burn',3,2);
+            return 0;
         }
     },
     {
@@ -1361,15 +1411,19 @@ let Magics = [
         description:'当たったらラッキー、シールドでされたら空前で追撃なつよつよ技。\nけどギガサンダーの方が好き(雷の大ダメージ)',
         mp:20,
         lv:15,
+
         process:async function(who, are){
-                let result = await damage(who, are,6,'mg',4);//雷
-                return result
+            let res = await damage(who, are,600,'mg',4);//雷
+            if(res) return 1;
+
+            if(probability(90)) buffadd(who, are,'stan',1,1);
+            return 0;
         }
     },
     {
         id:'random',
         name:'Random',
-        description:'自身が覚えてる魔法からランダム(mpは5固定)。これぞ醍醐味ってやつよな',
+        description:'自身が覚えてる魔法からランダムに発動\nmp消費は5固定です\nWAO！お得〜！',
         mp:5,
         lv:1,
         process:async function(who, are){
@@ -1377,11 +1431,11 @@ let Magics = [
             // y = Math.floor(Math.random() * x.length);
             // log.textContent = x[y]+'が出た！';await delay(1000);
             // x[y](who, are);
-            let arr = Object.values(Magics).filter(a => a.lv <= who.level && a.mp <= who.mp).map(a => a.name);
+            let arr = Object.values(Magics).filter(a => a.lv <= who.level).map(a => a.name);
             if(arr.length >= 1){
-                let mg = arraySelect(arr).name;
+                let mg = arraySelect(arr);
                 await addtext(`${mg}が出た！`);
-                await delay(500);
+                
                 let res = await Magics[mg].process(who, are);
                 return res
             }else{
@@ -2453,7 +2507,7 @@ let Enemies = [
                     await addtext(`${who.name}はローキックしてきた！`)
                     let are = ShallTargetSelect(who,'phpl',0);
                     let result = await damage(who, are, 70, 'sh');
-                    await buffadd(who, are, 'speed', 2, 1);
+                    // await buffadd(who, are, 'speed', 2, 1);
                     return result;
                 }
             }
