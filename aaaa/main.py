@@ -1,5 +1,6 @@
 from sub import asyncio,websockets,webbrowser,tk,ttk,Image,ImageTk,math,re,random,csv,copy,os,pickle,debug
 import sub
+
 inventry2=[]
 csvdata={}
 cemicaldata=[]
@@ -10,7 +11,8 @@ sub.boot_now.update()
 gui={}
 img_mini={}
 #Image.MAX_IMAGE_PIXELS = 200000000000
-debug.context.append(globals())
+
+
 
 os_listdir=os.listdir("./assets/images/items")
 sub.rooding_txt["text"]="ロード中...画像を読み込んでいます"
@@ -890,7 +892,7 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
 
             inventry=copy.deepcopy(inventry2)
 
-            print("876")
+            #print("876")
             await asyncio.sleep(1/120)
 
 
@@ -1097,13 +1099,13 @@ async def open_inventry(name:str):
 
 
 
-
+debug.focus(globals(),"main_globals")
 sub.boot_now.update()
 sub.boot_now.destroy()
 print("load_OK")
 
 #↓tkinter.mainloopのようなもの
-task=asyncio.gather(main(),mainloop_in_async(),inventry_update())#,ConnectUnity())
+task=asyncio.gather(main(),mainloop_in_async(),inventry_update(),debug.debug_loop_for_async())#,ConnectUnity())
 try:
     asynceventroop=asyncio.get_event_loop()
     asynceventroop.run_until_complete(task)

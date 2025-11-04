@@ -14,4 +14,3 @@ print('こんにちは！！！')
 print(pickle.load(f))
 
 #print(sample_list)
-

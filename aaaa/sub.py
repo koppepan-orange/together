@@ -12,7 +12,7 @@ import copy
 import os
 import pickle
 import debug
-debug.context.append(globals())
+debug.focus(globals(),"sub_globals")
 
 r={}
 boot_now=tk.Tk()
