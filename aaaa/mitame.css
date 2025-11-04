@@ -938,7 +938,6 @@ input[type="range"]::-moz-range-thumb {
     top: 5%;
     left: -650px;
     transition: left 2.0s cubic-bezier(0.55, 0.02, 0.75, 0.5);
-    overflow:hidden;
     box-sizing: border-box;
     z-index: 6;
 }
@@ -948,7 +947,7 @@ input[type="range"]::-moz-range-thumb {
 #gamble .opener{
     width: 50px;
     height: calc(100% + 20px);
-    background: #e28b8b;
+    background: #442020;
     position: absolute;
     top: -10px;
     right: -50px;
@@ -961,7 +960,7 @@ input[type="range"]::-moz-range-thumb {
     border-radius: 15px;
     font-size: 20px;
     position: absolute;
-    top: 50px;
+    top: 70px;
     right: -87.5%;
     transition: right 2.0s cubic-bezier(0.55, 0.02, 0.75, 0.5);
     cursor: pointer;

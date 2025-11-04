@@ -1,3 +1,7 @@
 @REM ～main.pyまでの動き～
 @echo off
-py -m venv venv & venv\Scripts\activate.bat & pip install websockets &pip install pillow & pip list
+py -m venv venv
+call venv\Scripts\activate.bat
+echo "pip is using now"
+pip install websockets pillow
+pip lis
