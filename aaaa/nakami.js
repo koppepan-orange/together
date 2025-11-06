@@ -461,7 +461,7 @@
 
         // エラー発生時の処理
         webSocket.onerror = function(message){
-            logadd("errored!! very very errored!!!!");
+            logadd("errored!! very v    ery errored!!!!");
         };
 
         // 受け取ったとき
@@ -494,6 +494,16 @@
                 for(let i = 0; i < +num; i++) get(name);
             }
             
+            if(mes.startsWith('sendjs_loadlis_')){
+                let moz = mes.slice(14);
+                let arr = moz.split(',');
+                console.log(arr);
+                
+                for(let nani of arr) sendpyTx(nani), savC.arr.push(nani);
+
+                savF.yomikomi();
+            }
+
             if(mes.startsWith('sendpy')) sendpy(mes.slice(7)); // asdasd
             
             if(mes == 'helasu') inv_pick_decr();
@@ -519,6 +529,45 @@
     };
 
 
+    //#endregion
+
+    //#region save
+    let savD = document.getElementById('save');
+    let savC = {
+        tog: 0,
+        arr: []
+    }
+    let savF = {};
+
+    savF.open = async function(){
+        savC.tog = 1;
+        savD.classList.add('open');
+
+        await delay(1000);
+        savD.classList.add('tog');
+        savD.classList.remove('open');
+    }
+
+    savF.clos = async function(){
+        savC.tog = 0;
+        savD.classList.add('clos');
+
+        await delay(1000);
+        savD.classList.remove('tog');
+        savD.classList.remove('clos');
+    }
+
+    savF.yomikomi = () => {
+        savC.arr.sort((a,b) => a - b);
+        let last = +savC.arr.at(-1);
+        // +1して、4の倍数ごとになんかどうにかする感じで　よろ
+        
+        // あとなんかscaleでなんかいい感じに
+
+        let str = '';
+        for(let i = 0; i < savC.arr.length; i++) str += `${savC.arr[i]},`;
+        savD.value = str;
+    }
     //#endregion
 
     let keys = {}
@@ -796,16 +845,38 @@
     //#endregion
 
     //#region titleArea
-    let titleD = document.getElementById('titleArea');
-    let titleC = {
-        newB: titleD.querySelector('.buttons .new'),
-        loadB: titleD.querySelector('.buttons .load'),
+    // const selectSport = document.getElementById("pul");
+    let titD = document.getElementById('titleArea');
+    let titC = {
+        newD: titD.querySelector('.buttons .new'),
+        loaD: titD.querySelector('.buttons .load'),
+        delD: titD.querySelector('.buttons .delload'),
+        selD: titD.querySelector('.buttons .pul')
     }
-    titleC.newB.addEventListener('click', () => {
-        titleD.classList.add('hidden');
-    })
-    //#endregion titleArea
+    let titF = {}
 
+    titF.new = () => {
+        titD.classList.add('hidden');
+    }
+    titC.newD.addEventListener('click', titF.new);
+    
+    titF.load = () => {
+
+
+        savF.open()
+    }
+    titC.loaD.addEventListener('click', titF.load);
+
+    
+    titC.delD.addEventListener('click', () => {
+        let num = titC.selD.selectedIndex;
+        let name = titC.selD.options[num].textContent;
+
+        sendpyTx(`rem_save_${name}`);
+        savC.name = name;
+    });
+    //#endregion titleArea
+    
     //#region ビッグマシュマロ（唐突）
     let bigmmD = document.getElementById('bigmashmaro');
     let bigmmC = {
@@ -849,13 +920,6 @@
             }
         },
         {
-            name:'inv_detail',
-            disp:'inventryの詳細を',
-            func: async function(){
-                sendpyTx('print,inventry');
-            }
-        },
-        {
             name: 'give me water',
             disp: 'Qoo! water is delisious!!', //くぅ～っ！水がうめぇ！！
             func: () => {for(let i = 0; i < 99; i++) get('water')}
@@ -876,6 +940,13 @@
             func: () => {
                 let moz = inv_save_to();
                 sendpyTx(`save_js_koppe_${moz}`);
+            }
+        },
+        {
+            name:'0%0%0%',
+            desp:'0%0%0%',
+            func: () => {
+                sendpyTx('rem_save_koppe');
             }
         }
     ];
@@ -1283,9 +1354,20 @@
 
         let cell = [...invC.areaD.querySelectorAll('.cell')].find(c => c.dataset.item == data.jpnm && +c.dataset.num < 99);
         
-        let sitey = invC.areaD.querySelector(`.cell.c${yx}`);
+        let wairo = 0;
 
-        if(!cell || sitey.dataset.name != item){
+        let sitey = invC.areaD.querySelector(`.cell.c${yx}`);
+        if(sitey){
+            if(sitey.dataset.name != item) wairo = 1;
+
+            else{
+                sitey.dataset.num = (+sitey.dataset.num + 1).toString();
+                inv_tekiou();
+                if(appe) nicoText(`${item}を手に入れた`)
+            }
+        }
+        
+        if(!cell || wairo){
             cell = [...invC.areaD.querySelectorAll('.cell')].find(c => !c.dataset.item);
 
             if(yx != 'no') cell = invC.areaD.querySelector(`.cell.c${yx}`);
@@ -1301,7 +1383,9 @@
             cell.appendChild(itemD);
             cell.dataset.item = data.jpnm;
             cell.dataset.num = 1;
-        }else{
+        }
+        else{
+
             if(yx != 'no') cell = sitey;
 
             cell.dataset.num = (+cell.dataset.num + 1).toString();
