@@ -464,8 +464,11 @@
             logadd("errored!! very v    ery errored!!!!");
         };
 
+        let datalist = document.getElementById('select');
+
         // 受け取ったとき
         webSocket.onmessage = function(message){
+            
             let mes = message.data;
             read(mes);
             nicoText(mes);
@@ -535,7 +538,8 @@
     let savD = document.getElementById('save');
     let savC = {
         tog: 0,
-        arr: []
+        arr: [],
+        page: 1,
     }
     let savF = {};
 
@@ -559,14 +563,32 @@
 
     savF.yomikomi = () => {
         savC.arr.sort((a,b) => a - b);
-        let last = +savC.arr.at(-1);
-        // +1して、4の倍数ごとになんかどうにかする感じで　よろ
-        
-        // あとなんかscaleでなんかいい感じに
+        let last = +savC.arr.at(-1) + 1;
 
-        let str = '';
-        for(let i = 0; i < savC.arr.length; i++) str += `${savC.arr[i]},`;
-        savD.value = str;
+        let max = Math.ceil(last / 4)
+
+        savC.page = max;
+
+        for(let i = 0; i < max*4; i++){
+            let div = document.createElement('div');
+            div.className = 'youso';
+
+            let lavel = document.createElement('div');
+            lavel.className = 'lavel';
+            lavel.textContent = `No. ${i}`;
+            div.appendChild(lavel);
+
+            //この辺のUIはあのゲームの文字をか￥￥参考にしてくれ
+            // アニメーションとかも録画して
+        }
+    }
+    
+    savF.saveR = (num) => {
+        // let num = titC.selD.selectedIndex;
+        // let name = titC.selD.options[num].textContent;
+
+        sendpyTx(`rem_save_${num}`);
+        savC.num = num;
     }
     //#endregion
 
@@ -845,6 +867,7 @@
     //#endregion
 
     //#region titleArea
+
     // const selectSport = document.getElementById("pul");
     let titD = document.getElementById('titleArea');
     let titC = {
@@ -861,16 +884,17 @@
     titC.newD.addEventListener('click', titF.new);
     
     titF.load = () => {
-
+    //savC.arrに入った 
 
         savF.open()
     }
-    titC.loaD.addEventListener('click', titF.load);
-
     
-    titC.delD.addEventListener('click', () => {
-        let num = titC.selD.selectedIndex;
-        let name = titC.selD.options[num].textContent;
+    titC.loaD.addEventListener('click', titF.load);
+    
+
+    titleC.delD.addEventListener('click', () => {
+        let num = titleC.selD.selectedIndex;
+        let name = titleC.selD.options[num].textContent;
 
         sendpyTx(`rem_save_${name}`);
         savC.name = name;

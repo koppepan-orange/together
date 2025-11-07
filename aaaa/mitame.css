@@ -263,7 +263,7 @@ input[type="range"]::-moz-range-thumb {
     justify-content: center;
     align-items: center;
     width: 30vw;
-    aspect-ratio: 4/1;
+    aspect-ratio: 3/1;
     padding: 5px 30px;
     background-color: #def0ff;
     border: 3px solid #cfe9ff;
@@ -374,7 +374,7 @@ input[type="range"]::-moz-range-thumb {
     transform: translate(-50%, -50%) scale(0);
     transition: transform 1.0s cubic-bezier(0.25,-0.5, 1, 1);
 }
-#save .nakami{
+#save .youso{
     display: flex;
     justify-content: center;
     align-items: center;

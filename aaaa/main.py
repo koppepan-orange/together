@@ -238,7 +238,7 @@ async def handler(websocket):
                 canvas["craft_table"].place(x = 0,y = 0)
                 img["assets/images/craft_table_UI.png"]=tk.PhotoImage(file="assets/images/craft_table_UI.png", master=root["craft_table"])
                 canvas["craft_table"].create_image(100,100,image = img["assets/images/craft_table_UI.png"],tag="craft_table")
-                stan = 100; add = 47; aded = 0;
+                stan = 100; add = 47; aded = 0
                 for a in range(4):
                     for b in range(4):
                         aded += 1
@@ -288,67 +288,47 @@ async def handler(websocket):
             #    f = open("./save/"+message[15:]+"pkl","wb")
             #    pickle.dump(inventry,f)
             #    f.close
-            elif message[:8]=="save_js_":
+            elif message[:8]=="save_js_":#"save_js_{name}_{data}"
                 x=message[8:].split("_")
-                f= open("./save/"+x[0]+".kpsv","w")
-                f.write(x[1])
-                f.close()
-                f = open("./save/"+x[0]+".pkl","wb")
-                pickle.dump(inventry,f)
-                f.close
-            elif message[:8]=="load_js_":
+                with open("./save/"+x[0]+".kpsv","w", encoding='utf-8') as f:
+                    f.write(x[1])
+                #f.close()
+                with open("./save/"+x[0]+".pkl", "wb") as file:
+                    pickle.dump(inventry, file)
+                #f = open("./save/"+x[0]+".pkl","wb")
+                #pickle.dumps(inventry,f)
+                #f.close
+            elif message[:8]=="load_js_":#"load_js_{name}_{data}"
                 x=message[8:].split("_")
-                f=open("./save/"+x[0]+".kpsv","r")
-                sendjs(f.read())
-                f.close()
-                f = open("./save/"+x[0]+".pkl","rb")
-                inventry=pickle.load(f)
-                f.close
-            elif message[:9]=="rem_save_":
+                with open("./save/"+x[0]+".kpsv","r", encoding='utf-8') as f:
+                    sendjs("load_js_"+f.read())
+                #f.close()
+                with open("./save/"+x[0]+".pkl", "rb") as file:
+                    inventry=pickle.load(inventry, file)
+                #f = open("./save/"+x[0]+".pkl","rb")
+                #inventry=pickle.load(f)
+                #f.close
+            elif message[:9]=="rem_save_":#"rem_save_{name}"
                 try:
                     os.remove(f"./save/{message[9:]}.pkl")
                     os.remove(f"./save/{message[9:]}.kpsv")
                 except Exception as e:
                     print(f"{e}のためセーブデータの削除に失敗しました。")
+            elif message[:16]=="get_savedataname":#"get_savedataname"
+                koppepan_hayakuUItukure=""
+                for n in os.listdir("./save"):
+                    if n[-4:]==".pkl":
+                        koppepan_hayakuUItukure+=","+n[:-4]
+                sendjs("sendjs_loadlis_"+str(koppepan_hayakuUItukure))
             #囧
-            
             elif message[:8]=="printTx,":
-                print(message[8:])
+               print(message[8:])
             
-            elif message[:6]=="print,":
-                print(eval(message[6:]))
-                
             elif message[:3]=="次は、" and message[-2:]=="です":
-                print("次は？") # 次は、${nextIS}です
-                nextIs = message[3:-2]
-                
-            elif message[:8]=="execute_":
-                kmes = message[8:]
-                if kmes.startswith("print"): # print,mes
-                    mu, mes = kmes.split(",")
-                    print(mes)
-                    return
-                
-                if kmes.startswith("変数"):
-                    mu, name, val1, val2 = kmes.split(",")
-                    if val2!="":
-                        kontext[name] = val1
-                    else:
-                        match val1:
-                            case "=":   kontext[name] =  val2
-                            case "+==": kontext[name] += val2
-                            case "+=":  kontext[name] += int(val2)
-                            case "-=":  kontext[name] -= int(val2)
-                            case "*=":  kontext[name] *= int(val2)
-                            case "/=":  kontext[name] /= int(val2)
-                            case _:     kontext[name] =  val1
-                    return
-                
-                if kmes.startswith("乱数生成"): #乱数生成,min,max
-                    mu, min, max = kmes.split(",")
-                    res = random.randint(int(min), int(max))
-                    kontext["乱数"] = res
-                    return
+               print("次は？") # 次は、${nextIS}です
+               nextIs = message[3:-2]
+               
+            
             else:
                 print(f'コマンド"{message}"は正しく認証されませんでした')
             
@@ -589,7 +569,7 @@ async def hitbox(ichi, ichiD, dens, name, width, hight, count):
         inventry2[name][0][count][1] = ichi[1]
         inventry2[name][0][count][0] = ichi[0]
         inventry2[name][0][count][3] = ichi[3]
-    print("filled2:" + filled) #デバックで邪魔なので切りました ←〇
+    print("filled2:" + str(filled)) #デバックで邪魔なので切りました ←〇
 
 async def change_taiseki(cm3:float,g_cm3_moto:float,g_cm3_ato:float):
     #print("cm3",cm3,"g/cm3_moto",g_cm3_moto,"g/cm3_ato",g_cm3_ato))
@@ -659,7 +639,7 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                 byw=0
                 melt_yw={}
                 breakALL=False
-                print(index[5])
+                #print(index[5])
                 #print("indexの中身:", index, type(index)) #class<int>だった
                 for a,b in serch(index[5],3,True):
                     if b==0:
@@ -673,9 +653,9 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                         breakALL=True
                         break
                     if write:
-                        print("a")
+                        #print("a")
                         img[str(name)+"assets/images/items/melt_"+str(a)+".png"]=ImageTk.PhotoImage(imgg["assets/images/items/melt_"+str(a)+".png"].crop((0,0,int(index[1]),min(int(yw-byw),int(index[2])))),master=root["inventry_root_"+str(name)])
-                        print("b")
+                        #print("b")
                         canvas["inventry_root_"+str(name)].lower(canvas["inventry_root_"+str(name)].create_image(int(index[1]/2),int(index[2]-(min(int(yw-byw),int(index[2]))/2)), image=img[str(name)+"assets/images/items/melt_"+str(a)+".png"],tag="item"))
                 if breakALL:
                     break
@@ -691,178 +671,195 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                         canvas["inventry_root_"+str(name)].lift(airid)
 
                     #canvas["inventry_root_"+str(name)].create_image(0,0, image=img[i[4]])
-                count=0
-                delet_list=[]
-                filled = {}
-                num=0
-                for i in index[0]:
-                    try:
-                        i[4]
-                    except Exception:
-                        print(inventry)
-                    #囧 print(i)
-                    #print(await change_yuuten(csvdata[i[4]][0],csvdata[i[4]][5],inventry2[name][4],csvdata[i[4]][8],csvdata[i[4]][7]))
-                    #print(inventry2[name][3])
-                    
-                    # print(i[4], csvdata[i[4]][0])
-                    if await change_yuuten(csvdata[i[4]][0],csvdata[i[4]][5],inventry2[name][4],csvdata[i[4]][8],csvdata[i[4]][7]) <= inventry2[name][3]:
-                        #print("chack3")
-                        #inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]+1,onndo_2=inventry2[name][3])
-                        #print("aaaaaaa")
-                        zzzzzz=await combined_gas_law(taiseki_1= await change_taiseki(cm3=50,g_cm3_moto=csvdata[i[4]][2],g_cm3_ato=csvdata[i[4]][3]),aturyoku_1=csvdata[i[4]][5],onndo_1=20,aturyoku_2=inventry2[name][4],onndo_2=inventry2[name][3])
+                flag["cem_roop"]=True
+                while flag["cem_roop"]:
+                    flag["cem_roop"]=False
+                    count=0
+                    delet_list=[]
+                    filled = {}
+                    num=0
+                    for i in index[0]:
                         try:
-                            inventry2[name][5][i[4]] += zzzzzz
-                            #del inventry2[name][0][count]
-                            delet_list.append(i)
-                        except KeyError as e:
-                            delet_list.append(i)
-                            #del inventry2[name][0][count]
-                            inventry2[name][5][i[4]] = zzzzzz
-                        # inventry2[name][3]+=(50)*100/(csvdata[i[4]][7])*(csvdata[i[4]][8])*4.184*inventry2[name][1]*inventry2[name][2]
-                        print("bbbbbbbb")
-                        inventry2[name][3]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],aturyoku_2=inventry2[name][4],taiseki_2=index[1]*index[2]+zzzzzz-50.0)
-                        print("cccccccc")
-                        inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]+zzzzzz-50.0,onndo_2=inventry2[name][3])
-                    else:
-                        #print("chack4")
-                        if write:
-                            canvas["inventry_root_"+str(name)].create_image(i[0], i[1], image=img[str(name)+"assets/images/items/"+str(i[4])+".png"],tag="item")
-                        print("711")
-                        await hitbox(ichi=i,ichiD=melt_y,dens=inventry2[name][3],name=name,width=inventry2[name][1],hight=inventry2[name][2],count=count) 
-                    count+=1
-                for xxxxa in delet_list:
-                    try:
-                        inventry2[name][0].remove(xxxxa)
-                    except IndexError as e:
-                        print(inventry2)
-                        print(xxxxa)
-                        print(e)
-                print("721")
-                for key,i in index[5].items():
-                    if i==0:
-                        continue
-                    print("725")
-                    if await change_yuuten(csvdata[key][0],csvdata[key][5],inventry2[name][4],csvdata[key][8],csvdata[key][7]) > inventry2[name][3] and inventry2[name][5][key]!=0:
-                        #print("chack5")
-                        #囧 print(await change_yuuten(csvdata[key][0],csvdata[key][5],inventry2[name][4],csvdata[key][8],csvdata[key][7]))
-                        #囧 print(inventry2[name][3])
-                        #inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]+melt_yw[key][0],onndo_2=inventry2[name][3])
-                        try:
-                            save=melt_yw[key][0]
-                        except Exception as e:
-                            print(e)
-                        print("dddddddd")
-                        xw=await combined_gas_law(taiseki_1= await change_taiseki(cm3=melt_yw[key][0],g_cm3_moto=csvdata[key][3],g_cm3_ato=csvdata[key][2]),aturyoku_2=csvdata[key][5],onndo_2=20,aturyoku_1=inventry2[name][4],onndo_1=inventry2[name][3])
-                        #inventry2[name][3]-=(inventry2[name][5][key])*100/(csvdata[key][7])*(csvdata[key][8])*4.184*inventry2[name][1]*inventry2[name][2]
-                        print("eeeeeee")
-                        inventry2[name][3] = await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],aturyoku_2=inventry2[name][4],taiseki_2=(index[1]*index[2])-save+xw)
-                        if xw==0:xw=1e-90
-                        xxw=index[1]/xw
-                        inventry2[name][5][key] = 0
-                        for v in range(int(xw/50)):
-                            inventry2[name][0] += [[xxw*v,melt_yw[key][1],0,0,key]]
-                        print("fffffffff")
-                        inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=(index[1]*index[2])-save+xw,onndo_2=inventry2[name][3])
-                    elif await change_yuuten(csvdata[key][1],csvdata[key][6],inventry2[name][4],csvdata[key][9],csvdata[key][7]) <= inventry2[name][3] and inventry2[name][5][key]!=0:
-                        #print("chack6")
-                        print("749")
-                        #inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]+melt_yw[key][0],onndo_2=inventry2[name][3])
-                        save=inventry2[name][5][key]
-                        #print(save)
-                        #print((await change_taiseki(cm3=inventry2[name][5][key],g_cm3_moto=csvdata[key][3],g_cm3_ato=csvdata[key][4]),"taiseki"))
-                        #print("ggggggggg")
-                        xw=await combined_gas_law(taiseki_1= await change_taiseki(cm3=inventry2[name][5][key],g_cm3_moto=csvdata[key][3],g_cm3_ato=csvdata[key][4]),aturyoku_2=csvdata[key][6],onndo_2=20,aturyoku_1=inventry2[name][4],onndo_1=inventry2[name][3])
-                        try:
-                            inventry2[name][6][key] += xw
-                        except Exception as en:
-                            print(f"=> {en}")
-                            inventry2[name][6][key] = xw
-                        #inventry2[name][3]+=(inventry2[name][5][key])*100/(csvdata[key][7])*(csvdata[key][9])*4.184*inventry2[name][1]*inventry2[name][2]
-                        #print("hhhhhhhhh")
-                        if inventry2[name][4]!=0:
-                            inventry2[name][3]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],aturyoku_2=inventry2[name][4],taiseki_2=index[1]*index[2]-save+xw)
-                        inventry2[name][5][key] = 0
-                        #print("iiiiiiiii")
-                        inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]-save+xw,onndo_2=inventry2[name][3])
+                            i[4]
+                        except Exception:
+                            print(inventry)
+                        #囧 print(i)
+                        #print(await change_yuuten(csvdata[i[4]][0],csvdata[i[4]][5],inventry2[name][4],csvdata[i[4]][8],csvdata[i[4]][7]))
+                        #print(inventry2[name][3])
 
-                print("769")
-                for key,i in index[6].items():
-                    if await change_yuuten(csvdata[key][1],csvdata[key][6],inventry2[name][4],csvdata[key][9],csvdata[key][7]) > inventry2[name][3] and inventry2[name][6][key]!=0:
-                        #print("chack7")
-                        #inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]+melt_yw[key][0],onndo_2=inventry2[name][3])
-                        try:
-                            save=inventry2[name][6][key]
-                        except KeyError:
-                            save=0
-                        print(f"{inventry2[name][4]}jjjjjjjjj")
-                        xw=await combined_gas_law(taiseki_1= await change_taiseki(cm3=inventry2[name][6][key],g_cm3_moto=csvdata[key][4],g_cm3_ato=csvdata[key][3]),aturyoku_2=csvdata[key][6],onndo_2=20,aturyoku_1=inventry2[name][4],onndo_1=inventry2[name][3])
-                        inventry2[name][5][key] += xw 
-                        #inventry2[name][3]-=(inventry2[name][6][key])*100/(csvdata[key][7])*(csvdata[key][9])*4.184*inventry2[name][1]*inventry2[name][2]
-                        #print("kkkkkkkkk")
-                        inventry2[name][3]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],aturyoku_2=inventry2[name][4],taiseki_2=(index[1]*index[2])-save+xw)
-                        inventry2[name][6][key] = 0
-                        #print("lllllllll")
-                        inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=(index[1]*index[2])-save+xw,onndo_2=inventry2[name][3])
-                print("787")
-                for cem in cemicaldata:
-                    for aa in range(len(cem[2])):
-                        dicta={"℃+":[3,True]}
-                        if not ((inventry2[name][dicta[cem[2][aa]][0]] >= cem[3][aa])) and (dicta[cem[2][aa]][1]):
-                            break
-                        elif not(inventry2[name][dicta[cem[2][aa]][0]] <= cem[3][aa]) and not(dicta[cem[2][aa]][1]):
-                            break
-
-                    else:
-                        print("797")
-                        #print(cem[0])
-                        for aaa in range(len(cem[0])):
-                            if (inventry2[name][6][cem[0][aaa]] >= cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000):#気体
-                                pass
-                                #print("c")
-                            elif (inventry2[name][5][cem[0][aaa]] >= cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000):#液体
-                                pass
-                                #print("d")
-                            else:
-                                popop=0
-                                for x in inventry[name][0]:
-                                    if x[4] == cem[0][aaa]:
-                                        popop+=1
-                                if not(popop >= cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000):
-                                    #print("e")
-                                    break
+                        # print(i[4], csvdata[i[4]][0])
+                        if await change_yuuten(csvdata[i[4]][0],csvdata[i[4]][5],inventry2[name][4],csvdata[i[4]][8],csvdata[i[4]][7]) <= inventry2[name][3]:
+                            #print("chack3")
+                            #inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]+1,onndo_2=inventry2[name][3])
+                            #print("aaaaaaa")
+                            zzzzzz=await combined_gas_law(taiseki_1= await change_taiseki(cm3=50,g_cm3_moto=csvdata[i[4]][2],g_cm3_ato=csvdata[i[4]][3]),aturyoku_1=csvdata[i[4]][5],onndo_1=20,aturyoku_2=inventry2[name][4],onndo_2=inventry2[name][3])
+                            try:
+                                inventry2[name][5][i[4]] += zzzzzz
+                                #del inventry2[name][0][count]
+                                delet_list.append(i)
+                            except KeyError as e:
+                                delet_list.append(i)
+                                #del inventry2[name][0][count]
+                                inventry2[name][5][i[4]] = zzzzzz
+                            # inventry2[name][3]+=(50)*100/(csvdata[i[4]][7])*(csvdata[i[4]][8])*4.184*inventry2[name][1]*inventry2[name][2]
+                            print("bbbbbbbb")
+                            inventry2[name][3]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],aturyoku_2=inventry2[name][4],taiseki_2=index[1]*index[2]+zzzzzz-50.0)
+                            print("cccccccc")
+                            inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]+zzzzzz-50.0,onndo_2=inventry2[name][3])
                         else:
-                            print("815")
-                            #print(f"{inventry2[name][4]}f")
+                            #print("chack4")
+                            if write:
+                                canvas["inventry_root_"+str(name)].create_image(i[0], i[1], image=img[str(name)+"assets/images/items/"+str(i[4])+".png"],tag="item")
+                            print("711")
+                            await hitbox(ichi=i,ichiD=melt_y,dens=inventry2[name][3],name=name,width=inventry2[name][1],hight=inventry2[name][2],count=count) 
+                        count+=1
+                    for xxxxa in delet_list:
+                        try:
+                            inventry2[name][0].remove(xxxxa)
+                        except IndexError as e:
+                            print(inventry2)
+                            print(xxxxa)
+                            print(e)
+                    for key,i in index[5].items():
+                        if i==0:
+                            continue
+                        #print("725")
+                        if await change_yuuten(csvdata[key][0],csvdata[key][5],inventry2[name][4],csvdata[key][8],csvdata[key][7]) > inventry2[name][3] and inventry2[name][5][key]!=0:
+                            #print("chack5")
+                            #囧 print(await change_yuuten(csvdata[key][0],csvdata[key][5],inventry2[name][4],csvdata[key][8],csvdata[key][7]))
+                            #囧 print(inventry2[name][3])
+                            #inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]+melt_yw[key][0],onndo_2=inventry2[name][3])
+                            try:
+                                save=melt_yw[key][0]
+                            except Exception as e:
+                                print(e)
+                            print("dddddddd")
+                            xw=await combined_gas_law(taiseki_1= await change_taiseki(cm3=melt_yw[key][0],g_cm3_moto=csvdata[key][3],g_cm3_ato=csvdata[key][2]),aturyoku_2=csvdata[key][5],onndo_2=20,aturyoku_1=inventry2[name][4],onndo_1=inventry2[name][3])
+                            #inventry2[name][3]-=(inventry2[name][5][key])*100/(csvdata[key][7])*(csvdata[key][8])*4.184*inventry2[name][1]*inventry2[name][2]
+                            print("eeeeeee")
+                            inventry2[name][3] = await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],aturyoku_2=inventry2[name][4],taiseki_2=(index[1]*index[2])-save+xw)
+                            if xw==0:xw=1e-90
+                            xxw=index[1]/xw
+                            inventry2[name][5][key] = 0
+                            for v in range(int(xw/50)):
+                                inventry2[name][0] += [[xxw*v,melt_yw[key][1],0,0,key]]
+                            print("fffffffff")
+                            inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=(index[1]*index[2])-save+xw,onndo_2=inventry2[name][3])
+                        elif await change_yuuten(csvdata[key][1],csvdata[key][6],inventry2[name][4],csvdata[key][9],csvdata[key][7]) <= inventry2[name][3] and inventry2[name][5][key]!=0:
+                            #print("chack6")
+                            print("749")
+                            #inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]+melt_yw[key][0],onndo_2=inventry2[name][3])
+                            save=inventry2[name][5][key]
+                            #print(save)
+                            #print((await change_taiseki(cm3=inventry2[name][5][key],g_cm3_moto=csvdata[key][3],g_cm3_ato=csvdata[key][4]),"taiseki"))
+                            #print("ggggggggg")
+                            xw=await combined_gas_law(taiseki_1= await change_taiseki(cm3=inventry2[name][5][key],g_cm3_moto=csvdata[key][3],g_cm3_ato=csvdata[key][4]),aturyoku_2=csvdata[key][6],onndo_2=20,aturyoku_1=inventry2[name][4],onndo_1=inventry2[name][3])
+                            try:
+                                inventry2[name][6][key] += xw
+                            except Exception as en:
+                                print(f"=> {en}")
+                                inventry2[name][6][key] = xw
+                            #inventry2[name][3]+=(inventry2[name][5][key])*100/(csvdata[key][7])*(csvdata[key][9])*4.184*inventry2[name][1]*inventry2[name][2]
+                            #print("hhhhhhhhh")
+                            if inventry2[name][4]!=0:
+                                inventry2[name][3]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],aturyoku_2=inventry2[name][4],taiseki_2=index[1]*index[2]-save+xw)
+                            inventry2[name][5][key] = 0
+                            #print("iiiiiiiii")
+                            inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]-save+xw,onndo_2=inventry2[name][3])
+
+                    #print("769")
+                    for key,i in index[6].items():
+                        if await change_yuuten(csvdata[key][1],csvdata[key][6],inventry2[name][4],csvdata[key][9],csvdata[key][7]) > inventry2[name][3] and inventry2[name][6][key]!=0:
+                            #print("chack7")
+                            #inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=index[1]*index[2]+melt_yw[key][0],onndo_2=inventry2[name][3])
+                            try:
+                                save=inventry2[name][6][key]
+                            except KeyError:
+                                save=0
+                            print(f"{inventry2[name][4]}jjjjjjjjj")
+                            xw=await combined_gas_law(taiseki_1= await change_taiseki(cm3=inventry2[name][6][key],g_cm3_moto=csvdata[key][4],g_cm3_ato=csvdata[key][3]),aturyoku_2=csvdata[key][6],onndo_2=20,aturyoku_1=inventry2[name][4],onndo_1=inventry2[name][3])
+                            inventry2[name][5][key] += xw 
+                            #inventry2[name][3]-=(inventry2[name][6][key])*100/(csvdata[key][7])*(csvdata[key][9])*4.184*inventry2[name][1]*inventry2[name][2]
+                            #print("kkkkkkkkk")
+                            inventry2[name][3]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],aturyoku_2=inventry2[name][4],taiseki_2=(index[1]*index[2])-save+xw)
+                            inventry2[name][6][key] = 0
+                            #print("lllllllll")
+                            inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=(index[1]*index[2])-save+xw,onndo_2=inventry2[name][3])
+                    #print("787")
+                    for cem in cemicaldata:
+                        for aa in range(len(cem[2])):
+                            dicta={"℃+":[3,True]}
+                            if not ((inventry2[name][dicta[cem[2][aa]][0]] >= cem[3][aa])) and (dicta[cem[2][aa]][1]):
+                                break
+                            elif not(inventry2[name][dicta[cem[2][aa]][0]] <= cem[3][aa]) and not(dicta[cem[2][aa]][1]):
+                                break
+
+                        else:
+                            #print("797")
+                            #print(cem[0])
                             for aaa in range(len(cem[0])):
-                                if inventry2[name][6][cem[0][aaa]] >= cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000:#気体
-                                    inventry2[name][6][cem[0][aaa]] -= cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000
-                                    #print("g")
-                                    continue
-                                elif inventry2[name][5][cem[0][aaa]] >= cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000:#液体
-                                    inventry2[name][5][cem[0][aaa]] -= cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000
-                                    print(f"{inventry2[name][4]}h")
-                                    continue
+                                if (inventry2[name][6][cem[0][aaa]] >= cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000):#気体
+                                    pass
+                                    #print("c")
+                                elif (inventry2[name][5][cem[0][aaa]] >= cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000):#液体
+                                    pass
+                                    #print("d")
                                 else:
-                                    print("826")
-                                    popop=int(cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000)
-                                    ap=len(inventry2[name][0])
-                                    for x in range(ap):
-                                        try:
-                                            if inventry2[name][0][x][4] == cem[0][aaa]:
-                                                popop-=50
-                                                del inventry2[name][0][x]
-                                            if popop <=0:
-                                                break
-                                        except Exception as e:
-                                            print(f"Exceptionやで!!! {e}")
-                                            pass
-                            
-                            for aaaa in range(len(cem[4])):
-                                if cem[4][aaaa]=="cal":
-                                    inventry2[name][3] += cem[5][aaaa]*inventry2[name][2]*inventry2[name][1]
-                                else:
-                                    inventry2[name][5][cem[4][aaaa]] += cem[5][aaaa]*csvdata[cem[4][aaaa]][7]/1000000
-                            #print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+                                    popop=0
+                                    for x in inventry[name][0]:
+                                        if x[4] == cem[0][aaa]:
+                                            popop+=1
+                                    if not(popop >= cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000):
+                                        #print("e")
+                                        break
+                            else:
+                                flag["cem_roop"]={}
+                                print("815")
+                                #print(f"{inventry2[name][4]}f")
+                                for aaa in range(len(cem[0])):
+                                    if inventry2[name][6][cem[0][aaa]] >= cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000:#気体
+                                        flag["cem_roop"]["are"]= min(int((cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000)/inventry2[name][6][cem[0][aaa]]),flag["cem_roop"]["are"])
+                                        #print("g")
+                                        continue
+                                    elif inventry2[name][5][cem[0][aaa]] >= cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000:#液体
+                                        flag["cem_roop"]["melt"]= min(int((cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000)/inventry2[name][5][cem[0][aaa]]),flag["cem_roop"]["melt"])
+                                        print(f"{inventry2[name][4]}h")
+                                        continue
+                                    else:
+                                        print("826")
+                                        flag["cem_roop"]["cell"+str(aaa)]=[]
+                                        popop=int(cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000)
+                                        ap=len(inventry2[name][0])
+                                        for x in range(ap):
+                                            try:
+                                                if inventry2[name][0][x][4] == cem[0][aaa]:
+                                                    popop-=50
+                                                    flag["cem_roop"]["cell"+str(aaa)].append(x)
+                                                if popop <=0:
+                                                    break
+                                            except Exception as e:
+                                                print(f"Exceptionやで!!! {e}")
+                                                pass
+                                for aaa in range(len(cem[0])):
+                                    inventry2[name][6][cem[0][aaa]]-=flag["cem_roop"]["are"]
+                                    inventry2[name][5][cem[0][aaa]]-=flag["cem_roop"]["melt"]
+                                ssssssss=0
+                                while True:
+                                    vs=0
+                                    for aaa in range(len(cem[0])):
+                                        vs=min(len(flag["cem_roop"]["cell"+str(aaa)]),vs)
+                                    if vs<1:
+                                        break
+                                    for aaa in range(len(cem[0])):
+                                        del inventry2[name][0][flag["cem_roop"]["cell"+str(aaa)][0]]
+                                    ssssssss+=1
+                                for vvvvv in range(ssssssss+flag["cem_roop"]["are"]+flag["cem_roop"]["melt"]):
+                                    for aaaa in range(len(cem[4])):
+                                        if cem[4][aaaa]=="cal":
+                                            inventry2[name][3] += cem[5][aaaa]*inventry2[name][2]*inventry2[name][1]
+                                        else:
+                                            inventry2[name][5][cem[4][aaaa]] += cem[5][aaaa]*csvdata[cem[4][aaaa]][7]/1000000
+                                #print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 
                 if  write:
                     canvas["inventry_root_"+str(name)].delete("pressuregauge")
