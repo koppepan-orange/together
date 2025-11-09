@@ -82,6 +82,12 @@
             "name": "数学鱈",
             "file": "koppe/mass_cod/index.html"
         },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "なんとかかんとか耐え試験",
+            "file": "koppe/sheken/index.html"
+        },
 
     ],                                                                                                                                              
 }
