@@ -254,7 +254,7 @@ input[type="range"]::-moz-range-thumb {
     justify-self: flex-start;
     align-items: center;
     position: absolute;
-    top: 50%;
+    bottom: 5%;
     left: 50%;
     transform: translateX(-50%);
 }

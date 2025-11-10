@@ -227,25 +227,25 @@ async def handler(websocket):
                 ###
                 flag["command_box"]=False
             
-            elif message == "craft_table" and flag["craft_table"]:
-                root["craft_table"]=tk.Tk()
-                root["craft_table"].geometry(f"350x350+{random.randint(1,500)}+500") # width x height + x座標 + y座標
-                root["craft_table"].attributes("-toolwindow",True)
-                root["craft_table"].attributes("-topmost", True)
-                root["craft_table"].resizable(False, False)
-                root["craft_table"].protocol("WM_DELETE_WINDOW",window_del("craft_table",itembox=["craft_table_1","craft_table_2","craft_table_3"]))
-                canvas["craft_table"] = tk.Canvas(master=root["craft_table"],bg = "white", width = 350,height = 350)
-                canvas["craft_table"].place(x = 0,y = 0)
-                img["assets/images/craft_table_UI.png"]=tk.PhotoImage(file="assets/images/craft_table_UI.png", master=root["craft_table"])
-                canvas["craft_table"].create_image(100,100,image = img["assets/images/craft_table_UI.png"],tag="craft_table")
-                stan = 100; add = 47; aded = 0
-                for a in range(4):
-                    for b in range(4):
-                        aded += 1
-                        sx = stan + b*add
-                        sy = stan + a*add
-                        create_itembox("craft_table","craft_table",f"craft_table_{aded}",sx,sy)
-                flag["craft_table"]=False   
+            #elif message == "craft_table" and flag["craft_table"]:
+            #    root["craft_table"]=tk.Tk()
+            #    root["craft_table"].geometry(f"350x350+{random.randint(1,500)}+500") # width x height + x座標 + y座標
+            #    root["craft_table"].attributes("-toolwindow",True)
+            #    root["craft_table"].attributes("-topmost", True)
+            #    root["craft_table"].resizable(False, False)
+            #    root["craft_table"].protocol("WM_DELETE_WINDOW",window_del("craft_table",itembox=["craft_table_1","craft_table_2","craft_table_3"]))
+            #    canvas["craft_table"] = tk.Canvas(master=root["craft_table"],bg = "white", width = 350,height = 350)
+            #    canvas["craft_table"].place(x = 0,y = 0)
+            #    img["assets/images/craft_table_UI.png"]=tk.PhotoImage(file="assets/images/craft_table_UI.png", master=root["craft_table"])
+            #    canvas["craft_table"].create_image(100,100,image = img["assets/images/craft_table_UI.png"],tag="craft_table")
+            #    stan = 100; add = 47; aded = 0
+            #    for a in range(4):
+            #        for b in range(4):
+            #            aded += 1
+            #            sx = stan + b*add
+            #            sy = stan + a*add
+            #            create_itembox("craft_table","craft_table",f"craft_table_{aded}",sx,sy)
+            #    flag["craft_table"]=False   
             elif message[:5]=="pick_":
                 pic_item=message[5:]
             elif message[:10]=="item_pick_":
@@ -281,43 +281,43 @@ async def handler(websocket):
             elif message[:14]=="open_inventry_" and message[14:] not in flag["inventry_name"]:#f"open_inventry_{name}"
                 await open_inventry(message[14:])
             #elif message[:15]=="save_data_load_":
-            #    f = open("./save/"+message[15:]+"pkl","rb")
+            #    f = open("./save/"+message[15:]+"txt","rb")
             #    inventry=pickle.load(f)
             #    f.close
             #elif message[:15]=="save_data_save_":
-            #    f = open("./save/"+message[15:]+"pkl","wb")
+            #    f = open("./save/"+message[15:]+"txt","wb")
             #    pickle.dump(inventry,f)
             #    f.close
             elif message[:8]=="save_js_":#"save_js_{name}_{data}"
                 x=message[8:].split("_")
-                with open("./save/"+x[0]+".kpsv","w", encoding='utf-8') as f:
+                with open("./save/"+x[0]+".js","w", encoding='utf-8') as f:
                     f.write(x[1])
                 #f.close()
-                with open("./save/"+x[0]+".pkl", "wb") as file:
+                with open("./save/"+x[0]+".txt", "wb") as file:
                     pickle.dump(inventry, file)
-                #f = open("./save/"+x[0]+".pkl","wb")
+                #f = open("./save/"+x[0]+".txt","wb")
                 #pickle.dumps(inventry,f)
                 #f.close
-            elif message[:8]=="load_js_":#"load_js_{name}_{data}"
+            elif message[:8]=="load_js_":#"load_js_{name}"
                 x=message[8:].split("_")
-                with open("./save/"+x[0]+".kpsv","r", encoding='utf-8') as f:
+                with open("./save/"+x[0]+".js","r", encoding='utf-8') as f:
                     sendjs("load_js_"+f.read())
                 #f.close()
-                with open("./save/"+x[0]+".pkl", "rb") as file:
-                    inventry=pickle.load(inventry, file)
-                #f = open("./save/"+x[0]+".pkl","rb")
+                with open("./save/"+x[0]+".txt", "rb") as file:
+                    inventry=pickle.load(file)
+                #f = open("./save/"+x[0]+".txt","rb")
                 #inventry=pickle.load(f)
                 #f.close
             elif message[:9]=="rem_save_":#"rem_save_{name}"
                 try:
-                    os.remove(f"./save/{message[9:]}.pkl")
-                    os.remove(f"./save/{message[9:]}.kpsv")
+                    os.remove(f"./save/{message[9:]}.txt")
+                    os.remove(f"./save/{message[9:]}.js")
                 except Exception as e:
                     print(f"{e}のためセーブデータの削除に失敗しました。")
             elif message[:16]=="get_savedataname":#"get_savedataname"
                 koppepan_hayakuUItukure=""
                 for n in os.listdir("./save"):
-                    if n[-4:]==".pkl":
+                    if n[-4:]==".txt":
                         koppepan_hayakuUItukure+=","+n[:-4]
                 sendjs("sendjs_loadlis_"+str(koppepan_hayakuUItukure))
             #囧
@@ -385,11 +385,6 @@ def end():
             pass
     task.cancel()
 
-def create_itembox(root_me,canvas_me,tag,x,y):
-    img["assets/images/items/item_box.png"]=tk.PhotoImage(file="assets/images/items/item_box.png", master=root[root_me])
-    canvas[canvas_me].create_image(x,y,image = img["assets/images/items/item_box.png"],tag=tag)
-    itembox_item[tag]="item_box"
-    canvas[canvas_me].tag_bind(tag,"<ButtonRelease-1>",lambda e,b=tag,c=canvas_me,r=root_me:plass_itembox_chack(b,c,r))
 
 def plass_itembox_chack(tag,canvasname,rootname):
     global pic_item

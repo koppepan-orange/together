@@ -443,6 +443,140 @@ let clicking = false;
 document.addEventListener('mousedown', () => clicking = true);
 document.addEventListener('mouseup', () => clicking = false);
 //#endregion
+//#region tk
+class tk{
+    constructor(name, x = 'half', y = 'half', w = window.innerWidth/2, h = window.innerWidth/2){
+        let div = document.createElement('div');
+        div.className = `tk ${name}`;
+
+        let yoko = ['x', 'w'];
+        for(let n of yoko){
+            if(typeof eval(n) != 'string' || typeof eval(n) == 'string' && !eval(n).endsWith('%')) continue;
+            let num = eval(n).slice(0, -1);
+            eval(n) = num * window.innerWidth / 100;
+        }
+
+        let tate = ['y', 'h'];
+        for(let n of tate){
+            if(typeof eval(n) != 'string' || typeof eval(n) == 'string' && !eval(n).endsWith('%')) continue;
+            let num = eval(n).slice(0, -1);
+            eval(n) = num * window.innerHeight / 100;
+        }
+
+        console.log(x, y, w, h);
+
+        div.style.width = `${w}px`;
+        div.style.height = `${h}px`;
+
+        div.style.left = `${x}px`;
+         if(x == 'half') div.style.left = `${window.innerWidth/2 - w/2}px`;
+        div.style.top = `${y}px`;
+         if(y == 'half') div.style.top = `${window.innerHeight/2 - h/2}px`;
+
+        this.div = div;
+    };
+
+    attrAdd(dict = 'none'){
+        if(dict == 'none') return;
+        
+        if(typeof dict == 'string'){
+            //attr: nanka
+            let [key, val] = dict.split(':');
+             key = key.trim();
+             val = val.trim();
+            this.div.setAttribute(key, val);
+            return 0;
+        }
+
+        if(typeof dict != 'object') return 1;
+
+        for(let key in dict) this.div.setAttribute(key, dict[key]);
+
+        return 0;
+    }
+
+    styleAdd(dict){
+        for(let key in dict) this.div.style[key] = dict[key];
+    }
+
+    classAdd(name){this.div.classList.add(name)};
+    classRem(name){this.div.classList.remove(name)};
+    classTog(name){this.div.classList.toggle(name)};
+    classHas(name){
+        let is = this.div.classList.contains(name);
+        return is;
+    }
+
+    evAdd(type, func){
+        this.div.addEventListener(type, func);
+    }
+
+    yousoAdd(type, dict){
+        let youso = document.createElement(type);
+        for(let key in dict){
+            console.log(`[${key}]`, dict[key]);
+            let ban = ['className', 'textContent', 'innerHTML', 'href', 'src', 'style'];
+            let baned = 0;
+            for(let b of ban){
+                if(key == 'style'){
+                    console.log('she is a style')
+                    baned = 1;
+                    let styles0 = dict[key];
+                    let styles = styles0.replace(/ /g, '').replace(/\n/g, '');
+                    let arr = styles.split(';');
+                    for(let style of arr){
+                        let [key, val] = style.split(':');
+                        youso.style[key] = val;
+                        // console.log(`youso.style[${key}] = ${val}`)
+                    }
+                    // for(let key in styles) console.log(key, styles[key]), youso.style[key] = styles[key];
+                    break;
+                }
+
+                if(key == b) youso[key] = dict[key], baned = 1;
+            }
+
+            if(baned) console.log('ban対象！')
+
+            if(!baned) youso.setAttribute(key, dict[key])
+        };
+
+        this.div.appendChild(youso);
+    };
+
+    append(){
+        document.body.appendChild(this.div);
+    };
+
+    remove(){
+        this.div.remove();
+    };
+}
+keys.asd = [];
+
+function tkTest(){
+    let mono = new tk('mono', 'half', 'half')
+    mono.classAdd('draggable')
+    mono.styleAdd({background: '#f0f8ff'})
+
+    mono.yousoAdd('div', {textContent: 'koppepandesu'})
+    mono.yousoAdd('div', {
+        className: 'draggable',
+        style: `
+            width: 100px;
+            height: 100px;
+            background: #cfe9ff
+        `
+    });
+
+    mono.evAdd('click', function(){
+        nicoText('clicked')
+    })
+
+    mono.append();
+}
+
+//#endregion
 
 
 //#region Re:connection!!
@@ -456,7 +590,7 @@ let commanC = {
 let connecten = 0;
 
 commanC.senB.addEventListener('click', () => {   
-    sendpyTx(commanC.texD.value);
+    sendpyTx(commanC.texD.value);//ha
 })
 
 // サーバとの通信を接続する関数
@@ -478,14 +612,13 @@ function connect(){
 
     // エラー発生時の処理
     webSocket.onerror = function(message){
-        logadd("errored!! very v    ery errored!!!!");
+        logadd("errored!! very very errored!!!!");
     };
 
     let datalist = document.getElementById('select');
 
     // 受け取ったとき
     webSocket.onmessage = function(message){
-        
         let mes = message.data;
         read(mes);
         nicoText(mes);
@@ -515,13 +648,7 @@ function connect(){
         }
         
         if(mes.startsWith('sendjs_loadlis_')){
-            let moz = mes.slice(14);
-            let arr = moz.split(',');
-            console.log(arr);
-            
-            for(let nani of arr) sendpyTx(nani), savC.arr.push(nani);
-
-            savF.yomikomi();
+            savF.load(mes.slice(15));
         }
 
         if(mes.startsWith('sendpy')) sendpy(mes.slice(7)); // asdasd
@@ -578,7 +705,22 @@ savF.clos = async function(){
     savD.classList.remove('clos');
 }
 
+savF.load = (moz) => {
+    console.log(moz)
+    let arr = moz.split(',').filter(a => a != '' && a != undefined && a != null && !isNaN(a));
+    console.log(arr)
+    savC.arr = [];
+    
+    for(let nani of arr) savC.arr.push(nani);
+
+    console.log(savC.arr);
+
+    savF.yomikomi();
+    savF.yomikomi2();
+}
+
 savF.yomikomi = () => {
+    console.log('yomikomi now')
     savC.arr.sort((a,b) => a - b);
     let last = +savC.arr.at(-1) + 1;
 
@@ -595,10 +737,30 @@ savF.yomikomi = () => {
         lavel.textContent = `No. ${i}`;
         div.appendChild(lavel);
 
-        //この辺のUIはあのゲームの文字をか￥￥参考にしてくれ
+        //この辺のUIはあのゲームの文字をか&#%$参考にしてくれ
         // アニメーションとかも録画して
     }
+
+    
+    // savF.open()
 }
+
+//꒰𑁬⎛ಲළ൭⎞໒꒱
+let datalist = document.getElementById('select');
+savF.yomikomi2 = () => {
+    console.log('yomikomi2 now')
+    datalist.innerHTML = '';
+    console.log(savC.arr)
+    for(let i=0; i<savC.arr.length; i++){
+        let name = savC.arr[i];
+        // datalist.options.add(new Option('Orange', 'orange'));
+        let opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        datalist.appendChild(opt);  
+    }
+}
+
 
 savF.saveR = (num) => {
     // let num = titC.selD.selectedIndex;
@@ -885,21 +1047,23 @@ titF.new = () => {
 titC.newD.addEventListener('click', titF.new);
 
 titF.load = () => {
-//savC.arrに入った 
-
-    savF.open()
+    let name = titC.selD.value;
+    sendpyTx(`load_js_${name}`)
+    // sendpyTx("get_savedataname");
 }
-
 titC.loaD.addEventListener('click', titF.load);
 
+//꒰𑁬⎛ಲළ൭⎞໒꒱
+titC.selD.addEventListener('mouseover', () => {
+    sendpyTx('get_savedataname');
+})
+titC.delD.addEventListener('click', () => {
+    //let num = titC.selD.selectedIndex;
+    //let name = titC.selD.options[num].textContent;
+    let name = titC.selD.value
+    sendpyTx(`rem_save_${name}`);
+});
 
-// titleC.delD.addEventListener('click', () => {
-//     let num = titleC.selD.selectedIndex;
-//     let name = titleC.selD.options[num].textContent;
-
-//     sendpyTx(`rem_save_${name}`);
-//     savC.name = name;
-// });
 //#endregion titleArea
 
 //#region ビッグマシュマロ（唐突）
@@ -964,14 +1128,14 @@ bigmmC.subL = [
         desp:'save',
         func: () => {
             let moz = inv_save_to();
-            sendpyTx(`save_js_koppe_${moz}`);
+            sendpyTx(`save_js_0_${moz}`);
         }
     },
     {
         name:'0%0%0%',
         desp:'0%0%0%',
         func: () => {
-            sendpyTx('rem_save_koppe');
+            sendpyTx('rem_save_0');
         }
     }
 ];

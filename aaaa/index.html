@@ -1,186 +1,181 @@
 
 
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>debug-room!!</title>
-    <link rel="stylesheet" href="mitame.css"/>
-  </head>
-  <body>
-    <div id="movableDescription"></div>
-    <div id="text"></div>
-    
-    <div id="back"></div>
-
-    <div id="titleArea">
-      <div class="title">いいかんじのたいとるろご</div>
-      <div class="buttons">
-        <div class="bt new">New York City</div>
-        <input class="pulldown pul" type="text" name="a" list="select">
-        <datalist class="pulldown" size="1" id="select">
-          <!--ここ使わん恐れもある　zoi  -->
-        </datalist>
-        <div class="bt load">Load of the Ring</div>
-        <div class="bt delload">delet savedata</div>
-      </div>
-    </div>
-
-    <div id="mainArea">
-
-      <div id="save">
-        <div class="youso">1</div>
-        <div class="youso">b</div>
-        <div class="youso">three</div>
-        <div class="youso">Ⅳ</div>
-      </div>
-
-      <div id="inventory">
-        <div class="row">
-          <div class="opener">
-            <img src="assets/images/inventory.png"/>
-          </div>
-          <div class="area"></div>
-        </div>
-      </div>
-
-      <!-- <div id="items" class="draggable">asdasdas</div> -->
-
-      <div id="bigmashmaro">
-        <div class="kitekey">
-          <div class="column">
-            <div class="theta"></div>
-            <div class="theta"></div>
-          </div>
-        </div>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>debug-room!!</title>
+        <link rel="stylesheet" href="mitame.css"/>
+    </head>
+    <body>
+        <div id="movableDescription"></div>
+        <div id="text"></div>
         
-        <textarea type="text" class="bodies"></textarea>
-        <div class="sub"></div>
+        <div id="back"></div>
 
-        <div class="jouge"></div>
-      </div>
+        <div id="titleArea">
+            <div class="title">いいかんじのたいとるろご</div>
+            <div class="buttons">
+                <div class="bt new">New York City</div>
 
-      <div id="sideL">
-        <div class="garara">
-          <div class="row">
-            <div class="megy"></div>
-            <div class="megy"></div>
-          </div>
-        </div>
-        <div id="log">
-          <div class="log">
-            <div class="megy"></div>
-          </div>
-          <div class="opener"></div>
-        </div>
-      </div>
+                <input class="pulldown pul" type="text" name="a" list="select">
+                <datalist class="pulldown" size="1" id="select"></datalist><!-- 必須　zoi    -->
 
-      <div id="underBar">
-        <div class="checks"></div>
-      </div>
-
-      <div id="achieve">
-        <span>何もないよ（笑）</span>
-      </div>
-
-      <div id="fonts"></div>
-
-      <div id="rainbt" class="draggable"></div>
-      
-      <div id="commands">
-        <div class="row">
-          <input class="text" type="text">
-          <button class="send">Send</button>
-        </div>
-        <textarea class="log" rows="10" cols="50"></textarea>
-      </div>
-
-      <div id="battle">
-        <div class="turn"></div>
-        <div class="column">
-          <div class="enemies"></div>
-          <div class="players"></div>
-        </div>
-        <div class="commands">
-          <button class="button s1">act</button>   
-          <button class="button s2">magic</button>
-          <button class="button s3">tool</button>   
-          <button class="button s4">run</button>
+                <div class="bt load">Load of the Ring</div>
+                <div class="bt delload">delet savedata</div>
+            </div>
         </div>
 
-        <div class="sele"></div>  
-      </div>
+        <div id="mainArea">
 
-      <div id="salen">
-        <div class="x">
-          <div class="inner"></div>
+            <div id="save"></div>
+
+            <div id="inventory">
+                <div class="row">
+                    <div class="opener">
+                        <img src="assets/images/inventory.png"/>
+                    </div>
+                    <div class="area"></div>
+                </div>
+            </div>
+
+            <!-- <div id="items" class="draggable">asdasdas</div> -->
+
+            <div id="bigmashmaro">
+                <div class="kitekey">
+                    <div class="column">
+                        <div class="theta"></div>
+                        <div class="theta"></div>
+                    </div>
+                </div>
+                
+                <textarea type="text" class="bodies"></textarea>
+                <div class="sub"></div>
+
+                <div class="jouge"></div>
+            </div>
+
+            <div id="sideL">
+                <div class="garara">
+                    <div class="row">
+                        <div class="megy"></div>
+                        <div class="megy"></div>
+                    </div>
+                </div>
+                <div id="log">
+                    <div class="log">
+                        <div class="megy"></div>
+                    </div>
+                    <div class="opener"></div>
+                </div>
+            </div>
+
+            <div id="underBar">
+                <div class="checks"></div>
+            </div>
+
+            <div id="achieve">
+                <span>何もないよ（笑）</span>
+            </div>
+
+            <div id="fonts"></div>
+
+            <div id="rainbt" class="draggable"></div>
+            
+            <div id="commands">
+                <div class="row">
+                    <input class="text" type="text">
+                    <button class="send">Send</button>
+                </div>
+                <textarea class="log" rows="10" cols="50"></textarea>
+            </div>
+
+            <div id="battle">
+                <div class="turn"></div>
+                <div class="column">
+                    <div class="enemies"></div>
+                    <div class="players"></div>
+                </div>
+                <div class="commands">
+                    <button class="button s1">act</button>     
+                    <button class="button s2">magic</button>
+                    <button class="button s3">tool</button>     
+                    <button class="button s4">run</button>
+                </div>
+
+                <div class="sele"></div>    
+            </div>
+
+            <div id="salen">
+                <div class="x">
+                    <div class="inner"></div>
+                </div>
+                <div class="cell salen"></div>
+                <div class="yazirushi">
+                    <div class="tate"></div>
+                    <div class="kasa"></div>
+                </div>
+                <div class="payout">
+                    <div class="euro">0</div>
+                    <div class="span">€</div>
+                </div>
+            </div>
+
+            <div id="gamble">
+                <div class="opener"></div>
+                <div class="euro">0€</div>
+
+                <div class="heya loby tog">
+                    <span>ここはロビーです。</span><br><i>バカ乙</i>
+                </div>
+
+                <div class="heya blacky">
+                    <div class="h p">
+                        <div class="holder"></div>
+                    </div>
+                    <div class="h d">
+                        <div class="holder"></div>
+                    </div>
+                </div>
+                
+                <div class="heya roulette"></div>
+            </div>
+
+            <div id="gachan">
+                <div class="hontai">
+                    <div class="kyuu"></div>
+                    <div class="sita">
+                        <div class="maru"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="ghost">
+                <div class="bubble" id="bubble">
+                    <div class="text"></div>
+                    <div class="sankack"></div>
+                </div>
+                <div class="head" id="head" aria-hidden="true">
+                        <div class="eye left"></div>
+                        <div class="eye right"></div>
+                        <div class="top"></div>
+                        <div class="bottom"></div>
+                </div>
+                <div class="body"></div>
+                <div class="tail"></div>
+            </div>
+
+            <canvas id="canvas"></canvas>
+            <div id="mapmake" class="draggable"></div>
+            
+            <canvas id="bleBack"></canvas>
+            <div id="ble">
+                <div class="hited">hited: null</div>
+            </div>
+
         </div>
-        <div class="cell salen"></div>
-        <div class="yazirushi">
-          <div class="tate"></div>
-          <div class="kasa"></div>
-        </div>
-        <div class="payout">
-          <div class="euro">0</div>
-          <div class="span">€</div>
-        </div>
-      </div>
-
-      <div id="gamble">
-        <div class="opener"></div>
-        <div class="euro">0€</div>
-
-        <div class="heya loby tog">
-          <span>ここはロビーです。</span><br><i>バカ乙</i>
-        </div>
-
-        <div class="heya blacky">
-          <div class="h p">
-            <div class="holder"></div>
-          </div>
-          <div class="h d">
-            <div class="holder"></div>
-          </div>
-        </div>
-        
-        <div class="heya roulette"></div>
-      </div>
-
-      <div id="gachan">
-        <div class="hontai">
-          <div class="kyuu"></div>
-          <div class="sita">
-            <div class="maru"></div>
-          </div>
-        </div>
-      </div>
-      
-      <div id="ghost">
-        <div class="bubble" id="bubble">
-          <div class="text"></div>
-          <div class="sankack"></div>
-        </div>
-        <div class="head" id="head" aria-hidden="true">
-            <div class="eye left"></div>
-            <div class="eye right"></div>
-            <div class="top"></div>
-            <div class="bottom"></div>
-        </div>
-        <div class="body"></div>
-        <div class="tail"></div>
-      </div>
-
-      <canvas id="canvas"></canvas>
-      <div id="mapmake" class="draggable"></div>
-      
-      <canvas id="bleBack"></canvas>
-      <div id="ble">
-        <div class="hited">hited: null</div>
-      </div>
-
-    </div>
 
 
-    <script src="data.js" defer></script>
-    <script src="battle.js" defer></script>
-    <script src="nakami.js" defer></script>
-  </body>
-  </html>
+        <script src="data.js" defer></script>
+        <script src="battle.js" defer></script>
+        <script src="nakami.js" defer></script>
+    </body>
+    </html>
