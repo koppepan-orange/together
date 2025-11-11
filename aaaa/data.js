@@ -1882,6 +1882,7 @@ let Tools = [
                 return 0;
         }
     },
+
     {
         name:'投げナイフ',
         id:'throwknife',
@@ -1897,6 +1898,7 @@ let Tools = [
                 return 0;
         }
     },
+
     {
         name:'トリッキーな変数',
         id:'trickyvariables',
@@ -1919,6 +1921,7 @@ let Tools = [
             return 0;
         }
     },
+
     {
         name:'ボトルグレネード',
         id:'bottlegrenade',
@@ -1936,6 +1939,7 @@ let Tools = [
             return 0;
         }
     },
+
     {
         name:'援護射撃',
         id:'coveringfire',
@@ -1951,6 +1955,7 @@ let Tools = [
             return 0;
         }
     },
+
     {
         name:'爆弾',
         id:'bomb',

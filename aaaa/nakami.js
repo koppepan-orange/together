@@ -552,7 +552,6 @@ class tk{
         this.div.remove();
     };
 }
-keys.asd = [];
 
 function tkTest(){
     let mono = new tk('mono', 'half', 'half')
@@ -707,7 +706,7 @@ savF.clos = async function(){
 
 savF.load = (moz) => {
     console.log(moz)
-    let arr = moz.split(',').filter(a => a != '' && a != undefined && a != null && !isNaN(a));
+    let arr = moz.split(',').filter(a => a != '' && a != undefined && a != null && isNaN(a));
     console.log(arr)
     savC.arr = [];
     
@@ -743,6 +742,33 @@ savF.yomikomi = () => {
 
     
     // savF.open()
+}
+
+savF.dele = async function(){
+    let ok = 0;
+
+
+    let lis = [
+        ['ほんとうに セーブデータを 削除しますか？', '#ffab91'],
+        ['えまじ？？いいの？？？','#f0f8ff'],
+        ['いいんだな？今！ここで！！！！','#000000']
+    ]
+    
+    for(let l of lis){
+        let [text, iro] = l;
+        
+        
+        let mono = new tk('t', 'half', 'half', window.innerWidth/2, 30);
+        mono.styleAdd({background: iro});
+        mono.evAdd('click', () => {
+            ok = 1;
+            mono1.remove();
+        });
+
+        mono.yousoAdd('div', {textContent: text});
+        while(!ok) await delay(10);
+    }
+
 }
 
 //꒰𑁬⎛ಲළ൭⎞໒꒱
@@ -1055,6 +1081,7 @@ titC.loaD.addEventListener('click', titF.load);
 
 //꒰𑁬⎛ಲළ൭⎞໒꒱
 titC.selD.addEventListener('mouseover', () => {
+    if(!loop) return
     sendpyTx('get_savedataname');
 })
 titC.delD.addEventListener('click', () => {
@@ -1302,7 +1329,8 @@ let undD = document.getElementById('underBar'); //地下のbar(酒屋)
 let undC = {
     open:0,
     checkD:undD.querySelector('.checks'),
-    checking:{}
+    checking:{},
+    fooD:undD.querySelector('.footer'),
 }
 let undF = {};
 
@@ -1382,7 +1410,45 @@ undF.load = () => {
         undC.checking[ch.name] = ch.kitei ? 0 : 1;
         clcl();
     }
+
+    for(let foot of undC.foots){
+        let div = document.createElement('div');
+        div.className = `youso ${foot.name}`;
+        div.addEventListener('click', foot.func);
+
+        let img = document.createElement('img');
+        img.src = `assets/images/systems/${foot.img}.png`;
+        div.appendChild(img);
+
+        div.addEventListener('mouseover', () => img.src = `assets/images/systems/${foot.img}_red.png`);
+        div.addEventListener('mouseout', () => img.src = `assets/images/systems/${foot.img}.png`);
+
+        undC.fooD.appendChild(div);
+    }
 }
+
+undF.exit = () => {
+    undF.clos();
+    titD.classList.remove('hidden');
+}
+
+undC.foots = [
+    {
+        name:'exit',
+        img: 'export',
+        func:() => {
+            undF.exit();
+        }
+    },
+    {
+        name:'del_save',
+        img: 'delete',
+        func:() => {
+            savF.dele();
+            undF.exit();
+        }
+    }
+]
 //#endregion
 
 //#region achieve
@@ -2924,7 +2990,7 @@ function start(){
     gameloop();
 }
 
-let loop = 1;
+let loop = 0;
 let looped = 0;
 async function gameloop(){
     looped++;
