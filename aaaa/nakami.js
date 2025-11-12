@@ -445,9 +445,9 @@ document.addEventListener('mouseup', () => clicking = false);
 //#endregion
 //#region tk
 class tk{
-    constructor(name, x = 'half', y = 'half', w = window.innerWidth/2, h = window.innerWidth/2){
-        let div = document.createElement('div');
-        div.className = `tk ${name}`;
+    constructor(type, x = 'half', y = 'half', w = window.innerWidth/2, h = window.innerWidth/2){
+        let youso = document.createElement(type);
+        youso.className = `tk ${type}`;
 
         let yoko = ['x', 'w'];
         for(let n of yoko){
@@ -465,15 +465,17 @@ class tk{
 
         console.log(x, y, w, h);
 
-        div.style.width = `${w}px`;
-        div.style.height = `${h}px`;
+        youso.style.width = `${w}px`;
+        youso.style.height = `${h}px`;
 
-        div.style.left = `${x}px`;
-         if(x == 'half') div.style.left = `${window.innerWidth/2 - w/2}px`;
-        div.style.top = `${y}px`;
-         if(y == 'half') div.style.top = `${window.innerHeight/2 - h/2}px`;
+        youso.style.left = `${x}px`;
+        youso.style.top = `${y}px`;
+        
+        if(x == 'half' && y == 'half') youso.classList.add('cenXY');
+         else if(x == 'half') youso.classList.add('cenX');
+         else if(y == 'half') youso.classList.add('cenY');
 
-        this.div = div;
+        this.youso = youso;
     };
 
     attrAdd(dict = 'none'){
@@ -484,93 +486,59 @@ class tk{
             let [key, val] = dict.split(':');
              key = key.trim();
              val = val.trim();
-            this.div.setAttribute(key, val);
+            this.youso.setAttribute(key, val);
             return 0;
         }
 
         if(typeof dict != 'object') return 1;
 
-        for(let key in dict) this.div.setAttribute(key, dict[key]);
+        for(let key in dict) this.youso.setAttribute(key, dict[key]);
 
         return 0;
     }
 
     styleAdd(dict){
-        for(let key in dict) this.div.style[key] = dict[key];
+        for(let key in dict) this.youso.style[key] = dict[key];
     }
 
-    classAdd(name){this.div.classList.add(name)};
-    classRem(name){this.div.classList.remove(name)};
-    classTog(name){this.div.classList.toggle(name)};
+    classAdd(name){this.youso.classList.add(name)};
+    classRem(name){this.youso.classList.remove(name)};
+    classTog(name){this.youso.classList.toggle(name)};
     classHas(name){
-        let is = this.div.classList.contains(name);
+        let is = this.youso.classList.contains(name);
         return is;
     }
 
     evAdd(type, func){
-        this.div.addEventListener(type, func);
+        this.youso.addEventListener(type, func);
     }
 
-    yousoAdd(type, dict){
-        let youso = document.createElement(type);
-        for(let key in dict){
-            console.log(`[${key}]`, dict[key]);
-            let ban = ['className', 'textContent', 'innerHTML', 'href', 'src', 'style'];
-            let baned = 0;
-            for(let b of ban){
-                if(key == 'style'){
-                    console.log('she is a style')
-                    baned = 1;
-                    let styles0 = dict[key];
-                    let styles = styles0.replace(/ /g, '').replace(/\n/g, '');
-                    let arr = styles.split(';');
-                    for(let style of arr){
-                        let [key, val] = style.split(':');
-                        youso.style[key] = val;
-                        // console.log(`youso.style[${key}] = ${val}`)
-                    }
-                    // for(let key in styles) console.log(key, styles[key]), youso.style[key] = styles[key];
-                    break;
-                }
-
-                if(key == b) youso[key] = dict[key], baned = 1;
-            }
-
-            if(baned) console.log('ban対象！')
-
-            if(!baned) youso.setAttribute(key, dict[key])
-        };
-
-        this.div.appendChild(youso);
-    };
+    yousoAdd(youso){
+        this.youso.appendChild(youso);
+    }
 
     append(){
-        document.body.appendChild(this.div);
+        document.body.appendChild(this.youso);
     };
 
     remove(){
-        this.div.remove();
+        this.youso.remove();
     };
 }
 
 function tkTest(){
-    let mono = new tk('mono', 'half', 'half')
-    mono.classAdd('draggable')
-    mono.styleAdd({background: '#f0f8ff'})
+    let mono = new tk('div', 'half', 'half');
+    mono.classAdd('draggable');
+    mono.styleAdd({background: '#f0f8ff'});
 
-    mono.yousoAdd('div', {textContent: 'koppepandesu'})
-    mono.yousoAdd('div', {
-        className: 'draggable',
-        style: `
-            width: 100px;
-            height: 100px;
-            background: #cfe9ff
-        `
-    });
+    let mono2 = new tk('div', 'half', 'half');
+    mono2.styleAdd({background: '#cfe9ff'});
+
+    mono.yousoAdd(mono2.div);
 
     mono.evAdd('click', function(){
-        nicoText('clicked')
-    })
+        nicoText('clicked');
+    });
 
     mono.append();
 }
@@ -750,23 +718,34 @@ savF.dele = async function(){
 
     let lis = [
         ['ほんとうに セーブデータを 削除しますか？', '#ffab91'],
-        ['えまじ？？いいの？？？','#f0f8ff'],
-        ['いいんだな？今！ここで！！！！','#000000']
+        ['えまじ？？いいの？？？','#a82700'],
+        ['やるんだな？？\n今！！ここで！！！！','#fed0c1']
     ]
     
     for(let l of lis){
         let [text, iro] = l;
         
         
-        let mono = new tk('t', 'half', 'half', window.innerWidth/2, 30);
+        let mono = new tk('t', 'half', 'half', window.innerWidth/2, 300);
+        mono.classAdd('mostop')
         mono.styleAdd({background: iro});
         mono.evAdd('click', () => {
             ok = 1;
-            mono1.remove();
+            mono.remove();
         });
 
-        mono.yousoAdd('div', {textContent: text});
+        let span = new tk('div', 'half', 'half', window.innerWidth/2, 100);
+        if(iro == '#fed0c1') span.classAdd('color-red'), span.styleAdd({fontSize: '32px'});
+        span.styleAdd({textAlign: 'center'});
+        span.youso.innerText = text;
+
+        mono.youso.appendChild(span.youso);
+
+        mono.append();
         while(!ok) await delay(10);
+
+        ok = 0;
+        if(iro != '#fed0c1') await delay(1000);
     }
 
 }
@@ -1273,7 +1252,7 @@ sideLC.list = [
     },
     {
         name:'dummy!',
-        img:'seafood',
+        img:'gacha',
         func: () => {
             sideLF.toggle();
             gacF.tog();
@@ -1281,7 +1260,7 @@ sideLC.list = [
     },
     {
         name:'dummy!!',
-        img:'seafood',
+        img:'gamble',
         func: () => {
             sideLF.toggle();
             gamF.tog();
@@ -1443,8 +1422,8 @@ undC.foots = [
     {
         name:'del_save',
         img: 'delete',
-        func:() => {
-            savF.dele();
+        func:async () => {
+            await savF.dele();
             undF.exit();
         }
     }
@@ -3214,3 +3193,15 @@ for(let type of Object.keys(canI.imagesNames)){
     };
 };
 //#endregion
+
+
+let Colors = [
+    [
+        '#391b0a',
+        '#6f3c0e',
+        '#a66021',
+        '#c88843',
+        '#cfa776',
+        '#e5d1b4'
+    ]
+]

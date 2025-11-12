@@ -273,9 +273,9 @@ async def handler(websocket):
             elif message[:10]=="imput_air_":#imput_melt_{name}_{item}_{cm3}
                 x=message[10:].split("_")
                 inventry[str(x[0])][6][x[1]]+=x[2]
-            elif message[:16]=="create_inventry_":#f"create_invryentry_{name}_{windth}_{higth}_{onndo}_{aturyoku}_{tainetuMAX}_{taiatu}_{taiatuMIN}"
+            elif message[:16]=="create_inventry_":#f"create_invryentry_{name}_{windth}_{higth}_{onndo}_{aturyoku}_{tainetuMAX}_{taiatu}_{taiatuMIN}_{zokusei}"
                 x=message[16:].split("_")
-                inventry[x[0]]=[[],float(x[1]),float(x[2]),float(x[3]),float(x[4]),tem.copy(),tem.copy(),float(x[5]),float(x[6]),float(x[7])]
+                inventry[x[0]]=[[],float(x[1]),float(x[2]),float(x[3]),float(x[4]),tem.copy(),tem.copy(),float(x[5]),float(x[6]),float(x[7]),str(x[8])]
                 inventry[x[0]][6]["酸素"]=float(x[1])*float(x[2])*0.2095
                 inventry[x[0]][6]["窒素"]=float(x[1])*float(x[2])*0.7808
             elif message[:14]=="open_inventry_" and message[14:] not in flag["inventry_name"]:#f"open_inventry_{name}"
@@ -624,6 +624,7 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
             
             inventry2=copy.deepcopy(inventry)
             for name,index in inventry.items():
+                
                 #print(inventry2)
                 write=False
                 if name in flag["inventry_name"]:
@@ -656,7 +657,7 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                     break
                 if write:
                     for a,b in index[6].items():
-                        if b == 0:
+                        if b == 0 or (a not in []):
                             continue
                         air=imgg["assets/images/items/air_"+str(a)+".png"].crop((0,0,index[1],(index[2]-yw)))
                         air.putalpha(int(b/30))
@@ -829,7 +830,7 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                                     #print(f"{inventry2[name][4]}h")
                                     continue
                                 else:
-                                    print("826")
+                                    #print("826")
                                     popop=int(cem[1][aaa]*csvdata[cem[0][aaa]][7]/1000000)
                                     ap=len(inventry2[name][0])
                                     for x in range(ap):
@@ -842,7 +843,7 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                                         except Exception as e:
                                             print(f"Exceptionやで!!! {e}")
                                             pass
-                            print(flag["cem_roop"])
+                            #print(flag["cem_roop"])
                             if flag["cem_roop"]["are"]==float("inf"):
                                 flag["cem_roop"]["are"]=0
                             
@@ -895,7 +896,7 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                     canvas["inventry_root_"+str(name)].lift("system")
                     canvas["inventry_root_"+str(name)].lift("have")
                     
-
+            if (index[3]>index[7])or(index[3]<index[9])or(index[4]>index[8]):inventry_break(name)
             inventry=copy.deepcopy(inventry2)
 
             #print("876")
@@ -1058,6 +1059,9 @@ def thermometer_move(name):
         print(e)
         return
     
+def craft_button(e,name):
+    
+
 
 def out(e,name):
     canvas["inventry_root_"+str(name)].delete('have')
@@ -1090,6 +1094,11 @@ async def open_inventry(name:str):
         gui["inventry_thermometer_gui"+str(name)]=canvas["inventry_root_"+str(name)].create_image(39,13, image=img[str(name)+"thermometer"],tag=("system","thermometer_outline"))
         canvas["inventry_root_"+str(name)].tag_bind(gui["inventry_pressuregauge_gui"+str(name)],"<ButtonPress-1>",lambda e,name=name:pressuregauge(e,name))
         canvas["inventry_root_"+str(name)].tag_bind(gui["inventry_thermometer_gui"+str(name)],"<ButtonPress-1>",lambda e,name=name:thermometer(e,name))
+        if inventry[name][10]=="craft_table":
+            img[str(name)+"craft_button"]=tk.PhotoImage(file = "./assets/images/systems/craft_button.png",master=root["inventry_root_"+str(name)])
+            gui["inventry_craft_button_gui"+str(name)]=canvas["inventry_root_"+str(name)].create_image(65,13, image=img[str(name)+"craft_button"],tag=("system","craft_button_outline"))
+            canvas["inventry_root_"+str(name)].tag_bind(gui["inventry_craft_button_gui"+str(name)],"<ButtonPress-1>",lambda e,name=name:craft_button(e,name))
+        # 囧:: minecraft table is a very so nice ihin by Tokugawa Ieyasu.
         root["inventry_root_"+str(name)].bind("<Leave>",lambda e,name=name:out(e,name))
         root["inventry_root_"+str(name)].bind("<Motion>",lambda e,name=name:motion(e,name))
         root["inventry_root_"+str(name)].bind("<ButtonRelease-1>",lambda e,name=name:click(e,name))

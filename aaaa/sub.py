@@ -63,7 +63,7 @@ async def endrole():
     #a832a6
     karioki.append(ttk.Label(r[0], text="pythonコードの記入(main)", font=("ＭＳ ゴシック", 15,"bold"), padding=[10], relief=tk.RIDGE,background="#f6fac3",foreground="#544f01").place(x=50,y=10))
     karioki.append(ttk.Label(r[0], text="竹延久志", font=("ＭＳ ゴシック", 15,"bold"), padding=[10], relief=tk.RIDGE,background="#baa0b9",foreground="#4a1549").place(x=50,y=55))
-    r[0].protocol("WM_DELETE_WINDOW",lambda:1==1)
+    r[0].protocol("WM_DELETE_WINDOW",lambda:True)
     
     
     
@@ -79,7 +79,7 @@ async def endrole():
     #32a84c
     karioki.append(ttk.Label(r[1], text="pythonコードの記入(物理演算)", font=("ＭＳ ゴシック", 15,"bold"), padding=[10], relief=tk.RIDGE,background="#f6fac3",foreground="#544f01").place(x=50,y=10))
     karioki.append(ttk.Label(r[1], text="山形虎太郎", font=("ＭＳ ゴシック", 15,"bold"), padding=[10], relief=tk.RIDGE,background="#a0baa1",foreground="#164a15").place(x=50,y=55))
-    r[1].protocol("WM_DELETE_WINDOW",lambda:1==1)
+    r[1].protocol("WM_DELETE_WINDOW",lambda:True)
     #r[1].after(10,endrolemovey,r[1])
     #r[0].after(10,endrolemovey,r[0])
 
@@ -107,7 +107,7 @@ async def endrole():
     karioki.append(ttk.Label(r[2], text="tkinter.ttk", font=("ＭＳ ゴシック", 10,"bold"), padding=[5], relief=tk.RIDGE,background="#63a7ff",foreground="#1f334d").place(x=50,y=400))
     karioki.append(ttk.Label(r[2], text="asyncio", font=("ＭＳ ゴシック", 10,"bold"), padding=[5], relief=tk.RIDGE,background="#63a7ff",foreground="#1f334d").place(x=50,y=430))
     karioki.append(ttk.Label(r[2], text="webbrowser", font=("ＭＳ ゴシック", 10,"bold"), padding=[5], relief=tk.RIDGE,background="#63a7ff",foreground="#1f334d").place(x=50,y=460))
-    r[2].protocol("WM_DELETE_WINDOW",lambda:1==1)
+    r[2].protocol("WM_DELETE_WINDOW",lambda:True)
     
     
     
