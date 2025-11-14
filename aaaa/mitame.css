@@ -677,8 +677,8 @@ input[type="range"]::-moz-range-thumb {
     width: 450px;
     height: 80%;
     padding: 20px 5px;
-    /* background: linear-gradient(to top, #391d00fc 0%, #391d00fc 60%, #4f2c07fc 100%); */
-    background: linear-gradient(to top, #391b0a, #6f3c0e, #a66021, #c88843, #cfa776, #e5d1b4);
+    background: linear-gradient(to top, #391d00fc 0%, #391d00fc 60%, #4f2c07fc 100%);
+    /* background: linear-gradient(to top, #391b0a, #6f3c0e, #a66021, #c88843, #cfa776, #e5d1b4); */
     color: #fffffffc;
     font-family: craft;
     position: fixed;
@@ -1708,3 +1708,4 @@ input[type="range"]::-moz-range-thumb {
     filter: brightness(1.2);
 }
 /* #endregion */
+
