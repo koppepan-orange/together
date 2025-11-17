@@ -74,12 +74,12 @@ input[type="range"]::-moz-range-thumb {
 .checkbox .box{
     width: 25px;
     aspect-ratio: 1/1;
-    background-color: #b2b2b2;
+    background: #b2b2b2;
     border: solid 2px #2b2b2b;
     cursor: pointer;
 }
 .checkbox.tog .box{
-    background-color: #23c51a;
+    background: #23c51a;
 }
 
 /*nicotext*/
@@ -87,7 +87,7 @@ input[type="range"]::-moz-range-thumb {
     position: fixed;
     top: 0;
     right: 0;
-    background-color: #f0f8ff80;
+    background: #f0f8ff80;
     color: #000000;
     font-size: 20px;
     transition: right 2.0s linear;
@@ -116,7 +116,7 @@ input[type="range"]::-moz-range-thumb {
 #log .opener{
     width: 30px;
     height: 100%;
-    background-color: #000000ef;
+    background: #000000ef;
     text-align: center;
     cursor: pointer;
     z-index: inherit;
@@ -126,7 +126,7 @@ input[type="range"]::-moz-range-thumb {
     height: 100%;
     max-height: 100%;
     overflow-x: hidden; overflow-y: scroll;
-    background-color: #000000de;
+    background: #000000de;
     text-align: left;
     font-size: 14px;
     transition: right 0.3s;
@@ -173,7 +173,7 @@ input[type="range"]::-moz-range-thumb {
     display: none;
     position: fixed;
     pointer-events: none;
-    background-color: #363636e2;
+    background: #363636e2;
     color: #f0f8ff;
     text-align: left;
     padding: 5px 10px;
@@ -225,7 +225,7 @@ input[type="range"]::-moz-range-thumb {
     height: 100px;
     /* aspect-ratio: 1/1; */
     padding: 5px;
-    background-color: #f0f8ff;
+    background: #f0f8ff;
     border: 1px solid #000000;
     color: #000000;
     font-size: 12px;
@@ -287,24 +287,47 @@ input[type="range"]::-moz-range-thumb {
     justify-content: center;
     align-items: center;
     width: 30vw;
-    aspect-ratio: 3/1;
+    aspect-ratio: 5/1;
     padding: 5px 30px;
-    background-color: #def0ff;
+    background: #def0ff;
     border: 3px solid #cfe9ff;
+    /* box-shadow: 0 4px 2px #001987; */
     color: #4473ad;
     font-size: 25px;
+    font-family: kurobara;
+    transition: scale 0.05s ease-in-out;
     cursor: pointer;
     margin: 5px;
+    box-sizing: content-box;
 }
-#titleArea .pulldown{
-    width: 30vw;
-    height: 50px;
-    background-color: #ffffff;
-    color: #000000;
-    font-size: 18px;
-    font-family: Yu Gothic;
-    /* font-family: kurobara; */
+#titleArea .buttons .bt:hover{
+    background: #cfe9ff;
+    scale: 1.2
 }
+
+/* #titleArea .buttons div.bt:active{
+    animation: sample 0.2s ease-in-out forwards;
+} */
+@keyframes sample {
+
+    0% {
+        /* animation-fill-mode: forwards; */
+        /* transform:scale(-0.2); */
+        /* box-shadow: none; */
+        transform: translateY(0px);
+        /* scale: 1; */
+    
+    }
+    100%{
+        /* animation-fill-mode: forwards; */
+        /* transform:scale(-0.2); */
+        transform: translateY(5px);
+        /* box-shadow: 3px -4px 2px #001987; */
+        /* scale: 1.5; */
+    }
+    
+}
+
 /* #endregion */
 
 #mainArea{
@@ -677,8 +700,8 @@ input[type="range"]::-moz-range-thumb {
     width: 450px;
     height: 80%;
     padding: 20px 5px;
-    background: linear-gradient(to top, #391d00fc 0%, #391d00fc 60%, #4f2c07fc 100%);
-    /* background: linear-gradient(to top, #391b0a, #6f3c0e, #a66021, #c88843, #cfa776, #e5d1b4); */
+    /* background: linear-gradient(to top, #391d00fc 0%, #391d00fc 60%, #4f2c07fc 100%); */
+    background: linear-gradient(to top, #391b0a, #6f3c0e, #a66021, #c88843, #cfa776, #e5d1b4);
     color: #fffffffc;
     font-family: craft;
     position: fixed;
@@ -1708,4 +1731,3 @@ input[type="range"]::-moz-range-thumb {
     filter: brightness(1.2);
 }
 /* #endregion */
-

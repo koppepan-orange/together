@@ -4,6 +4,7 @@ import sub
 inventry2=[]
 csvdata={}
 cemicaldata=[]
+craftdata=[]
 kakikae_list=[]
 tem={}
 imgg={}
@@ -61,6 +62,17 @@ with open('cemical.csv',"r",encoding="utf-8_sig", newline='\r\n') as f:
         #print(fa)
         if fa[0]!="元":
             cemicaldata.append([fa[0].split(";"),fa[1].split(";"),fa[2].split(";"),fa[3].split(";"),fa[4].split(";"),fa[5].split(";")])
+
+
+sub.rooding_txt["text"]="ロード中...クラフトレシピのデータを読み込んでいます"
+sub.boot_now.update()
+with open('crafts.csv',"r",encoding="utf-8_sig", newline='\r\n') as f:
+    for fa in csv.reader(f):
+        sub.boot_now.update()
+        #print(fa)
+        craftdata.append([fa[0].split("|"),fa[1].split("|"),fa[2].split("|"),fa[3].split("|"),fa[4]])
+
+
 
 for a in range(len(cemicaldata)):
     for b in range(len(cemicaldata[a])):
@@ -298,28 +310,35 @@ async def handler(websocket):
                 #f = open("./save/"+x[0]+".txt","wb")
                 #pickle.dumps(inventry,f)
                 #f.close
+                sendjs("save_Oll_Kollect")
             elif message[:8]=="load_js_":#"load_js_{name}"
                 x=message[8:].split("_")
-                with open("./save/"+x[0]+".js","r", encoding='utf-8') as f:
-                    sendjs("load_js_"+f.read())
-                #f.close()
-                with open("./save/"+x[0]+".txt", "rb") as file:
-                    inventry=pickle.load(file)
-                #f = open("./save/"+x[0]+".txt","rb")
-                #inventry=pickle.load(f)
-                #f.close
+                try:
+                    with open("./save/"+x[0]+".jsdata","r", encoding='utf-8') as f:
+                        sendjs("load_js_"+f.read())
+                    #f.close()
+                    with open("./save/"+x[0]+".pydata", "rb") as file:
+                        inventry=pickle.load(file)
+                    sendjs("load_Oll_Kollect")
+                except Exception as e:
+                    sendjs("failed_"+str(e))
+                 #f = open("./save/"+x[0]+".txt","rb")
+                 #inventry=pickle.load(f)
+                 #f.close
             elif message[:9]=="rem_save_":#"rem_save_{name}"
                 try:
-                    os.remove(f"./save/{message[9:]}.txt")
-                    os.remove(f"./save/{message[9:]}.js")
+                    os.remove(f"./save/{message[9:]}.pydata")
+                    os.remove(f"./save/{message[9:]}.jsdata")
+                    sendjs("rem_Oll_Kollect")
                 except Exception as e:
                     print(f"{e}のためセーブデータの削除に失敗しました。")
+                    sendjs("failed_"+str(e))
             elif message[:16]=="get_savedataname":#"get_savedataname"
-                koppepan_hayakuUItukure=""
+                getSave=""
                 for n in os.listdir("./save"):
-                    if n[-4:]==".txt":
-                        koppepan_hayakuUItukure+=","+n[:-4]
-                sendjs("sendjs_loadlis_"+str(koppepan_hayakuUItukure))
+                    if n[-4:]==".pydata":
+                        getSave+=","+n[:-4]
+                sendjs("sendjs_loadlis_"+str(getSave))
             #囧
             elif message[:8]=="printTx,":
                print(message[8:])
@@ -465,7 +484,7 @@ def plass_command_box_button(a):
         grafic[f"command_box{cl}"]=tk.PhotoImage(file=f"assets/images/{cl}_off.png", master=root["command_box"])
         canvas["command_box"].itemconfigure(f"command_box{cl}",image=grafic[f"command_box{cl}"])
         if cl != "chack" or cl != "delet":
-            canvas["command_box_Entry"].insert(tk.END,cl)
+            canvas["command_box_Entry"].insert(tk.END, cl)
     root["command_box"].after(200,b)
 def window_del(rootPPP,itembox=[]):
     def a():
@@ -475,11 +494,11 @@ def window_del(rootPPP,itembox=[]):
         
         for x in root[rootPPP].winfo_children():
             for c, d in canvas.items():
-                if d==x:
+                if d == x:
                     
-                    if len(canvas[c].winfo_children())!=0:
+                    if len(canvas[c].winfo_children()) != 0:
                         for e in canvas[c].winfo_children():
-                            for f,g in canvas.items():
+                            for f, g in canvas.items():
                                 if e == g:
                                     canvas[f].destroy()
                                     del canvas[f]
@@ -489,7 +508,6 @@ def window_del(rootPPP,itembox=[]):
                             break
                     #print(canvas[c].find_all())
                     for h in itembox:
-                        
                         del itembox_item[h]
                     canvas[c].destroy()
                     del canvas[c]
@@ -647,12 +665,18 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                     if yw>index[2]:
                         inventry_break(name)
                         breakALL=True
-                        break
-                    if write:
-                        #print("a")
-                        img[str(name)+"assets/images/items/melt_"+str(a)+".png"]=ImageTk.PhotoImage(imgg["assets/images/items/melt_"+str(a)+".png"].crop((0,0,int(index[1]),min(int(yw-byw),int(index[2])))),master=root["inventry_root_"+str(name)])
-                        #print("b")
-                        canvas["inventry_root_"+str(name)].lower(canvas["inventry_root_"+str(name)].create_image(int(index[1]/2),int(index[2]-(min(int(yw-byw),int(index[2]))/2)), image=img[str(name)+"assets/images/items/melt_"+str(a)+".png"],tag="item"))
+                        break 
+                    # 囧: exception => error
+                    if write: 
+                        if str(name)+"assets/images/items/melt_"+str(a)+".png" in imgg:
+                            # print("a")
+                            # img[str(name)+"assets/images/items/melt_"+str(a)+".png"]=ImageTk.PhotoImage(imgg["assets/images/items/melt_"+str(a)+".png"].crop((0,0,int(index[1]),min(int(yw-byw),int(index[2])))),master=root["inventry_root_"+str(name)])
+                            # print("b")
+                            xxxxxxxxxxx=a
+                        else:
+                            xxxxxxxxxxx="error"
+                        img[str(name)+"assets/images/items/melt_"+str(xxxxxxxxxxx)+".png"]=ImageTk.PhotoImage(imgg["assets/images/items/melt_"+str(xxxxxxxxxxx)+".png"].crop((0,0,int(index[1]),min(int(yw-byw),int(index[2])))),master=root["inventry_root_"+str(name)])
+                        canvas["inventry_root_"+str(name)].lower(canvas["inventry_root_"+str(name)].create_image(int(index[1]/2),int(index[2]-(min(int(yw-byw),int(index[2]))/2)), image=img[str(name)+"assets/images/items/melt_"+str(xxxxxxxxxxx)+".png"],tag="item"))
                 if breakALL:
                     break
                 if write:
@@ -702,7 +726,11 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                     else:
                         #print("chack4")
                         if write:
-                            canvas["inventry_root_"+str(name)].create_image(i[0], i[1], image=img[str(name)+"assets/images/items/"+str(i[4])+".png"],tag="item")
+                            if str(name)+"assets/images/items/"+str(i[4])+".png" in img:
+                                canvas["inventry_root_"+str(name)].create_image(i[0], i[1], image=img[str(name)+"assets/images/items/"+str(i[4])+".png"],tag="item")
+                            else:
+                                canvas["inventry_root_"+str(name)].create_image(i[0], i[1], image=img[str(name)+"assets/images/items/error.png"],tag="item")
+                            
                         print("711")
                         await hitbox(ichi=i,ichiD=melt_y,dens=inventry2[name][3],name=name,width=inventry2[name][1],hight=inventry2[name][2],count=count) 
                     count+=1
@@ -896,7 +924,7 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                     canvas["inventry_root_"+str(name)].lift("system")
                     canvas["inventry_root_"+str(name)].lift("have")
                     
-            if (index[3]>index[7])or(index[3]<index[9])or(index[4]>index[8]):inventry_break(name)
+                if (index[3]>index[7])or(index[3]<index[9])or(index[4]>index[8]):inventry_break(name)
             inventry=copy.deepcopy(inventry2)
 
             #print("876")
@@ -1060,7 +1088,33 @@ def thermometer_move(name):
         return
     
 def craft_button(e,name):
-    
+    for a in craftdata:
+        have={}
+        for b in range(len(inventry[name][0])):
+            if inventry[name][0][b][4] == a[2][0]+"のレシピ":
+                break #囧:画像を出すときは最後の文字が"のレシピ"ならば、「レシピ」って画像を表示するって感じに よろ   
+        else:
+            continue
+        for n in range(len(a[0])):#条件
+            have[n]=[]
+            fl=True
+            for b in range(len(inventry[name][0])):
+                if inventry[name][0][b][4] == n:
+                    fl=False
+                    have[n].append(b)
+            if fl:
+                #else通らない
+                break
+        else:
+            n=float("inf")#結果
+            for names,index in have.items():
+                n=min(a[1][names]*len(index),n)
+            for a in range(n):
+                for pp in range(len(a[0])):
+                    del inventry[name][0][have[pp][0]]
+                for pp in range(len(a[2])):
+                    for x in range(a[3][pp]):inventry[name][0].append([root["inventry_root_"+str(name)].winfo_width()/2,0,0,0,a[2][pp]])
+        
 
 
 def out(e,name):
@@ -1094,7 +1148,7 @@ async def open_inventry(name:str):
         gui["inventry_thermometer_gui"+str(name)]=canvas["inventry_root_"+str(name)].create_image(39,13, image=img[str(name)+"thermometer"],tag=("system","thermometer_outline"))
         canvas["inventry_root_"+str(name)].tag_bind(gui["inventry_pressuregauge_gui"+str(name)],"<ButtonPress-1>",lambda e,name=name:pressuregauge(e,name))
         canvas["inventry_root_"+str(name)].tag_bind(gui["inventry_thermometer_gui"+str(name)],"<ButtonPress-1>",lambda e,name=name:thermometer(e,name))
-        if inventry[name][10]=="craft_table":
+        if inventry[name][10]=="craft-table":
             img[str(name)+"craft_button"]=tk.PhotoImage(file = "./assets/images/systems/craft_button.png",master=root["inventry_root_"+str(name)])
             gui["inventry_craft_button_gui"+str(name)]=canvas["inventry_root_"+str(name)].create_image(65,13, image=img[str(name)+"craft_button"],tag=("system","craft_button_outline"))
             canvas["inventry_root_"+str(name)].tag_bind(gui["inventry_craft_button_gui"+str(name)],"<ButtonPress-1>",lambda e,name=name:craft_button(e,name))

@@ -1042,7 +1042,9 @@ let titC = {
     newD: titD.querySelector('.buttons .new'),
     loaD: titD.querySelector('.buttons .load'),
     delD: titD.querySelector('.buttons .delload'),
-    selD: titD.querySelector('.buttons .pul')
+    selD: titD.querySelector('.buttons input.pul'),
+    savD_h: titD.querySelector(".buttons .save_h"),
+    selD_focD: titD.querySelector(".buttons .focus.input"),
 }
 let titF = {}
 
@@ -1057,6 +1059,21 @@ titF.load = () => {
     // sendpyTx("get_savedataname");
 }
 titC.loaD.addEventListener('click', titF.load);
+
+titC.savD_h.addEventListener("click", () => {
+    let moz = inv_save_to();
+    sendpyTx(`save_js_${titC.selD.value}_${moz}`);
+});
+
+titC.focusInput = () => {
+    let div = titC.selD_focD;
+    let tdiv = titC.selD;
+
+    let [tx, ty] = [tdiv.offsetLeft, tdiv.offsetTop];
+    let [tw, th] = [tdiv.offsetWidth, tdiv.offsetHeight];
+    div.style.left = `${tx}px`;
+    div.style.top = `${ty}px`;
+}
 
 //꒰𑁬⎛ಲළ൭⎞໒꒱
 titC.selD.addEventListener('mouseover', () => {
@@ -1108,7 +1125,7 @@ bigmmC.subL = [
         disp:'makeInv',
         func: async function(){
             sendpyTx('printTx,脳2に接続しています....')
-            sendpyTx('create_inventry_koppe_400_400_600_101325_0_1013250_-300');
+            sendpyTx('create_inventry_koppe_400_400_600_101325_9000_1013250_-3000_craft-table');
             sendpyTx('open_inventry_koppe');
             sendpyTx('print,inventry')
             sendpyTx('printTx,接続..切断....');
@@ -3205,3 +3222,4 @@ let Colors = [
         '#e5d1b4'
     ]
 ]
+
