@@ -4,4 +4,4 @@ py -m venv venv
 call venv\Scripts\activate.bat
 echo "pip is using now"
 pip install websockets pillow
-pip lis
+pip list

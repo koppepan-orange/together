@@ -304,7 +304,6 @@ input[type="range"]::-moz-range-thumb {
     background: #cfe9ff;
     scale: 1.2
 }
-
 /* #titleArea .buttons div.bt:active{
     animation: sample 0.2s ease-in-out forwards;
 } */
@@ -326,6 +325,25 @@ input[type="range"]::-moz-range-thumb {
         /* scale: 1.5; */
     }
     
+}
+
+#titleArea .buttons .bt.pul::placeholder {
+    color: #4473ad;
+    font-size: 13px;
+}
+
+#titleArea .buttons .focus.input{
+    display: block;
+    position: fixed;    
+}
+#titleArea .buttons .focus.input img{
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 75px;
+    aspect-ratio: 1/1;
+    object-fit: cover;
 }
 
 /* #endregion */

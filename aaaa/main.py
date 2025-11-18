@@ -49,7 +49,9 @@ with open('book1.csv',"r",encoding="utf-8_sig", newline='\r\n') as f:
             coun+=1
         if float_non_fack : tem[fa[0]]=0.0
         csvdata[fa[0]]=fas#+[float(fa[8])/100]+fa[9:]
+        csvdata[fa[0]+"のレシピ"]=[float("inf"),float("inf"),float("inf"),float("inf"),float("inf"),101325,101325,133,float("inf"),float("inf")]
         #csvname.append(fa[0])
+    
     del csvdata["name"]
     del tem["name"]
 
@@ -153,7 +155,7 @@ async def handler(websocket):
             if message.startswith('"') and message.endswith('"'):
                 message = message[1:-1] # 囧
             
-            if message[:7] != "printTx" or message[:4] == "none":print(f"{message}")
+            #if message[:7] != "printTx" or message[:4] == "none":print(f"{message}")
             
             if (len(socketname) > 1 )and(websocket not in socketname):
                 print("cheater's elegant arrive!!!!!!!!!!!")
@@ -238,28 +240,6 @@ async def handler(websocket):
                 canvas["command_box"].tag_bind("command_boxchack","<ButtonPress>",lambda e:plass_command_box_chack())
                 ###
                 flag["command_box"]=False
-            
-            #elif message == "craft_table" and flag["craft_table"]:
-            #    root["craft_table"]=tk.Tk()
-            #    root["craft_table"].geometry(f"350x350+{random.randint(1,500)}+500") # width x height + x座標 + y座標
-            #    root["craft_table"].attributes("-toolwindow",True)
-            #    root["craft_table"].attributes("-topmost", True)
-            #    root["craft_table"].resizable(False, False)
-            #    root["craft_table"].protocol("WM_DELETE_WINDOW",window_del("craft_table",itembox=["craft_table_1","craft_table_2","craft_table_3"]))
-            #    canvas["craft_table"] = tk.Canvas(master=root["craft_table"],bg = "white", width = 350,height = 350)
-            #    canvas["craft_table"].place(x = 0,y = 0)
-            #    img["assets/images/craft_table_UI.png"]=tk.PhotoImage(file="assets/images/craft_table_UI.png", master=root["craft_table"])
-            #    canvas["craft_table"].create_image(100,100,image = img["assets/images/craft_table_UI.png"],tag="craft_table")
-            #    stan = 100; add = 47; aded = 0
-            #    for a in range(4):
-            #        for b in range(4):
-            #            aded += 1
-            #            sx = stan + b*add
-            #            sy = stan + a*add
-            #            create_itembox("craft_table","craft_table",f"craft_table_{aded}",sx,sy)
-            #    flag["craft_table"]=False   
-            elif message[:5]=="pick_":
-                pic_item=message[5:]
             elif message[:10]=="item_pick_":
                 sendjs('pickしたed')
                 x=message[10:].split("_")
@@ -282,7 +262,7 @@ async def handler(websocket):
             elif message[:11]=="imput_melt_":#imput_melt_{name}_{item}_{cm3}
                 x=message[11:].split("_")
                 inventry[str(x[0])][5][x[1]]+=x[2]
-            elif message[:10]=="imput_air_":#imput_melt_{name}_{item}_{cm3}
+            elif message[:10]=="imput_air_":#imput_air_{name}_{item}_{cm3}
                 x=message[10:].split("_")
                 inventry[str(x[0])][6][x[1]]+=x[2]
             elif message[:16]=="create_inventry_":#f"create_invryentry_{name}_{windth}_{higth}_{onndo}_{aturyoku}_{tainetuMAX}_{taiatu}_{taiatuMIN}_{zokusei}"
@@ -405,28 +385,6 @@ def end():
     task.cancel()
 
 
-def plass_itembox_chack(tag,canvasname,rootname):
-    global pic_item
-    
-    #if pic_item!="" :
-    grafic["itembox"+tag]=tk.PhotoImage(file="assets/images/items/"+str(pic_item)+".png", master=root[rootname])
-    canvas[canvasname].itemconfigure(tag,image=grafic["itembox"+tag])
-    #canvas[canvasname].image = grafic["itembox"+pic_item]
-    oo=pic_item
-    try:
-        pic_item=itembox_item[tag]
-        itembox_item[tag]=oo
-    except KeyError:
-        itembox_item[tag]=oo
-        pic_item="item_box"
-    finally:
-        sendjs("pick"+str(pic_item))
-    #elif pic_item in itembox_item.keys():
-    #    if itembox_item[tag]!="":
-    #        img["assets/images/item_box.png"]=tk.PhotoImage(file="assets/images/item_box.png", master=root[rootname])
-    #        canvas[canvasname].itemconfigure(tag,image=img["assets/images/item_box.png"])
-    #        pic_item=itembox_item[tag]
-    #        itembox_item[tag]=""
 
 
 def red_button(e):
@@ -528,15 +486,16 @@ def window_del(rootPPP,itembox=[]):
 async def change_yuuten(motono_yuuten:int,motono_kiatu:int,atono_kiatu:int,j_mol:int,m3_mol:int) -> float:
     #return (motono_yuuten+((motono_yuuten+273.15)*m3_mol/j_mol)*(atono_kiatu-motono_kiatu)*1000000)
     try:
+        #print(1/(motono_yuuten+273.15))
         #print((1/((1/(motono_yuuten+273.15))-((8.314*math.log((motono_kiatu/atono_kiatu)))/j_mol)))-273.15)
-        return ((1/(1/(motono_yuuten+273.15))-((8.314*math.log((motono_kiatu/atono_kiatu)))/j_mol)))-273.15
+        return (1/((1/(motono_yuuten+273.15))-((8.314*math.log((motono_kiatu/atono_kiatu)))/j_mol)))-273.15
         #return ((motono_yuuten+273.15)*math.exp(((atono_kiatu-motono_kiatu)*j_mol)/m3_mol))-273.15
     except OverflowError: 
         #print((motono_yuuten,motono_kiatu,atono_kiatu,j_mol,m3_mol))
         return float("inf")
         #return float("inf")
     except ZeroDivisionError:
-        return 0.0
+        return float("inf")
     except ValueError:
         return 0.0
 #filled = {} # [x= , y= , dens] cmd "cls&start tree /f C:"
@@ -547,7 +506,7 @@ async def hitbox(ichi, ichiD, dens, name, width, hight, count):
     #ichi=[x,y,ax,ay,item]
     #cccc=name,融点 (℃),沸点 (℃),固体密度 (g/cm3) (20℃),液体密度,気体密度,融点気圧(Pa),沸点気圧(Pa),m3/mol,誘拐熱(J/mol),蒸発熱(J/mol),コメント
     #dens= 固体密度     """itemの座標は中心"""
-    print(f"filled1:{filled}")
+    #print(f"filled1:{filled}")
     #global filled
     global inventry2
     global num
@@ -582,7 +541,7 @@ async def hitbox(ichi, ichiD, dens, name, width, hight, count):
         inventry2[name][0][count][1] = ichi[1]
         inventry2[name][0][count][0] = ichi[0]
         inventry2[name][0][count][3] = ichi[3]
-    print("filled2:" + str(filled)) #デバックで邪魔なので切りました ←〇
+    #print("filled2:" + str(filled)) #デバックで邪魔なので切りました ←〇
 
 async def change_taiseki(cm3:float,g_cm3_moto:float,g_cm3_ato:float):
     #print("cm3",cm3,"g/cm3_moto",g_cm3_moto,"g/cm3_ato",g_cm3_ato))
@@ -699,6 +658,7 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                     try:
                         i[4]
                     except Exception:
+                        continue
                         print(inventry)
                     #囧 print(i)
                     #print(await change_yuuten(csvdata[i[4]][0],csvdata[i[4]][5],inventry2[name][4],csvdata[i[4]][8],csvdata[i[4]][7]))
@@ -728,10 +688,11 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                         if write:
                             if str(name)+"assets/images/items/"+str(i[4])+".png" in img:
                                 canvas["inventry_root_"+str(name)].create_image(i[0], i[1], image=img[str(name)+"assets/images/items/"+str(i[4])+".png"],tag="item")
+                            elif str(i[4])[-3:]=="レシピ":
+                                canvas["inventry_root_"+str(name)].create_image(i[0], i[1], image=img[str(name)+"assets/images/items/レシピ.png"],tag="item")
                             else:
                                 canvas["inventry_root_"+str(name)].create_image(i[0], i[1], image=img[str(name)+"assets/images/items/error.png"],tag="item")
                             
-                        print("711")
                         await hitbox(ichi=i,ichiD=melt_y,dens=inventry2[name][3],name=name,width=inventry2[name][1],hight=inventry2[name][2],count=count) 
                     count+=1
                 for xxxxa in delet_list:
@@ -809,7 +770,7 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                 #print("787")
                 for cem in cemicaldata:
                     for aa in range(len(cem[2])):
-                        dicta={"℃+":[3,True]}
+                        dicta={"℃+":[3,True],"Pa+":[4,True]}
                         if not ((inventry2[name][dicta[cem[2][aa]][0]] >= cem[3][aa])) and (dicta[cem[2][aa]][1]):
                             break
                         elif not(inventry2[name][dicta[cem[2][aa]][0]] <= cem[3][aa]) and not(dicta[cem[2][aa]][1]):
@@ -946,8 +907,13 @@ def motion(e,name):
     if ock[0]!="":
         #print(img[str(name)+"assets/images/items/"+str(ock[0])+".png"])
         canvas["inventry_root_"+str(name)].delete('have')
-        canvas["inventry_root_"+str(name)].create_image(e.x,e.y, image=img[str(name)+"assets/images/items/"+str(ock[0])+".png"],tag="have")
-
+        if str(name)+"assets/images/items/"+str(ock[0])+".png" in img:
+            canvas["inventry_root_"+str(name)].create_image(e.x,e.y, image=img[str(name)+"assets/images/items/"+str(ock[0])+".png"],tag="have")
+        elif str(ock[0])[-4:]=="のレシピ":
+            canvas["inventry_root_"+str(name)].create_image(e.x,e.y, image=img[str(name)+"assets/images/items/レシピ.png"],tag="have")
+        else:
+            canvas["inventry_root_"+str(name)].create_image(e.x,e.y, image=img[str(name)+"assets/images/items/error.png"],tag="have")
+        
 def click(e,name):
     global ock
     if ock[0]!="":
@@ -1090,6 +1056,7 @@ def thermometer_move(name):
 def craft_button(e,name):
     for a in craftdata:
         have={}
+        #print("push")
         for b in range(len(inventry[name][0])):
             if inventry[name][0][b][4] == a[2][0]+"のレシピ":
                 break #囧:画像を出すときは最後の文字が"のレシピ"ならば、「レシピ」って画像を表示するって感じに よろ   
@@ -1099,22 +1066,26 @@ def craft_button(e,name):
             have[n]=[]
             fl=True
             for b in range(len(inventry[name][0])):
-                if inventry[name][0][b][4] == n:
+                if inventry[name][0][b][4] == a[n]:
                     fl=False
                     have[n].append(b)
             if fl:
+                print("だめでした")
                 #else通らない
                 break
         else:
+            print("Ahh～↑↑↑💥💥真夏🌞🌴🏄🎇🎆🌺のJamboree〜〜〜〜‼️‼️レゲエ🇯🇲💃🙌🏻砂浜🌺🌺🏖🏖🌴🌞Big Wave🌊🌊🌊🌊🌊🌊🌊💥💥💥")
             n=float("inf")#結果
             for names,index in have.items():
-                n=min(a[1][names]*len(index),n)
+                n=min(a[1][names]*index,n)#save_point
             for a in range(n):
                 for pp in range(len(a[0])):
                     del inventry[name][0][have[pp][0]]
                 for pp in range(len(a[2])):
-                    for x in range(a[3][pp]):inventry[name][0].append([root["inventry_root_"+str(name)].winfo_width()/2,0,0,0,a[2][pp]])
+                    for x in range(a[3][pp]):
+                        inventry[name][0].append([root["inventry_root_"+str(name)].winfo_width()/2,0,0,0,a[2][pp]])
         
+    debug.focus(locals(),"craft_button")
 
 
 def out(e,name):

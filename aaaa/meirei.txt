@@ -1,0 +1,24 @@
+to python{
+
+chack
+endgame
+red_button_del
+"item_pick_"
+"item_ock_"
+"item_shositu"
+#f"heat_{name}_{add_heat}"
+#f"pressure}"
+#f"imput_item_{name}_{x}_{y}_{item}"
+#imput_melt_{name}_{item}_{cm3}
+#imput_air_{name}_{item}_{cm3}
+#f"create_invryentry_{name}_{windth}_{higth}_{onndo}_{aturyoku}_{tainetuMAX}_{taiatu}_{taiatuMIN}_{zokusei}"
+#f"open_inventry_{name}"
+#"save_js_{name}_{data}"
+#"load_js_{name}"
+#"rem_save_{name}"
+#"get_savedataname"
+
+
+to js
+
+

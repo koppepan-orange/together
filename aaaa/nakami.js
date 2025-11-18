@@ -1065,14 +1065,13 @@ titC.savD_h.addEventListener("click", () => {
     sendpyTx(`save_js_${titC.selD.value}_${moz}`);
 });
 
-titC.focusInput = () => {
+titC.focusInput = async() => {
     let div = titC.selD_focD;
     let tdiv = titC.selD;
-
+    
     let [tx, ty] = [tdiv.offsetLeft, tdiv.offsetTop];
-    let [tw, th] = [tdiv.offsetWidth, tdiv.offsetHeight];
-    div.style.left = `${tx}px`;
-    div.style.top = `${ty}px`;
+    div.style.left = `${tx-50}px`;
+    div.style.top = `${ty+25}px`;
 }
 
 //꒰𑁬⎛ಲළ൭⎞໒꒱
@@ -1125,7 +1124,7 @@ bigmmC.subL = [
         disp:'makeInv',
         func: async function(){
             sendpyTx('printTx,脳2に接続しています....')
-            sendpyTx('create_inventry_koppe_400_400_600_101325_9000_1013250_-3000_craft-table');
+            sendpyTx('create_inventry_koppe_400_400_200_101325_9000_1013250_-3000_craft-table');
             sendpyTx('open_inventry_koppe');
             sendpyTx('print,inventry')
             sendpyTx('printTx,接続..切断....');
@@ -1139,7 +1138,7 @@ bigmmC.subL = [
     {
         name:'give me stone',
         disp:'ishiwo kudasai',
-        func: () => {for(let i = 0; i < 99; i++) get('stone')}
+        func: () => {for(let i = 0; i < 99; i++) get('log'), get('plank')}
     },
     {
         name:'nenryo denchi sha',
@@ -2973,6 +2972,7 @@ function start(){
     commanC.logD.value += `hello! no name!`;
     connect();
     
+    titC.focusInput();
     inv_make();
     map_load()
     map_make();

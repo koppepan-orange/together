@@ -64,14 +64,14 @@ let Items = [
         price:0,
     },
     {
-        name:'mebra_log', //amber、琥珀。砂漠の
-        jpnm:'メブラの丸太',
+        name:'log', //amber、琥珀。砂漠の
+        jpnm:'原木',
         kind:'natural mebra tree log',
         price:4,
     },
     {
-        name:'mebra_plank',
-        jpnm:'メブラの板材',
+        name:'plank',
+        jpnm:'木材',
         kind:'natural mebra tree plank',
         price:1,
     },
