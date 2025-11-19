@@ -286,7 +286,7 @@ input[type="range"]::-moz-range-thumb {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 30vw;
+    width: 275px;
     aspect-ratio: 5/1;
     padding: 5px 30px;
     background: #def0ff;
@@ -334,7 +334,17 @@ input[type="range"]::-moz-range-thumb {
 
 #titleArea .buttons .focus.input{
     display: block;
-    position: fixed;    
+    opacity: 0;
+    position: fixed;
+    cursor: pointer;  
+}
+#titleArea .buttons .focus.input.appe{
+    opacity: 1;
+    transition: top 0.3s linear, left 0.3s linear;
+}
+#titleArea .buttons .focus.input.san{
+    opacity: 1;
+    transition: top 0.3s linear, left 0.3s linear;
 }
 #titleArea .buttons .focus.input img{
     display: block;
@@ -1511,6 +1521,7 @@ input[type="range"]::-moz-range-thumb {
     transition: right 0.5s ease;
     background: #ffffffee;
     z-index: 7;
+    pointer-events: none;
 }
 .notice.tap{
     right: 0;

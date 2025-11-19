@@ -1065,14 +1065,31 @@ titC.savD_h.addEventListener("click", () => {
     sendpyTx(`save_js_${titC.selD.value}_${moz}`);
 });
 
-titC.focusInput = async() => {
+titF.focusInput = async() => {
     let div = titC.selD_focD;
     let tdiv = titC.selD;
     
-    let [tx, ty] = [tdiv.offsetLeft, tdiv.offsetTop];
-    div.style.left = `${tx-50}px`;
-    div.style.top = `${ty+25}px`;
+    let [tx, ty] = [tdiv.offsetLeft - 50, tdiv.offsetTop + 25];
+    let [nx, ny] = [tx - 300, ty + 100]
+    div.style.left = `${nx}px`;
+    div.style.top = `${ny}px`;
+    div.classList.add('appe');
+    await delay(100)
+    
+    div.style.left = `${tx}px`;
+    div.style.top = `${ty}px`;
 }
+titF.focusInputRem = async() => {
+    let div = titC.selD_focD;
+
+    let [tx, ty] = [window.innerWidth+200, -200];
+    div.style.left = `${tx}px`;
+    div.style.top = `${ty}px`;
+
+    await delay(500)
+    div.classList.remove('appe');
+}
+titC.selD_focD.addEventListener('mouseover', titF.focusInputRem);
 
 //꒰𑁬⎛ಲළ൭⎞໒꒱
 titC.selD.addEventListener('mouseover', () => {
@@ -1352,7 +1369,7 @@ undC.checks = [
     // [名前, 初期値]
     {
         name:'emozi',
-        kitei:1,
+        kitei:0,
         pro:2,
         func: () => {
             let Emozis = [`^~^`,`uwu`,`owo`,`;~;`,`$w$`,`┐o_o┌`,];
@@ -1362,8 +1379,8 @@ undC.checks = [
     },
     {
         name:'follow',
-        kitei:0,
-        pro:3,
+        kitei:1,
+        pro:10,
         func: () => {
             makeNotice();
         }
@@ -2972,7 +2989,7 @@ function start(){
     commanC.logD.value += `hello! no name!`;
     connect();
     
-    titC.focusInput();
+    titF.focusInput();
     inv_make();
     map_load()
     map_make();
