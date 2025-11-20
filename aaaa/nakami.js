@@ -548,16 +548,17 @@ function tkTest(){
 
 //#region Re:connection!!
 var webSocket; //ウェブソケット
-let commanD = document.getElementById("commands");
-let commanC = {
-    texD: commanD.querySelector('.text'),
-    logD: commanD.querySelector('.log'),
-    senB: commanD.querySelector('.send')
+let comD = document.getElementById("commands");
+let comC = {
+    texD: comD.querySelector('.text'),
+    logD: comD.querySelector('.log'),
+    senB: comD.querySelector('.send'),
 }
+let comF = {};
 let connecten = 0;
 
-commanC.senB.addEventListener('click', () => {   
-    sendpyTx(commanC.texD.value);//ha
+comC.senB.addEventListener('click', () => {   
+    sendpyTx(comC.texD.value);//ha
 })
 
 // サーバとの通信を接続する関数
@@ -625,8 +626,8 @@ function connect(){
 }
 
 function logadd(text){
-    commanC.logD.value += `\n${text}`; // ${random(1000,2900)}-${random(1,12)}-${random(1,31)} ${random(0,23)}:${random(0,59)}:${random(0,59)} INFO
-    commanC.logD.scrollTop = commanC.logD.scrollHeight;
+    comC.logD.value += `\n${text}`; // ${random(1000,2900)}-${random(1,12)}-${random(1,31)} ${random(0,23)}:${random(0,59)}:${random(0,59)} INFO
+    comC.logD.scrollTop = comC.logD.scrollHeight;
     if(text.includes('endgame')) window.open('about:blank', '_self').close();
 };
 
@@ -641,6 +642,34 @@ function sendpyTx(text){
     logadd(`Send => ${text.replace(/printTx,/g, () => '').replace(/print,/g, () => '')}`);
     if(connecten) webSocket.send(text);
 };
+
+comF.getRecipe = (name) => {
+    let tar = comC.crafts.find(a => a.ato[0] == name);
+    return tar;
+}
+comF.takeRecipe = (name) => {
+    let tar = comF.getRecipe(name);
+    let item = tar.ato[0];
+    if(!tar) return console.error(`${name}のレシピは存在しないでゲス`);
+
+    console.log(item);
+    get(`${item}のレシピ`);
+}
+
+comC.crafts = [];
+fetch("crafts.csv").then(a => a.text()).then(t=>{
+    let lines = t.split(/\r?\n/);
+    for(let line of lines){
+        let [mae, maen, ato, aton, kigu, bio] = line.split(',');
+        let shutu = {};
+        for(let a of ['mae', 'maen', 'ato', 'aton', 'kigu', 'bio']){
+            let res = eval(a).split('|').filter(a => a != '');
+            if(a.endsWith('n')) res = res.map(b => b = +b);
+            shutu[a] = res;
+        }
+        comC.crafts.push(shutu);
+    }
+});
 
 
 //#endregion
@@ -1132,6 +1161,8 @@ bigmmC.kitekeyD.addEventListener('click', async function(){
     if(gen.startsWith('loadfile,')){
         [, src, name] = gen.split(',');
         await loadScriptFile(src);
+        if(!name) name = 'イベント';
+        
         read(allScripts[src][name], 'arrayed');
     };
 })
@@ -1143,6 +1174,9 @@ bigmmC.subL = [
             sendpyTx('printTx,脳2に接続しています....')
             sendpyTx('create_inventry_koppe_400_400_200_101325_9000_1013250_-3000_craft-table');
             sendpyTx('open_inventry_koppe');
+            sendpyTx('create_inventry_koppe2_400_400_200_101325_9000_1013250_-3000_craft-table');
+            sendpyTx('open_inventry_koppe');
+            sendpyTx('make_paip_a_100');
             sendpyTx('print,inventry')
             sendpyTx('printTx,接続..切断....');
         }
@@ -1461,6 +1495,7 @@ undC.foots = [
         }
     }
 ]
+
 //#endregion
 
 //#region achieve
@@ -1613,10 +1648,17 @@ function inv_make(){
     };
 }
 function get(item, yx = 'no', appe = 1){
-    // console.log('get:: ')
+    console.log(`get:: ${item} at ${yx}`);
     // console.log(item)
+    let isrecipe = 0;
     if(!item) return nicoText('アイテム名を指定してください');
     let data = Items.find(o => o.name == item);
+
+    if(item.endsWith('のレシピ')){
+        isrecipe = 1;
+        data = Items.find(o => o.name == 'recipe');
+    }
+    console.log(data)
     // console.log(data)
 
     let cell = [...invC.areaD.querySelectorAll('.cell')].find(c => c.dataset.item == data.jpnm && +c.dataset.num < 99);
@@ -1625,7 +1667,7 @@ function get(item, yx = 'no', appe = 1){
 
     let sitey = invC.areaD.querySelector(`.cell.c${yx}`);
     if(sitey){
-        if(sitey.dataset.name != item) wairo = 1;
+        if(sitey.dataset.item != item) wairo = 1;
 
         else{
             sitey.dataset.num = (+sitey.dataset.num + 1).toString();
@@ -1645,6 +1687,8 @@ function get(item, yx = 'no', appe = 1){
         itemD.src = `assets/images/items/${data.jpnm}.png`;
         itemD.draggable = false;
         itemD.dataset.item = data.jpnm;
+        itemD.dataset.description = data.jpnm;
+        if(isrecipe) itemD.dataset.description = item;
 
         cell.innerHTML = '';
         cell.appendChild(itemD);
@@ -1832,7 +1876,9 @@ function inv_pick(cell, px, py){
 
     let name = pickItem.dataset.item;
     let num = pickItem.dataset.num || 1;
-    
+    let desc = pickItem.dataset.description || ''; 
+    if(desc.endsWith('のレシピ')) name = desc;//ここバグるかも。
+
     sendpyTx(`item_pick_${name}_${num}`);
 }
 function inv_ock(cell){
@@ -2986,7 +3032,7 @@ async function goRabbit(){
 
 
 function start(){
-    commanC.logD.value += `hello! no name!`;
+    comC.logD.value += `hello! no name!`;
     connect();
     
     titF.focusInput();
@@ -3155,7 +3201,7 @@ document.addEventListener('keydown', async function(e){
 
 
     //これ以降はinput内では機能しない
-    if(document.activeElement == commanC.texD) return;
+    if(document.activeElement == comC.texD) return;
     if(document.activeElement == bigmmC.bodyD) return;
 
     if(key == 'o') objmake();

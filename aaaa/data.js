@@ -76,8 +76,8 @@ let Items = [
         price:1,
     },
     {
-        name:'mebra_seed',
-        jpnm:'メブラの種子',
+        name:'seed',
+        jpnm:'種子',
         kind:'natural mebra tree seed',
         price:1,
     },
@@ -227,6 +227,14 @@ let Items = [
         kind:'natural gas',
         price:0,
     },
+
+    //exceptions
+    {
+        name:'recipe',
+        jpnm:'レシピ',
+        kind:'exception',
+        price:0,
+    }
     
 ]
 
@@ -238,7 +246,7 @@ let Objects = [
         desc:'木。', //description.
         kind:'natural tree',
         sozai:[
-            {name:'mebra_log', p:100, amo:[5,8]},
+            {name:'log', p:100, amo:[5,8]},
             {name:'stick', p:50, amo:[1,4]},
             {name:'apple', p:10, amo:[1,1]}
         ]
@@ -250,7 +258,7 @@ let Objects = [
         desc:'木。\nなんとりんごがついている。',
         kind:'natural tree',
         sozai:[
-            {name:'mebra_log', p:100, amo:[5,8]},
+            {name:'log', p:100, amo:[5,8]},
             {name:'stick', p:50, amo:[1,4]},
             {name:'apple', p:100, amo:[3,7]}
         ]
@@ -262,7 +270,7 @@ let Objects = [
         desc:'枯木。',
         kind:'natural tree',
         sozai:[
-            {name:'mebra_log', p:100, amo:[4,7]},
+            {name:'log', p:100, amo:[4,7]},
             {name:'stick', p:75, amo:[1,7]},
         ]
     },
