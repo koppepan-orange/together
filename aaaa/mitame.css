@@ -382,10 +382,11 @@ input[type="range"]::-moz-range-thumb {
 
 /* #region commands */
 #commands{
+    display: block;
     margin-top: 50px;
     margin-left: 20px;
     width: 400px;
-    display: block;
+    position: relative;
 }
 #commands .log{
     width: 100%;
@@ -393,6 +394,7 @@ input[type="range"]::-moz-range-thumb {
     border: 1px solid #2b2b2b;
     font-size: 14px;
     font-family: var(--font-textarea);
+    box-sizing: border-box;
 }
 #commands .row{
     margin-bottom: -1px;
@@ -408,14 +410,109 @@ input[type="range"]::-moz-range-thumb {
     margin-left: -1px;
     width: calc(15% + 1px);
     height: 22px;
-    background: #cecece;
-    border: 1px solid #2b2b2b;
+    background: #cacaca;
+    border: 1px solid #4d4d4d;
     font-family: hangyaku;
     box-sizing: border-box;
 }
 #commands .send:hover{
-    background: #6e6e6e;
+    background: #2f2f2f;
     cursor: pointer;
+}
+#commands .side{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    position: absolute;
+    right: -50px;
+    top: 0;
+}
+#commands .co{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    aspect-ratio: 1/1;
+    position: relative;
+}
+#commands .side .icon{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    aspect-ratio: 1/1;
+    border: 2px solid aliceblue;
+    border-radius: 0 10px 10px 0;
+    overflow: hidden;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+#commands .side .icon img{
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+}
+
+#commands .endgame .icon{
+    background: #666666;
+    border-color: #2b2b2b;
+}
+#commands .endgame .icon:hover{
+    background: #444444;
+}
+#commands .recipe .icon{
+    background: #ffaf8a;
+    border: solid 2px #ff8750;
+}
+#commands .recipe .icon:hover{
+    background: #ff8b55;
+}
+#commands .recipe img{
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+}
+
+#commands .recipe .list{
+    display: none;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 5px;
+    width: 200px;
+    height: fit-content;
+    max-height: 500px;
+    padding: 10px;
+    background: #ffaf8a;
+    border: 2px solid #ff8750;
+    position: absolute;
+    top: 0;
+    right: 48px;
+    box-sizing: border-box;
+}
+#commands .recipe.tog .list{
+    display: flex;
+}
+#commands .recipe .list .craf{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    height: 50px;
+    padding: 5px;
+    background: #e49d7c;
+    border-bottom: 2px solid #ff8750;
+    margin: 0 10px 0 10px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+#commands .recipe .list .craf img{
+    width: fit-content;
+    height: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
 }
 /* #endregion */
 

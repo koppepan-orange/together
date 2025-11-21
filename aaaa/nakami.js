@@ -553,6 +553,8 @@ let comC = {
     texD: comD.querySelector('.text'),
     logD: comD.querySelector('.log'),
     senB: comD.querySelector('.send'),
+    sideD: comD.querySelector('.side'),
+    SrecD: comD.querySelector('.side .recipe'),
 }
 let comF = {};
 let connecten = 0;
@@ -643,6 +645,29 @@ function sendpyTx(text){
     if(connecten) webSocket.send(text);
 };
 
+
+
+comC.apps = [
+    {
+        name:'endgame',
+        func: (e) => {
+            sendpyTx('endgame')
+        }
+    },
+    {
+        name:'recipe',
+        func: (e) => {
+            if(e.target)
+            comC.SrecD.classList.toggle('tog');
+        }
+    }
+]
+for(let app of comC.apps){
+    let div = comC.sideD.querySelector(`.co.${app.name} .icon`);
+    div.addEventListener('click', app.func);
+}
+
+
 comF.getRecipe = (name) => {
     let tar = comC.crafts.find(a => a.ato[0] == name);
     return tar;
@@ -668,6 +693,33 @@ fetch("crafts.csv").then(a => a.text()).then(t=>{
             shutu[a] = res;
         }
         comC.crafts.push(shutu);
+    }
+
+    
+    for(let cra of comC.crafts){
+        let tar = cra.ato[0];
+        let div = document.createElement('div');
+        div.className = 'craf';
+
+        let img = document.createElement('img');
+        img.src = `assets/images/items/${tar}.png`;
+        div.appendChild(img);
+
+        let lavel = document.createElement('div');
+        lavel.className = 'lavel';
+        lavel.textContent = tar;
+        div.appendChild(lavel);
+        
+        let sub = document.createElement('div');
+        sub.className = 'sub';
+        sub.textContent = cra.ato.slice(1).join(', ');
+        div.appendChild(sub);
+
+        div.addEventListener('click', () => {
+            comF.takeRecipe(tar);
+        })
+
+        comC.SrecD.querySelector('.list').appendChild(div);
     }
 });
 
@@ -1172,13 +1224,13 @@ bigmmC.subL = [
         disp:'makeInv',
         func: async function(){
             sendpyTx('printTx,脳2に接続しています....')
-            sendpyTx('create_inventry_koppe_400_400_200_101325_9000_1013250_-3000_craft-table');
+            sendpyTx('create_inventry_koppe_400_400_50_101325_9000_1013250_-3000_craft-table');
             sendpyTx('open_inventry_koppe');
-            sendpyTx('create_inventry_koppe2_400_400_200_101325_9000_1013250_-3000_craft-table');
-            sendpyTx('open_inventry_koppe');
+            sendpyTx('create_inventry_koppe2_400_400_50_101325_9000_1013250_-3000_craft-table');
+            sendpyTx('open_inventry_koppe2');
             sendpyTx('make_paip_a_100');
-            sendpyTx('print,inventry')
-            sendpyTx('printTx,接続..切断....');
+            sendpyTx('connect_a_koppe_0')
+            sendpyTx('connect_a_koppe2_0');
         }
     },
     {
