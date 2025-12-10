@@ -559,14 +559,16 @@ let comC = {
 let comF = {};
 let connecten = 0;
 
-comC.senB.addEventListener('click', () => {   
-    sendpyTx(comC.texD.value);//ha
+comC.senB.addEventListener('click', () => {
+    let message = comC.texD.value;
+    nicoText(message);
+    sendpyTx(message);
+    sendpyTx(`printTx,全次元の覇者・イージス「${message}」`)
 })
 
 // サーバとの通信を接続する関数
 function connect(){
     webSocket = new WebSocket("ws://localhost:8001"); // インスタンスを作り、サーバと接続
-
     // 接続したで～～！！
     webSocket.onopen = function(message){
         connecten = 1;
@@ -624,7 +626,34 @@ function connect(){
         if(mes.startsWith('sendpy')) sendpy(mes.slice(7)); // asdasd
         
         if(mes == 'helasu') inv_pick_decr();
+
+        if(mes.startsWith('takarabox_')){
+            sendpyTx(`create_inventry_${name}_100_100_25_101325_100_111325_-100_None'`)
+            //takarabox_${name}_${レア度}
+            let [name, rare] = mes.substr(10).split("_")
+            let ato = [];
+            let data = TakaraNakami.find(a => a.name == `normal_${rare}`);
+            for(let i=0; i<data.roll; i++){
+                let item = weightedRandom(data.list);
+                console.log(`${item}が選ばれたわよ`)
+                ato.push(item);
+                sendpyTx(`input_item_${name}_50_50_${item}`)
+            }
+        }
     };
+}
+
+function weightedRandom(obj) {
+    const entries = Object.entries(obj);
+    const totalWeight = entries.reduce((a, [, w]) => a + w, 0);
+
+    let r = Math.random() * totalWeight;
+
+    for (const [name, weight] of entries) {
+        r -= weight;
+        if (r <= 0) return name;
+    }
+    return entries[entries.length - 1][0]; // 念のため保険
 }
 
 function logadd(text){
@@ -644,8 +673,6 @@ function sendpyTx(text){
     logadd(`Send => ${text.replace(/printTx,/g, () => '').replace(/print,/g, () => '')}`);
     if(connecten) webSocket.send(text);
 };
-
-
 
 comC.apps = [
     {
@@ -722,7 +749,6 @@ fetch("crafts.csv").then(a => a.text()).then(t=>{
         comC.SrecD.querySelector('.list').appendChild(div);
     }
 });
-
 
 //#endregion
 
@@ -1126,6 +1152,7 @@ let titC = {
     selD: titD.querySelector('.buttons input.pul'),
     savD_h: titD.querySelector(".buttons .save_h"),
     selD_focD: titD.querySelector(".buttons .focus.input"),
+    setD: titD.querySelector('.bt.set')
 }
 let titF = {}
 
@@ -1184,6 +1211,10 @@ titC.delD.addEventListener('click', () => {
     sendpyTx(`rem_save_${name}`);
 });
 
+titC.setD.addEventListener('click',() => {
+    undF.open()
+})
+
 //#endregion titleArea
 
 //#region ビッグマシュマロ（唐突）
@@ -1213,8 +1244,6 @@ bigmmC.kitekeyD.addEventListener('click', async function(){
     if(gen.startsWith('loadfile,')){
         [, src, name] = gen.split(',');
         await loadScriptFile(src);
-        if(!name) name = 'イベント';
-        
         read(allScripts[src][name], 'arrayed');
     };
 })
@@ -1224,13 +1253,13 @@ bigmmC.subL = [
         disp:'makeInv',
         func: async function(){
             sendpyTx('printTx,脳2に接続しています....')
-            sendpyTx('create_inventry_koppe_400_400_50_101325_9000_1013250_-3000_craft-table');
-            sendpyTx('open_inventry_koppe');
-            sendpyTx('create_inventry_koppe2_400_400_50_101325_9000_1013250_-3000_craft-table');
-            sendpyTx('open_inventry_koppe2');
+            sendpyTx('create_inventry_きみのぜんぜんぜんせかいぼっくぁきみをさがしはじめたよ～はっ_400_400_200_101325_9000_1013250_-3000_craft-table');
+            sendpyTx('open_inventry_きみのぜんぜんぜんせかいぼっくぁきみをさがしはじめたよ～はっ');
+            sendpyTx('create_inventry_きみのぜんぜんぜんせかいぼっくぁきみをさがしはじめたよ～はっ2_400_400_200_101325_9000_1013250_-3000_craft-table');
+            sendpyTx('open_inventry_きみのぜんぜんぜんせかいぼっくぁきみをさがしはじめたよ～はっ2');
             sendpyTx('make_paip_a_100');
-            sendpyTx('connect_a_koppe_0')
-            sendpyTx('connect_a_koppe2_0');
+            sendpyTx('connect_a_きみのぜんぜんぜんせかいぼっくぁきみをさがしはじめたよ～はっ_0')
+            sendpyTx('connect_a_きみのぜんぜんぜんせかいぼっくぁきみをさがしはじめたよ～はっ2_0');
         }
     },
     {
@@ -1297,8 +1326,8 @@ for(let j of bigmmC.jougeL){
     let jD = document.createElement('div');
     jD.className = `j ${j.name}`;
     
-    let ageF = () => {sendpyTx(`${j.name}_koppe_${+j.num}`)};
-    let sgeF = () => {sendpyTx(`${j.name}_koppe_${-j.num}`)};
+    let ageF = () => {sendpyTx(`${j.name}_きみのぜんぜんぜんせかいぼっくぁきみをさがしはじめたよ～はっ_${+j.num}`)};
+    let sgeF = () => {sendpyTx(`${j.name}_きみのぜんぜんぜんせかいぼっくぁきみをさがしはじめたよ～はっ_${-j.num}`)};
     let resF = () => {clearInterval(holdIn), clearTimeout(holdTi)};
     let holdTi, holdIn;
 
@@ -1547,7 +1576,6 @@ undC.foots = [
         }
     }
 ]
-
 //#endregion
 
 //#region achieve
@@ -1688,6 +1716,10 @@ function inv_open(code = null){
     if(code == 0) invC.openD.classList.remove('tog'), invC.areaD.classList.remove('tog');
 }
 invC.openD.addEventListener('click', inv_open);
+invC.openD.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    connect();
+});
 
 function inv_make(){
     for(let i = 0; i < 5; i++){
@@ -1928,9 +1960,7 @@ function inv_pick(cell, px, py){
 
     let name = pickItem.dataset.item;
     let num = pickItem.dataset.num || 1;
-    let desc = pickItem.dataset.description || ''; 
-    if(desc.endsWith('のレシピ')) name = desc;//ここバグるかも。
-
+    
     sendpyTx(`item_pick_${name}_${num}`);
 }
 function inv_ock(cell){
@@ -3114,7 +3144,8 @@ async function gameloop(){
     if(loop) requestAnimationFrame(gameloop);
 }
 
-let secrates = [ // セクラテス
+//#region セクラテス
+let secrates = [
     {
         ind:0,
         name:'koppepan',
@@ -3274,7 +3305,7 @@ document.addEventListener('keydown', async function(e){
         else sec.ind = 0;
     }
 })
-
+//#endregion
 
 //#region 音をロードする機構
 let soundsLoaded = 0;

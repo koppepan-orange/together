@@ -6,5 +6,6 @@
     "editor.autoClosingBrackets": "languageDefined",
     "editor.autoClosingComments": "languageDefined",
     "editor.dragAndDrop": true,
-    "editor.emptySelectionClipboard": false
+    "editor.emptySelectionClipboard": false,
+    "liveServer.settings.port": 5501
 }

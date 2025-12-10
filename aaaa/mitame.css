@@ -258,14 +258,18 @@ input[type="range"]::-moz-range-thumb {
     display: none;
 }
 #titleArea .title{
-    display: inline;
+    display: flex;
     position: absolute;
+    justify-content: center;
+    align-items: center;
     top: 10%;
     left: 50%;
+    width: 100%;
+    height: fit-content;
     transform: translateX(-50%);
     /* text-decoration: underline #cfe9ff; */
     color: #b5dcff;
-    font-size: 60px;
+    font-size: 350%;
     font-family: urara;
     text-shadow:1px 1px 0 var(--txwaku), -1px -1px 0 var(--txwaku),
                 -1px 1px 0 var(--txwaku), 1px -1px 0 var(--txwaku),
@@ -282,7 +286,7 @@ input[type="range"]::-moz-range-thumb {
     left: 50%;
     transform: translateX(-50%);
 }
-#titleArea .buttons .bt{
+#titleArea .bt{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -300,9 +304,29 @@ input[type="range"]::-moz-range-thumb {
     margin: 5px;
     box-sizing: content-box;
 }
-#titleArea .buttons .bt:hover{
+#titleArea .bt:hover{
     background: #cfe9ff;
     scale: 1.2
+}
+#titleArea .bt.set{
+    justify-content: none;
+    align-items: none;
+    width: 5%;
+    aspect-ratio: 1/1;
+    position: fixed;
+    right: 0%;
+    top: 0%;
+    object-fit: cover;
+    padding: 0px 0px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+#titleArea .bt.set img{
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 /* #titleArea .buttons div.bt:active{
     animation: sample 0.2s ease-in-out forwards;
@@ -327,7 +351,7 @@ input[type="range"]::-moz-range-thumb {
     
 }
 
-#titleArea .buttons .bt.pul::placeholder {
+#titleArea .bt.pul::placeholder {
     color: #4473ad;
     font-size: 13px;
 }
@@ -835,7 +859,7 @@ input[type="range"]::-moz-range-thumb {
     transform: translateX(-50%);
     transition: bottom 1.0s ease;
     box-sizing: border-box;
-    z-index: 5;
+    z-index: 255;
 }
 #underBar.tog{
     bottom: 0;

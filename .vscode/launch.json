@@ -88,6 +88,12 @@
             "name": "なんとかかんとか耐え試験",
             "file": "koppe/sheken/index.html"
         },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "drink-shop(cat)",
+            "file": "koppe/drink-shop/index.html"
+        },
 
     ],                                                                                                                                              
 }

@@ -73,7 +73,12 @@ with open('crafts.csv',"r",encoding="utf-8_sig", newline='') as f:#なんか動�
     for fa in csv.reader(f):
         sub.boot_now.update()
         #print(fa)
-        craftdata.append([fa[0].split("|"),fa[1].split("|"),fa[2].split("|"),fa[3].split("|"),fa[4]])
+        res = []
+        for a in range(4):
+            res.append(fa[a].split("|"))
+        res.append(fa[4])
+        #craftdata.append([fa[0].split("|"),fa[1].split("|"),fa[2].split("|"),fa[3].split("|"),fa[4]])
+        craftdata.append(res)
 
 #print(craftdata)
 
@@ -158,12 +163,12 @@ async def handler(websocket):
             
             #if message[:7] != "printTx" or message[:4] == "none":print(f"{message}")
             
-            if (len(socketname) > 1 )and(websocket not in socketname):
+            if (len(socketname) >= 2 )and(websocket not in socketname):
                 print("cheater's elegant arrive!!!!!!!!!!!")
                 #print(socketname)
                 await websocket.send("Are you a cheater?")
                 await websocket.close()
-                break
+                continue
             elif websocket not in socketname:
                 print("cliant_conect")
                 socketname.append(websocket)
@@ -263,12 +268,13 @@ async def handler(websocket):
             elif message[:9]=="pressure_":#f"pressure_"
                 x=message[9:].split("_")
                 inventry[x[0]][4]+=float(x[1])
-            elif message[:11]=="input_item_":#f"imput_item_{name}_{x}_{y}_{item}"
+            elif message[:11]=="input_item_":#f"input_item_{name}_{x}_{y}_{item}"
                 x=message[11:].split("_")
                 inventry[str(x[0])][0]+=[[float(x[1]),float(x[2]),0,0,x[3]]]
             elif message[:11]=="imput_melt_":#imput_melt_{name}_{item}_{cm3}
                 x=message[11:].split("_")
-                inventry[str(x[0])][5][x[1]]+=x[2]
+                #inventry[str(x[0])][4]=combined_gas_law(aturyoku_1=inventry[str(x[0])][4],taiseki_1=inventry[str(x[0])][5][x[1]],taiseki_2=inventry[str(x[0])][5][x[1]])
+                inventry[str(x[0])][5][x[1]]+= x[2]
             elif message[:10]=="imput_air_":#imput_air_{name}_{item}_{cm3}
                 x=message[10:].split("_")
                 inventry[str(x[0])][6][x[1]]+=x[2]
@@ -328,15 +334,12 @@ async def handler(websocket):
                     if n[-4:]==".pydata":
                         getSave+=","+n[:-4]
                 sendjs("sendjs_loadlis_"+str(getSave))
-            #囧
+            
             elif message[:8]=="printTx,":
-               print(message[8:])
-            
-            elif message[:3]=="次は、" and message[-2:]=="です":
-               print("次は？") # 次は、${nextIS}です
-               nextIs = message[3:-2]
-               
-            
+                mes=message[8:]
+                # print(f"プレッツェル「{mes}」")
+                print(mes)
+                
             else:
                 print(f'コマンド"{message}"は正しく認証されませんでした')
             
@@ -348,6 +351,10 @@ async def handler(websocket):
             #    await websocket.send(str(s))
     except asyncio.exceptions.CancelledError:
         pass
+    except websockets.exceptions.ConnectionClosedOK:
+        pass
+    finally:
+        print("今回はハッカーは（たぶん）いませんでした!\nやったね！")
 """
 objectseses = {
     name:[
@@ -518,8 +525,6 @@ async def hitbox(ichi, ichiD, dens, name, width, hight, count):
     #print(f"filled1:{filled}")
     global inventry2
     global num
-    ichi[3] = 0.00098      #加速しない原因　外に出すかなんかする
-    #ichi[2] = 0.00098
     #now = [ichi[0]//2,ichi[1]//2,dens]
     gox=0
     goy=0
@@ -533,7 +538,7 @@ async def hitbox(ichi, ichiD, dens, name, width, hight, count):
                     ichi[0] += -(gox)*2
 
         if ichi[3] != 0:
-            goy = dens*(ichi[3]**2)*4.8
+            goy = ichi[3] + dens*(ichi[3]**2)*4.8
             ichi[1] += goy
             if ichi[1] == width:
                     ichi[1] += -(goy)*2
@@ -542,38 +547,102 @@ async def hitbox(ichi, ichiD, dens, name, width, hight, count):
         #now = [ichi[0]//2,ichi[1]//2,dens] #割る値によって当たり判定の大きさ変わる
 
 #ここから移動後
-        if ichi[1] > hight or ichi[1] > 0 : #同上
+async def hitbox(ichi, ichiD, dens, name, width, hight):
+    global inventry2
+    global num
+    global filled
+
+    gox = 0
+    goy = 0
+
+    if ichi[0]//2 not in filled or ichi[1]//2 not in filled:
+
+        if ichi[2] != 0:
+            gox = dens*(ichi[2]**2)*4.8
+            ichi[0] += gox
+            if ichi[0] == hight:
+                ichi[0] += -(gox)*2
+
+        if ichi[3] != 0:
+            goy = ichi[3] + dens*(ichi[3]**2)*4.8
+            ichi[1] += goy
+            if ichi[1] == width:
+                ichi[1] += -(goy)*2
+
+        # 位置制限
+        if ichi[1] > hight or ichi[1] < 0:
+            if ichi[1] > hight:
+                ichi[1] = hight
+                ichi[3] = 0            
+            if ichi[1] < 0:
+                ichi[1] = 0
+                ichi[3] -= ichi[3]*0.9
+
+        if ichi[0] > width or ichi[0] < 0:            
+            if ichi[0] > width:
+                ichi[0] = width
+                ichi[2] -= ichi[2]*0.9            
+            if ichi[0] < 0:
+                ichi[0] = 0
+                ichi[2] -= ichi[2]*0.9
+
+        if ichi[0] not in filled or ichi[1] not in filled:
+            filled[num] = [ichi[0], ichi[1]]
+            num += 1
+
+        # --- 🔥 ここが最大の修正点 ---
+        # count を使わず、ichi と同一オブジェクトを inventry2[name][0] の中から探す
+        try:
+            idx = inventry2[name][0].index(ichi)
+        except ValueError:
+            # 念のため（オブジェクトが見つからない場合）
+            await asyncio.sleep(0.1)
+            return
+
+        inventry2[name][0][idx][0] = ichi[0]
+        inventry2[name][0][idx][1] = ichi[1]
+        inventry2[name][0][idx][2] = ichi[2]
+        inventry2[name][0][idx][3] = ichi[3]
+
+    await asyncio.sleep(0.1)
+
+"""
+        if ichi[1] > hight or ichi[1] < 0 :
 
             if ichi[1] > hight:
                 ichi[1] = hight
-                ichi[3] = (hight-ichi[3])*2
+                ichi[3] = 0
             
             if ichi[1] < 0:
-                ichi = 0
+                ichi[1] = 0
+                ichi[3] -= ichi[3]*0.9
 
         if ichi[0] > width or ichi[0] < 0:
             
             if ichi[0]*2 > width:
                 ichi[0] = width
-                ichi[0] -= gox
+                ichi[2] -= ichi[2]*0.9
             
             if ichi[0]*2 < 0:
                 ichi[0] = 0
-                ichi[0] -= gox
+                ichi[2] -= ichi[2]*0.9
 
-        if ichi[0] not in filled or ichi[1] not in filled: #ここ今だと-の方向に振り切れた場合に高速で画面外に行きます  orとandで動く法を採用する
+        if ichi[0] not in filled or ichi[1] not in filled:#elseを作る
 
-            filled[num] = [ichi[0],ichi[1]]
+            filled[num] = [ichi[0],ichi[1]] #index[0]の値で埋まってるか判定　エラーのもとだよ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
             num += 1
-
-        inventry2[name][0][count][1] = ichi[1]
-        inventry2[name][0][count][0] = ichi[0]
-        inventry2[name][0][count][3] = ichi[3]
+        print(ichi)
+ #一個目は成功、二個目は失敗   おそらくcountの変更失敗
     
     await asyncio.sleep(0.1)
-    print("filled2:" + str(filled))
 
-#nowで全部判定した方がよくね？
+        inventry2[name][0][count][0] = ichi[0]
+        inventry2[name][0][count][1] = ichi[1]
+        inventry2[name][0][count][2] = ichi[2]
+        inventry2[name][0][count][3] = ichi[3] 
+    """
+
+    #print("filled2:" + str(filled))
 
 async def change_taiseki(cm3:float,g_cm3_moto:float,g_cm3_ato:float):
     #print("cm3",cm3,"g/cm3_moto",g_cm3_moto,"g/cm3_ato",g_cm3_ato))
@@ -633,13 +702,17 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
             
             inventry2=copy.deepcopy(inventry)
             for name,index in inventry.items():
-                
+                if index[10]=="heat-chinc":
+                    inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=inventry2[name][1]*inventry2[name][2],onndo_1=inventry2[name][3],taiseki_2=inventry2[name][1]*inventry2[name][2],onndo_2=inventry2[name][3]*0.9)
+                    sendjs(f"koppepansamadaze!!!!!!!!!!!!!yea!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!burger!!!!!!!!!!kasugai!!!!!!!!!!!!!!!!!!!_{name}_{inventry2[name][3]*0.1}")
+                    inventry2[name][3]*=0.9
                 #print(inventry2)
                 write=False
                 if name in flag["inventry_name"]:
                     write=True
                     canvas["inventry_root_"+str(name)].delete('item')
                 melt_y=[]
+                #echo echo&echo echo2&echo echo3&echo echo4
                 yw=0
                 byw=0
                 melt_yw={}
@@ -688,7 +761,7 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                 num=0
                 for i in index[0]:
                     try:
-                        i[4]
+                        _ = i[4]
                     except Exception:
                         continue
                         print(inventry)
@@ -725,8 +798,9 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                             else:
                                 canvas["inventry_root_"+str(name)].create_image(i[0], i[1], image=img[str(name)+"assets/images/items/error.png"],tag="item")
                             
-                        await hitbox(ichi=i,ichiD=melt_y,dens=inventry2[name][3],name=name,width=inventry2[name][1],hight=inventry2[name][2],count=count)#densイランかも 
+                        await hitbox(ichi=i,ichiD=melt_y,dens=inventry2[name][3],name=name,width=inventry2[name][1],hight=inventry2[name][2])
                     count+=1
+                    
                 for xxxxa in delet_list:
                     try:
                         inventry2[name][0].remove(xxxxa)
@@ -929,15 +1003,15 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                 maxs=0
                 for index_id in range(1,len(indexb)):
                     
-                    if maxs<inventry[indexb[index_id][0]][4]:
+                    if maxs<inventry[indexb[index_id][0]][4] and inventry[indexb[index_id][0]][4]-maxs>10:
                         maxs=inventry[indexb[index_id][0]][4]
                         ppaa=index_id
-                    if mins>inventry[indexb[index_id][0]][4]:
+                    if mins>inventry[indexb[index_id][0]][4] and mins-inventry[indexb[index_id][0]][4]>10:
                         mins=inventry[indexb[index_id][0]][4]
                         aapp=index_id
                 if ppaa==None or aapp==None or maxs==mins:
                     continue
-                print(indexb[ppaa][0]+" to "+indexb[aapp][0])
+                #print([indexb[ppaa][0]+" to "+indexb[aapp][0],inventry[indexb[ppaa][0]][4]-inventry[indexb[aapp][0]][4]])
                 melt_type=None
                 are_type=None
                 yw=0
@@ -963,18 +1037,23 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                     
                     
                     move = min(inventry[indexb[ppaa][0]][5][melt_type],indexb[0])
-                    print("melt")
-                    print(move)
+                    #print("melt")
+                    #print(move)
                     if move<0:
                         raise
+                    inventry[indexb[ppaa][0]][5][melt_type]-=move
+                    inventry[indexb[aapp][0]][5][melt_type]+=move
+                    inventry[indexb[ppaa][0]][4]-=move
+                    inventry[indexb[aapp][0]][4]+=move
+                    """
                     becouse=inventry[indexb[ppaa][0]][1]*inventry[indexb[ppaa][0]][2]
                     app=inventry[indexb[aapp][0]][1]*inventry[indexb[aapp][0]][2]
                     change_app_cm3=await combined_gas_law(aturyoku_1=inventry[indexb[ppaa][0]][4],aturyoku_2=inventry[indexb[aapp][0]][4],onndo_1=inventry[indexb[ppaa][0]][3],onndo_2=inventry[indexb[aapp][0]][3],taiseki_1=move)
-                    change_app_pa=await combined_gas_law(aturyoku_1=inventry[indexb[aapp][0]][4],onndo_1=inventry[indexb[aapp][0]][3],onndo_2=inventry[indexb[aapp][0]][3],taiseki_1=inventry[indexb[aapp][0]][5][melt_type],taiseki_2=change_app_cm3+inventry[indexb[aapp][0]][5][melt_type])
-                    change_app_do=await combined_gas_law(aturyoku_1=inventry[indexb[aapp][0]][4],aturyoku_2=inventry[indexb[aapp][0]][4],onndo_1=inventry[indexb[aapp][0]][3],taiseki_1=inventry[indexb[aapp][0]][5][melt_type],taiseki_2=change_app_cm3+inventry[indexb[aapp][0]][5][melt_type])
+                    change_app_pa=await combined_gas_law(aturyoku_1=inventry[indexb[aapp][0]][4],onndo_1=inventry[indexb[aapp][0]][3],onndo_2=inventry[indexb[aapp][0]][3],taiseki_1=inventry[indexb[aapp][0]][5][melt_type],taiseki_2=move+inventry[indexb[aapp][0]][5][melt_type])
+                    change_app_do=await combined_gas_law(aturyoku_1=inventry[indexb[aapp][0]][4],aturyoku_2=inventry[indexb[aapp][0]][4],onndo_1=inventry[indexb[aapp][0]][3],taiseki_1=inventry[indexb[aapp][0]][5][melt_type],taiseki_2=move+inventry[indexb[aapp][0]][5][melt_type])
                     #becouse_app_cm3=combined_gas_law(aturyoku_1=inventry[indexb[ppaa][0]][4],aturyoku_2=inventry[indexb[aapp][0]][4],onndo_1=inventry[indexb[ppaa][0]][3],onndo_2=inventry[indexb[aapp][0]][3],taiseki_1=move)
-                    becouse_app_pa=await combined_gas_law(aturyoku_1=inventry[indexb[ppaa][0]][4],onndo_1=inventry[indexb[ppaa][0]][3],onndo_2=inventry[indexb[ppaa][0]][3],taiseki_2=becouse,taiseki_1=move+becouse)
-                    becouse_app_do=await combined_gas_law(aturyoku_1=inventry[indexb[ppaa][0]][4],aturyoku_2=inventry[indexb[ppaa][0]][4],onndo_1=inventry[indexb[ppaa][0]][3],taiseki_2=becouse,taiseki_1=move+becouse)
+                    becouse_app_pa=await combined_gas_law(aturyoku_1=inventry[indexb[ppaa][0]][4],onndo_1=inventry[indexb[ppaa][0]][3],onndo_2=inventry[indexb[ppaa][0]][3],taiseki_2=becouse-move,taiseki_1=becouse)
+                    becouse_app_do=await combined_gas_law(aturyoku_1=inventry[indexb[ppaa][0]][4],aturyoku_2=inventry[indexb[ppaa][0]][4],onndo_1=inventry[indexb[ppaa][0]][3],taiseki_2=becouse-move,taiseki_1=becouse)
                     print(change_app_cm3)
                     inventry[indexb[ppaa][0]][5][melt_type]-=move
                     inventry[indexb[aapp][0]][5][melt_type]+=change_app_cm3
@@ -982,21 +1061,27 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                     inventry[indexb[aapp][0]][3]=change_app_do
                     inventry[indexb[ppaa][0]][4]=becouse_app_pa
                     inventry[indexb[ppaa][0]][3]=becouse_app_do
+                    """
                 elif are_type!=None:
                     move = min(inventry[indexb[ppaa][0]][6][are_type],indexb[0])
-                    print("are")
-                    print(move)
+                    #print("are")
+                    #print(move)
                     if move<0:
                         raise
                     #print("")
+                    inventry[indexb[ppaa][0]][6][are_type]-=move
+                    inventry[indexb[aapp][0]][6][are_type]+=move
+                    inventry[indexb[ppaa][0]][4]-=move
+                    inventry[indexb[aapp][0]][4]+=move
+                    """
                     becouse=inventry[indexb[ppaa][0]][1]*inventry[indexb[ppaa][0]][2]
                     app=inventry[indexb[aapp][0]][1]*inventry[indexb[aapp][0]][2]
                     change_app_cm3=await combined_gas_law(aturyoku_1=inventry[indexb[ppaa][0]][4],aturyoku_2=inventry[indexb[aapp][0]][4],onndo_1=inventry[indexb[ppaa][0]][3],onndo_2=inventry[indexb[aapp][0]][3],taiseki_1=move)
-                    change_app_pa=await combined_gas_law(aturyoku_1=inventry[indexb[aapp][0]][4],onndo_1=inventry[indexb[aapp][0]][3],onndo_2=inventry[indexb[aapp][0]][3],taiseki_1=inventry[indexb[aapp][0]][6][are_type],taiseki_2=change_app_cm3+inventry[indexb[aapp][0]][6][are_type])
-                    change_app_do=await combined_gas_law(aturyoku_1=inventry[indexb[aapp][0]][4],aturyoku_2=inventry[indexb[aapp][0]][4],onndo_1=inventry[indexb[aapp][0]][3],taiseki_1=inventry[indexb[aapp][0]][6][are_type],taiseki_2=change_app_cm3+inventry[indexb[aapp][0]][6][are_type])
+                    change_app_pa=await combined_gas_law(aturyoku_1=inventry[indexb[aapp][0]][4],onndo_1=inventry[indexb[aapp][0]][3],onndo_2=inventry[indexb[aapp][0]][3],taiseki_1=inventry[indexb[aapp][0]][6][are_type],taiseki_2=move+inventry[indexb[aapp][0]][6][are_type])
+                    change_app_do=await combined_gas_law(aturyoku_1=inventry[indexb[aapp][0]][4],aturyoku_2=inventry[indexb[aapp][0]][4],onndo_1=inventry[indexb[aapp][0]][3],taiseki_1=inventry[indexb[aapp][0]][6][are_type],taiseki_2=move+inventry[indexb[aapp][0]][6][are_type])
                     #becouse_app_cm3=combined_gas_law(aturyoku_1=inventry[indexb[ppaa][0]][4],aturyoku_2=inventry[indexb[aapp][0]][4],onndo_1=inventry[indexb[ppaa][0]][3],onndo_2=inventry[indexb[aapp][0]][3],taiseki_1=move)
-                    becouse_app_pa=await combined_gas_law(aturyoku_1=inventry[indexb[ppaa][0]][4],onndo_1=inventry[indexb[ppaa][0]][3],onndo_2=inventry[indexb[ppaa][0]][3],taiseki_2=becouse,taiseki_1=move+becouse)
-                    becouse_app_do=await combined_gas_law(aturyoku_1=inventry[indexb[ppaa][0]][4],aturyoku_2=inventry[indexb[ppaa][0]][4],onndo_1=inventry[indexb[ppaa][0]][3],taiseki_2=becouse,taiseki_1=move+becouse)
+                    becouse_app_pa=await combined_gas_law(aturyoku_1=inventry[indexb[ppaa][0]][4],onndo_1=inventry[indexb[ppaa][0]][3],onndo_2=inventry[indexb[ppaa][0]][3],taiseki_2=becouse-move,taiseki_1=becouse)
+                    becouse_app_do=await combined_gas_law(aturyoku_1=inventry[indexb[ppaa][0]][4],aturyoku_2=inventry[indexb[ppaa][0]][4],onndo_1=inventry[indexb[ppaa][0]][3],taiseki_2=becouse-move,taiseki_1=becouse)
                     print(change_app_cm3)
                     inventry[indexb[ppaa][0]][6][are_type]-=move
                     inventry[indexb[aapp][0]][6][are_type]+=change_app_cm3
@@ -1004,6 +1089,7 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                     inventry[indexb[aapp][0]][3]=change_app_do
                     inventry[indexb[ppaa][0]][4]=becouse_app_pa
                     inventry[indexb[ppaa][0]][3]=becouse_app_do
+                    """
             #input("")
             await asyncio.sleep(1/120)
     except asyncio.exceptions.CancelledError:
@@ -1028,12 +1114,26 @@ def motion(e,name):
         else:
             canvas["inventry_root_"+str(name)].create_image(e.x,e.y, image=img[str(name)+"assets/images/items/error.png"],tag="have")
     else:
-        canvas["inventry_root_"+str(name)].delete('have')  
+        canvas["inventry_root_"+str(name)].delete('have')
+
+async def W_W(key,index,name,e):
+    xw=await combined_gas_law(taiseki_1=20,aturyoku_2=csvdata[key][5],onndo_2=20,aturyoku_1=inventry2[name][4],onndo_1=inventry2[name][3])
+    #inventry2[name][3]-=(inventry2[name][5][key])*100/(csvdata[key][7])*(csvdata[key][8])*4.184*inventry2[name][1]*inventry2[name][2]
+    #print("eeeeeee")
+    inventry2[name][3] =await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],aturyoku_2=inventry2[name][4],taiseki_2=(index[1]*index[2])+xw)
+    inventry[name][0]+=[[e.x,e.y,0,0,ock[0]]]
+    #print("fffffffff")
+    inventry2[name][4]=await combined_gas_law(aturyoku_1=inventry2[name][4],taiseki_1=index[1]*index[2],onndo_1=inventry2[name][3],taiseki_2=(index[1]*index[2])+xw,onndo_2=inventry2[name][3])
+
+
 def click(e,name):
     global ock
     if ock[0]!="":
         sendjs("helasu")
-        inventry[name][0]+=[[e.x,e.y,0,0,ock[0]]]
+        asynceventroop.create_task(W_W(ock[0],["",inventry[name][1],inventry[name][2]],name,e))
+        #print("dddddddd")
+        #x=asyncio.run(change_taiseki(cm3=20,g_cm3_moto=csvdata[key][3],g_cm3_ato=csvdata[key][2]))
+        
     elif ock[0]=="":
         cccc=""
         for a in range(len(inventry[name][0])):
@@ -1200,7 +1300,6 @@ def craft_button(e,name):
                 #else通らない
                 break
         else:
-            #print("Ahh～↑↑↑💥💥真夏🌞🌴🏄🎇🎆🌺のJamboree〜〜〜〜‼️‼️レゲエ🇯🇲💃🙌🏻砂浜🌺🌺🏖🏖🌴🌞Big Wave🌊🌊🌊🌊🌊🌊🌊💥💥💥")
             n=float("inf")#結果
             for names in have.keys():
                 n=min(int(a[1][names])*len(have[names]),n)
@@ -1250,7 +1349,6 @@ async def open_inventry(name:str):
             img[str(name)+"craft_button"]=tk.PhotoImage(file = "./assets/images/systems/craft_button.png",master=root["inventry_root_"+str(name)])
             gui["inventry_craft_button_gui"+str(name)]=canvas["inventry_root_"+str(name)].create_image(65,13, image=img[str(name)+"craft_button"],tag=("system","craft_button_outline"))
             canvas["inventry_root_"+str(name)].tag_bind(gui["inventry_craft_button_gui"+str(name)],"<ButtonPress-1>",lambda e,name=name:craft_button(e,name))
-        # 囧:: minecraft table is a very so nice ihin by Tokugawa Ieyasu.
         root["inventry_root_"+str(name)].bind("<Leave>",lambda e,name=name:out(e,name))
         root["inventry_root_"+str(name)].bind("<Motion>",lambda e,name=name:motion(e,name))
         root["inventry_root_"+str(name)].bind("<ButtonRelease-1>",lambda e,name=name:click(e,name))
