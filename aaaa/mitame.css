@@ -39,31 +39,7 @@ img{
     outline: none;
 }
 
-input[type="range"] {
-    width: 300px;
-    -webkit-appearance: none;
-    appearance: none;
-    height: 8px;
-    background: #202020;
-    border: solid 1px #9d9d9d;
-    outline: none;
-}
-input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 15px;
-    height: 35px;
-    background: #9d9d9d;
-    border: solid 1px #202020;
-    cursor: pointer;
-}
-input[type="range"]::-moz-range-thumb {
-    width: 15px;
-    height: 35px;
-    background: #9d9d9d;
-    border: solid 1px #202020;
-    cursor: pointer;
-}
+
 
 
 .checkbox{
@@ -866,7 +842,11 @@ input[type="range"]::-moz-range-thumb {
 }
 #underBar .checks{
     display: flex;
+    /* display: grid; */
+    /* grid-template-columns: 30% 30% 30%; */
+    /* grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); */
     flex-direction: column;
+    align-items: flex-end;
     gap: 5px;
     width: 90%;
     height: fit-content;
@@ -877,7 +857,7 @@ input[type="range"]::-moz-range-thumb {
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
-    width: 100%;
+    width: 353px;
     height: 30px;
     padding: 0 5px;
     background: #6a4720;
@@ -896,6 +876,55 @@ input[type="range"]::-moz-range-thumb {
     transform: translateY(-50%);
     z-index: inherit;
 }
+
+#underBar .slider{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+    height: fit-content;
+    padding: 20px 0px;
+    /* grid-template-rows: 30px 30px 30px 30px 30px;
+    grid-template-columns: 50px 250px; */
+}
+#underBar .slider .slid{
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+}
+#underBar .slider .label{
+    display: flex;
+    flex-direction: row;
+    /* float:left; */
+    pointer-events: none;
+}
+#underBar .slider .slid input{
+    width: 30%;
+    appearance: none;
+    height: 8px;
+    background: #202020;
+    border: solid 1px #9d9d9d;
+    outline: none;
+}
+#underBar .slider .slid input::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 35px;
+    background: #9d9d9d;
+    border: solid 1px #202020;
+    cursor: pointer;
+}
+#underBar .slider .slid input::-moz-range-thumb {
+    width: 15px;
+    height: 35px;
+    background: #9d9d9d;
+    border: solid 1px #202020;
+    cursor: pointer;
+}
+
 
 #underBar .footer{
     display: flex;

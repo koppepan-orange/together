@@ -1457,6 +1457,7 @@ let undC = {
     open:0,
     checkD:undD.querySelector('.checks'),
     checking:{},
+    sliD:undD.querySelector('.slider'),
     fooD:undD.querySelector('.footer'),
 }
 let undF = {};
@@ -1509,6 +1510,30 @@ undC.checks = [
         }
     }
 ]
+
+undC.slids = [
+    {
+        name:'sound',
+        jpnm:'音量',
+        shoki:50,
+    },
+    {
+        name:'joiee',
+        jpnm:'ねこ',
+        shoki:50,
+    },
+    {
+        name:'torys',
+        jpnm:'とり',
+        shoki:50,
+    },
+    {
+        name:'kizys',
+        jpnm:'きじ',
+        shoki:50,
+    },
+]
+
 undF.load = () => {
     for(let ch of undC.checks){
         let div = document.createElement('div');
@@ -1536,6 +1561,28 @@ undF.load = () => {
 
         undC.checking[ch.name] = ch.kitei ? 0 : 1;
         clcl();
+    }
+
+    for(let slid of undC.slids){
+        let div = document.createElement('div');
+        div.className = `slid ${slid.name}`;
+        
+        let text = document.createElement('div');
+        text.className = 'lavel';
+        text.textContent = `${slid.jpnm}:`;
+        div.appendChild(text);
+        // undC.sliD.appendChild(text)
+        
+        let range = document.createElement('input')
+        range.type = 'range'
+        range.min = 0;
+        range.max = 100;
+        range.value = 50;
+        range.step = 1;
+        div.appendChild(range);
+        // undC.sliD.appendChild(range)
+
+        undC.sliD.appendChild(div)
     }
 
     for(let foot of undC.foots){
