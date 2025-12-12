@@ -709,8 +709,10 @@ comF.takeRecipe = (name) => {
 }
 
 comC.crafts = [];
-fetch("crafts.csv").then(a => a.text()).then(t=>{
-    let lines = t.split(/\r?\n/);
+comF.craLoad = async() => {
+    let dats = await fetch('crafts.csv').then(a => a.text());
+    if(!dats) return 0;
+    let lines = dats.split(/\r?\n/);
     for(let line of lines){
         let [mae, maen, ato, aton, kigu, bio] = line.split(',');
         let shutu = {};
@@ -722,7 +724,7 @@ fetch("crafts.csv").then(a => a.text()).then(t=>{
         comC.crafts.push(shutu);
     }
 
-    
+    console.log(comC.crafts);
     for(let cra of comC.crafts){
         let tar = cra.ato[0];
         let div = document.createElement('div');
@@ -736,20 +738,10 @@ fetch("crafts.csv").then(a => a.text()).then(t=>{
         lavel.className = 'lavel';
         lavel.textContent = tar;
         div.appendChild(lavel);
-        
-        let sub = document.createElement('div');
-        sub.className = 'sub';
-        sub.textContent = cra.ato.slice(1).join(', ');
-        div.appendChild(sub);
 
-        div.addEventListener('click', () => {
-            comF.takeRecipe(tar);
-        })
-
-        comC.SrecD.querySelector('.list').appendChild(div);
+        comC.SrecD.appendChild(div);
     }
-});
-
+}
 //#endregion
 
 //#region save
@@ -1100,8 +1092,7 @@ async function enter(line){
         case 'サウンド':{ //currentTime = 0要らん気がしてきた 連発の可能性あるし
             let [, name] = line;
             if(!sounds[name]) return console.error(`サウンド"${name}"がありませんぜ not existってやつだね`);
-            sounds[name].currentTime = 0;
-            sounds[name].play();
+            soundPlay(name);
             break;
         };
     }
@@ -1564,25 +1555,29 @@ undF.load = () => {
     }
 
     for(let slid of undC.slids){
-        let div = document.createElement('div');
-        div.className = `slid ${slid.name}`;
+        // let div = document.createElement('div');
+        // div.className = `slid ${slid.name}`;
         
         let text = document.createElement('div');
-        text.className = 'lavel';
+        text.className = 'label';
         text.textContent = `${slid.jpnm}:`;
-        div.appendChild(text);
-        // undC.sliD.appendChild(text)
+        // div.appendChild(text);
+        undC.sliD.appendChild(text);
         
         let range = document.createElement('input')
-        range.type = 'range'
+        range.type = "range"
         range.min = 0;
         range.max = 100;
         range.value = 50;
         range.step = 1;
-        div.appendChild(range);
-        // undC.sliD.appendChild(range)
+        range.addEventListener('input', (e) => {
+            if(slid.name != 'sound') return;
+            soundVolume(e.target.value)
+        })
+        // div.appendChild(range);
+        undC.sliD.appendChild(range)
 
-        undC.sliD.appendChild(div)
+        // undC.sliD.appendChild(div)
     }
 
     for(let foot of undC.foots){
@@ -1600,6 +1595,7 @@ undF.load = () => {
         undC.fooD.appendChild(div);
     }
 }
+
 
 undF.exit = () => {
     undF.clos();
@@ -1789,7 +1785,7 @@ function get(item, yx = 'no', appe = 1){
         isrecipe = 1;
         data = Items.find(o => o.name == 'recipe');
     }
-    console.log(data)
+    // console.log(data)
     // console.log(data)
 
     let cell = [...invC.areaD.querySelectorAll('.cell')].find(c => c.dataset.item == data.jpnm && +c.dataset.num < 99);
@@ -1994,7 +1990,7 @@ function inv_pick(cell, px, py){
     let colG = +css.getPropertyValue('--inv_colG').slice(0,1);
     let wid = (invD.offsetWidth*98/100 - colG*8)/9;
     let hei = (invD.offsetHeight*98/100 -rowG*4)/5;
-    console.log(wid, hei);
+    // console.log(wid, hei);
     pickItem.style.width = wid + 'px';
     pickItem.style.height = hei + 'px';
     pickItem.style.position = 'absolute';
@@ -2098,8 +2094,7 @@ salF.pay = () => {
 
     euroF.add(price);
     nicoText(`${item}を${num}個、全部で${price}€で売りました`);
-    sounds['money'].currentTime = 0;
-    sounds['money'].play();
+    soundPlay("money")
 
     salC.euroD.textContent = '0';
 
@@ -2118,6 +2113,9 @@ let gamC = {
     now: 'loby',
     moving: 0,
     togD: gamD.querySelector('.opener'),
+    lobyD: gamD.querySelector('.loby'),
+    blaD: gamD.querySelector('.blacky'),
+    rouD: gamD.querySelector('.roulette'),
 }
 gamC.basyos = [
     {
@@ -2134,11 +2132,34 @@ gamC.basyos = [
     }
 ]
 let gamF = {};
+
 gamF.tog = () => {
     gamC.open = fl(gamC.open);
     gamD.classList.toggle('tog');
 }
 gamC.togD.addEventListener('click', gamF.tog);
+
+gamF.load = () => {
+    gamC.now = 'loby';
+
+    for(let gam of gamC.basyos){
+        let div = document.createElement('div');
+        div.className = `bt ${gam.name}`;
+        
+        let text = document.createElement('div');
+        text.className = 'text';
+        text.textContent = gam.name;
+        div.appendChild(text);
+
+        let img = document.createElement('img');
+        // img.src = `assets/images/systems/${gam.name}.png`;
+        img.src = `assets/images/systems/error.png`;
+        div.appendChild(img);
+
+        gamC.lobyD.querySelector('.row').appendChild(div);
+    }
+}
+
 gamF.move = async function(to){
     if(gamC.moving) return;
     
@@ -2247,7 +2268,6 @@ let canC = {
             yy: 0,
         }
     ],
-    imgs:{},
     get: (id) => {
         if(!id) id = 0;
         let res = canC.objs[id]
@@ -2267,7 +2287,7 @@ let canC = {
         for(let y = 0; y < canC.mas; y++){
             for(let x = 0; x < canC.mas; x++){
                 if(!backmap[y][x]) continue;
-                let img = canC.imgs['maps'][backmap[y][x]];
+                let img = images['maps'][backmap[y][x]];
                 if(img) canC.ctx.drawImage(img, x*canC.size, y*canC.size, canC.size, canC.size);
                 else console.error(`assets/maps/${backmap[y][x]}.png is not found.`);
                 
@@ -2288,7 +2308,7 @@ let canC = {
             let type = ob.type;
             let img = ob.img;
     
-            canC.ctx.drawImage(canC.imgs[type][img], ob.sx*canC.size, ob.sy*canC.size, canC.size, canC.size);
+            canC.ctx.drawImage(images[type][img], ob.sx*canC.size, ob.sy*canC.size, canC.size, canC.size);
         }
 
         drawGrid()
@@ -2525,12 +2545,10 @@ async function pmoved(){
 
         let sozais = data.sozai;
         if(data.kind.includes('stone')){
-            sounds['breakstone'].currentTime = 0;
-            sounds['breakstone'].play();
+            soundPlay("breakstone")
         }
         else if(data.kind.includes('tree')){
-            sounds['breakgrass'].currentTime = 0;
-            sounds['breakgrass'].play();
+            soundPlay("breakgrass");
         }
         for(let so of sozais){
             if(!probability(so.p)) continue;
@@ -3172,6 +3190,7 @@ function start(){
     undF.load()
     fontF.load();
     canC.resize();
+    gamF.load();
     bleF.resize();
 
     loop = 1;
@@ -3354,30 +3373,9 @@ document.addEventListener('keydown', async function(e){
 })
 //#endregion
 
-//#region 音をロードする機構
-let soundsLoaded = 0;
-let sounds = {};
-let soundsNames = ['doom', 'money', 'breakstone', 'breakgrass'] //増やしたけりゃここに増やしなねs
-// let soundsNames = [];
-let totalsounds = soundsNames.length
-
-soundsNames.forEach(num => {
-    let sound = new Audio();
-    sound.preload = 'auto';
-    sound.src = `assets/sounds/${num}.mp3`; 
-    sound.addEventListener('canplaythrough', () => {
-        soundsLoaded++;
-        if(canI.imagesLoaded == canI.imagesTotal && soundsLoaded == totalsounds) start();
-    }, {once: true});
-    sound.onerror = () => {
-        console.error(`Sound ${num} failed to load.`);
-        soundsLoaded++;
-    };
-    sounds[num] = sound;
-}); 
-//#endregion
 //#region 画像の読み込み
-let canI = {
+let images = {}
+let imgC = {
     imagesLoaded: 0,
     imagesNames: {
         'maps':['0', 'a', 'b'],
@@ -3386,22 +3384,69 @@ let canI = {
         'objects':['tree','tree_apple','tree_kare','stone','stone_kuro','stone_hai','stone_ao','stone_aka','stone_kiro','stone_cha','stone_mido','stone_mizu', 'enemy'],
     },
 }
-canI.imagesTotal = Object.keys(canI.imagesNames).map(a => canI.imagesNames[a].length).reduce((a, b) => a + b);
-for(let type of Object.keys(canI.imagesNames)){
-    for(let id of canI.imagesNames[type]){
+imgC.imagesTotal = Object.keys(imgC.imagesNames).map(a => imgC.imagesNames[a].length).reduce((a, b) => a + b);
+for(let type of Object.keys(imgC.imagesNames)){
+    for(let id of imgC.imagesNames[type]){
         let img = new Image();
         img.src = `assets/images/${type}/${id}.png`;
         img.onload = async function (){
-            canI.imagesLoaded++;
-            if(canI.imagesLoaded == canI.imagesTotal && soundsLoaded == totalsounds) start();
+            imgC.imagesLoaded++;
+            if(imgC.imagesLoaded == imgC.imagesTotal && soundsLoaded == totalsounds) start();
         };
         img.onerror = () => {
             console.error(`Image assets/images/${type}/${id} failed to load.`);
+            imgC.imagesLoaded++;
+            img.src = `assets/images/systems/error.png`;
         };
-        if(!canC.imgs[type]) canC.imgs[type] = {};
-        canC.imgs[type][id] = img;
+        if(!images[type]) images[type] = {};
+        images[type][id] = img;
     };
 };
+//#endregion
+//#region 音をロードする機構
+let sounds = {};
+let souC = {
+    loaded: 0,
+    
+}
+let soundsLoaded = 0;
+let soundsNames = ['doom', 'money', 'breakstone', 'breakgrass', 'error'] //増やしたけりゃここに増やしなねs
+let totalsounds = soundsNames.length
+
+soundsNames.forEach(num => {
+    let sound = new Audio();
+    sound.preload = 'auto';
+    sound.src = `assets/sounds/${num}.mp3`;
+    sound.addEventListener('canplaythrough', () => {
+        soundsLoaded++;
+        if(imgC.imagesLoaded == imgC.imagesTotal && soundsLoaded == totalsounds) start();
+    }, {once: true});
+    sound.onerror = () => {
+        console.error(`Sound ${num} failed to load.`);
+        soundsLoaded++;
+        sound.src = `assets/sounds/error.mp3`;
+    };
+    sounds[num] = sound;
+}); 
+
+function soundPlay(name){
+    let sound = sounds[name];
+    if(!sound) return soundPlay("error");
+
+    sound.currentTime = 0;
+    sound.volume = souC.volume;
+    sound.play();
+}
+
+function soundVolume(val){
+    const v = Math.max(0, Math.min(1, val/100));
+    console.log(`[soundVolume] ${souC.volume??null} => ${v}`);
+    souC.volume = v;
+    document.querySelectorAll('audio,video').forEach(el => {
+        el.volume = v
+    });
+}
+soundVolume(50);
 //#endregion
 
 

@@ -517,7 +517,8 @@ async def change_yuuten(motono_yuuten:int,motono_kiatu:int,atono_kiatu:int,j_mol
         
 #filled = {} # [x= , y= , dens] cmd "cls&start tree /f C:"
 num = 0
-async def hitbox(ichi, ichiD, dens, name, width, hight, count): 
+async def hitbox(ichi, ichiD, dens, name, width, hight): 
+    save=ichi
     #ichiD=[["name",]...]　#気体密度,3,3/沸点　　←melt-yがわからん..というか今のところこれ使ってない
     #ichi=[x,y,ax,ay,item]
     #cccc=name,融点 (℃),沸点 (℃),固体密度 (g/cm3) (20℃),液体密度,気体密度,融点気圧(Pa),沸点気圧(Pa),m3/mol,誘拐熱(J/mol),蒸発熱(J/mol),コメント
@@ -547,62 +548,53 @@ async def hitbox(ichi, ichiD, dens, name, width, hight, count):
         #now = [ichi[0]//2,ichi[1]//2,dens] #割る値によって当たり判定の大きさ変わる
 
 #ここから移動後
-async def hitbox(ichi, ichiD, dens, name, width, hight):
-    global inventry2
-    global num
-    global filled
-
-    gox = 0
-    goy = 0
-
     if ichi[0]//2 not in filled or ichi[1]//2 not in filled:
 
+        #移動と制限
         if ichi[2] != 0:
             gox = dens*(ichi[2]**2)*4.8
             ichi[0] += gox
             if ichi[0] == hight:
                 ichi[0] += -(gox)*2
-
+            if ichi[0] > width or ichi[0] < 0:            
+                if ichi[0] > width:
+                    ichi[0] = width
+                    ichi[2] -= ichi[2]*0.9            
+                if ichi[0] < 0:
+                    ichi[0] = 0
+                    ichi[2] -= ichi[2]*0.9
+        
         if ichi[3] != 0:
             goy = ichi[3] + dens*(ichi[3]**2)*4.8
             ichi[1] += goy
             if ichi[1] == width:
                 ichi[1] += -(goy)*2
+            if ichi[1] > hight or ichi[1] < 0:
+                if ichi[1] > hight:
+                    ichi[1] = hight
+                    ichi[3] = 0            
+                if ichi[1] < 0:
+                    ichi[1] = 0
+                    ichi[3] -= ichi[3]*0.9
 
-        # 位置制限
-        if ichi[1] > hight or ichi[1] < 0:
-            if ichi[1] > hight:
-                ichi[1] = hight
-                ichi[3] = 0            
-            if ichi[1] < 0:
-                ichi[1] = 0
-                ichi[3] -= ichi[3]*0.9
-
-        if ichi[0] > width or ichi[0] < 0:            
-            if ichi[0] > width:
-                ichi[0] = width
-                ichi[2] -= ichi[2]*0.9            
-            if ichi[0] < 0:
-                ichi[0] = 0
-                ichi[2] -= ichi[2]*0.9
-
-        if ichi[0] not in filled or ichi[1] not in filled:
+        #移動後代入
+        
+        if ichi[0] not in filled or ichi[1] not in filled: #iranasou
             filled[num] = [ichi[0], ichi[1]]
             num += 1
 
-        # --- 🔥 ここが最大の修正点 ---
-        # count を使わず、ichi と同一オブジェクトを inventry2[name][0] の中から探す
         try:
-            idx = inventry2[name][0].index(ichi)
+            inventry2[name][0].remove(save)
+            inventry2[name][0].append(ichi)
         except ValueError:
             # 念のため（オブジェクトが見つからない場合）
-            await asyncio.sleep(0.1)
+            # await asyncio.sleep(0.1)
             return
 
-        inventry2[name][0][idx][0] = ichi[0]
-        inventry2[name][0][idx][1] = ichi[1]
-        inventry2[name][0][idx][2] = ichi[2]
-        inventry2[name][0][idx][3] = ichi[3]
+        # inventry2[name][0][idx][0] = ichi[0]
+        # inventry2[name][0][idx][1] = ichi[1]
+        # inventry2[name][0][idx][2] = ichi[2]
+        # inventry2[name][0][idx][3] = ichi[3]
 
     await asyncio.sleep(0.1)
 
@@ -632,17 +624,17 @@ async def hitbox(ichi, ichiD, dens, name, width, hight):
             filled[num] = [ichi[0],ichi[1]] #index[0]の値で埋まってるか判定　エラーのもとだよ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
             num += 1
         print(ichi)
- #一個目は成功、二個目は失敗   おそらくcountの変更失敗
-    
+
     await asyncio.sleep(0.1)
 
         inventry2[name][0][count][0] = ichi[0]
         inventry2[name][0][count][1] = ichi[1]
         inventry2[name][0][count][2] = ichi[2]
         inventry2[name][0][count][3] = ichi[3] 
-    """
+    
 
     #print("filled2:" + str(filled))
+    """
 
 async def change_taiseki(cm3:float,g_cm3_moto:float,g_cm3_ato:float):
     #print("cm3",cm3,"g/cm3_moto",g_cm3_moto,"g/cm3_ato",g_cm3_ato))
@@ -757,7 +749,7 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                     #canvas["inventry_root_"+str(name)].create_image(0,0, image=img[i[4]])
                 count=0
                 delet_list=[]
-                filled = {}
+                filled = {} #消す
                 num=0
                 for i in index[0]:
                     try:
@@ -800,7 +792,7 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                             
                         await hitbox(ichi=i,ichiD=melt_y,dens=inventry2[name][3],name=name,width=inventry2[name][1],hight=inventry2[name][2])
                     count+=1
-                    
+                    #boot.bat
                 for xxxxa in delet_list:
                     try:
                         inventry2[name][0].remove(xxxxa)

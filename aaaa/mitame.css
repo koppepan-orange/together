@@ -364,6 +364,7 @@ img{
     /* height: 100vh; */
     padding: 40px;
     background: #f0f8ff;
+    position: relative;
     font-family: hangyaku;
 }
 
@@ -822,7 +823,7 @@ img{
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    width: 450px;
+    width: 80%;
     height: 80%;
     padding: 20px 5px;
     /* background: linear-gradient(to top, #391d00fc 0%, #391d00fc 60%, #4f2c07fc 100%); */
@@ -841,13 +842,11 @@ img{
     bottom: 0;
 }
 #underBar .checks{
-    display: flex;
-    /* display: grid; */
-    /* grid-template-columns: 30% 30% 30%; */
-    /* grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); */
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 5px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit,300px);
+    justify-content: end;
+    row-gap: 5px;
+    column-gap: 30px;
     width: 90%;
     height: fit-content;
     z-index: inherit;
@@ -857,8 +856,9 @@ img{
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
-    width: 353px;
-    height: 30px;
+    gap: 10px;
+    width: 100%;
+    aspect-ratio: 8/1;
     padding: 0 5px;
     background: #6a4720;
     /* border: 3px solid #3c1f00; */
@@ -878,37 +878,38 @@ img{
 }
 
 #underBar .slider{
-    display: flex;
+    display: grid;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 2px;
+    row-gap: 25px;
     width: 100%;
-    height: fit-content;
+    /* height: fit-content; */
+    height: 30px;
     padding: 20px 0px;
-    /* grid-template-rows: 30px 30px 30px 30px 30px;
-    grid-template-columns: 50px 250px; */
+    /* grid-template-rows: repeat(auto-fit,50px 250px); */
+    grid-template-columns: repeat(auto-fit,50px 250px);
 }
-#underBar .slider .slid{
+/* #underBar .slider .slid{ 
     display: flex;
     flex-direction: row;
     gap: 4px;
-}
+} */
 #underBar .slider .label{
     display: flex;
     flex-direction: row;
-    /* float:left; */
+    font-size: 19.5px;
     pointer-events: none;
 }
-#underBar .slider .slid input{
-    width: 30%;
+#underBar .slider input{
+    /* width: 75%; */
     appearance: none;
     height: 8px;
     background: #202020;
     border: solid 1px #9d9d9d;
     outline: none;
 }
-#underBar .slider .slid input::-webkit-slider-thumb{
+#underBar .slider input::-webkit-slider-thumb{
     -webkit-appearance: none;
     appearance: none;
     width: 15px;
@@ -917,7 +918,7 @@ img{
     border: solid 1px #202020;
     cursor: pointer;
 }
-#underBar .slider .slid input::-moz-range-thumb {
+#underBar .slider input::-moz-range-thumb {
     width: 15px;
     height: 35px;
     background: #9d9d9d;
@@ -1007,6 +1008,33 @@ img{
 :root{
     --inv_rowG: 8px;
     --inv_colG: 8px;
+}
+#mainArea{
+    flex-wrap: wrap;
+}
+#health{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    width: 700px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+#health:not(:fullscreen){
+    display: grid;
+    /* display: flex; */
+    /* flex-direction: row;
+    justify-content: flex-start;
+    align-items: center; */
+    grid-template-columns: 700px repeat(5, 10%);
+    /* grid-template-rows: repeat(2, 10%); */
+}
+#health {
+    /* grid-column-start: 1; */
+    width: 100%;
+    aspect-ratio: 1;
 }
 #inventory{
     display: block;
@@ -1329,8 +1357,42 @@ img{
 
 #gamble .loby{
     background: #36962c;
+    position: relative;
 }
-
+#gamble .loby .row{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    width: 90%;
+    padding: 5px 10px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+#gamble .loby .row .bt{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    aspect-ratio: 1/1;
+    padding: 10px;
+    background: #ffffff;
+    border: 2px solid #ff5542;
+    border-radius: 10px;
+    opacity: 0.9;
+    cursor: pointer;
+}
+#gamble .loby .row .bt:hover{
+    opacity: 1;
+}
+#gamble .loby .row .bt img{
+    width: 80%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+}
 
 #gamble .blacky{
     display: flex;

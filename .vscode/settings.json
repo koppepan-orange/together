@@ -1,7 +1,7 @@
 {
     "python.analysis.autoImportCompletions": true,
     "python.analysis.typeCheckingMode": "basic",
-    "workbench.colorTheme": "miku",
+    "workbench.colorTheme": "Kawaine Theme",
     "editor.aiStats.enabled": true,
     "editor.autoClosingBrackets": "languageDefined",
     "editor.autoClosingComments": "languageDefined",
