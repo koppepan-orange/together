@@ -3421,6 +3421,8 @@ soundsNames.forEach(num => {
         soundsLoaded++;
         if(imgC.imagesLoaded == imgC.imagesTotal && soundsLoaded == totalsounds) start();
     }, {once: true});
+
+
     sound.onerror = () => {
         console.error(`Sound ${num} failed to load.`);
         soundsLoaded++;
