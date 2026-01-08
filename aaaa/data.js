@@ -33,29 +33,6 @@ let IranMikans = {
     }
 }
 
-let Fonts = [
-    {
-        name:'comicsans',
-        desc:'なんか嫌われてるらしい\n3位',
-        able:1,
-    },
-    {
-        name:'hangyaku',
-        desc:'まどまぎ風フォントらしい\n1位',
-        able:1,
-    },
-    {
-        name:'kurobara',
-        desc:'明朝体の角を超増やしたver?\n2位',
-        able:1,
-    },
-    {
-        name:'wingdings',
-        desc:'Hello!\nCan you speak G...\nあれ？  番号間違えたかな..',
-        able:0,
-    }
-]
-
 let Items = [
     {
         name:'water',

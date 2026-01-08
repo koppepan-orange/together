@@ -3,7 +3,7 @@ function delay(ms){
     return new Promise(resolve=>setTimeout(resolve,ms));
 };
 async function nicoText(mes){
-    const newDiv = document.createElement('div');
+    let newDiv = document.createElement('div');
     newDiv.textContent = mes;
     newDiv.className = 'nicotext';
     newDiv.style.top = `calc(${random(0, 100)}vh - 20px)`;
@@ -17,6 +17,44 @@ async function nicoText(mes){
     await delay(2000); 
     newDiv.remove();
 };
+function tobiText(youso, mes) {
+    let el = youso;
+    if(typeof el == 'string') el = document.querySelector(youso);
+    if(!el) return console.error('せんぱ〜い？この要素壊れてますよ〜〜？');
+
+    let rect = el.getBoundingClientRect();
+    let left = rect.left + window.scrollX + rect.width / 2;
+    let top = rect.top + window.scrollY + rect.height / 2;
+
+    let node = document.createElement('div');
+    node.className = 'tobitext';
+    node.textContent = mes;
+    node.style.top = `${top}px`;
+    node.style.left = `${left}px`;
+
+    document.body.appendChild(node);
+
+    let duration = 1200;
+    let distance = -48;
+    let jitter = (Math.random() - 0.5) * 10;
+
+    let start = performance.now();
+
+    function easeOutCubic(t){return 1 - Math.pow(1 - t, 3);}
+
+    function frame(now){
+        let t = Math.min(1, (now - start) / duration);
+        let e = easeOutCubic(t);
+        let tsY = distance * e;
+        let tsX = jitter * (1 - e);
+        node.style.transform = `translate(-50%, -50%) translateY(${tsY}px) translateX(${tsX}px)`;
+        node.style.opacity = String(1 - t);
+        if(t < 1) requestAnimationFrame(frame);
+        else node.remove();
+    }
+
+    requestAnimationFrame(frame);
+}
 function kaijou(num){
     if(num == 0) return 0;
     if(num == 1) return 1;
@@ -28,8 +66,8 @@ function arraySelect(array){
 };
 function arrayShuffle(array) {
     for(let i = array.length - 1; i > 0; i--) {
-    const i2 = Math.floor(Math.random() * (i + 1));
-    [array[i], array[i2]] = [array[i2], array[i]];
+        let i2 = Math.floor(Math.random() * (i + 1));
+        [array[i], array[i2]] = [array[i2], array[i]];
     }
     return array;
 };
@@ -38,47 +76,47 @@ function arraySize(array){
     return res;
 };
 function arrayCount(array){
-    const counts = {};
-    for (let value of array) {
-    counts[value] = (counts[value] || 0) + 1;
+    let counts = {};
+    for(let value of array){
+        counts[value] = (counts[value] || 0) + 1;
     }
     return counts;
 }
 function arrayMult(array){
     return array.reduce((a, v) => a * v, 1);
 }
-function arrayGacha(array,probability){
-    if(array.length != probability.length) throw new Error("長さがあってないっす！先輩、ちゃんとチェックした方がいいっすよ〜？");
-    const total = probability.reduce((sum, p) => sum + p, 0);
+function arrayGacha(array, prob){
+    if(array.length != prob.length) throw new Error("長さがあってないっす！先輩、ちゃんとチェックした方がいいっすよ〜？");
+    let total = prob.reduce((sum, p) => sum + p, 0);
     let random = Math.random() * total;
     for (let i = 0; i < array.length; i++) {
-        if(random < probability[i]) return array[i];
-        random -= probability[i];
+        if(random < prob[i]) return array[i];
+        random -= prob[i];
     }
 };
 function hask(obj, key){
-let res = obj.hasOwnProperty(key);
-res = res ? 1 : 0;
-return res;
+    let res = obj.hasOwnProperty(key);
+    res = res ? 1 : 0;
+    return res;
 }
 function copy(moto) {
     if(Array.isArray(moto)){
         let arr = [];
-        for (let i = 0; i < moto.length; i++) {
+        for(let i = 0; i < moto.length; i++){
             arr.push(copy(moto[i]));
         }
         return arr;
     }
     else if(moto != null && typeof moto == 'object'){
         let obj = {};
-        for (let key in moto) {
-            if (moto.hasOwnProperty(key)) {
-            obj[key] = copy(moto[key]);
+        for(let key in moto){
+            if(moto.hasOwnProperty(key)){
+                obj[key] = copy(moto[key]);
             }
         }
         return obj;
     }
-    else {
+    else{
         return moto;
     }
 }
@@ -87,13 +125,13 @@ function probability(num){
     //例:num == 20 → randomが20以内ならtrue,elseならfalseを返す
 };
 function random(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+    let num = Math.floor(Math.random() * (max - min + 1)) + min;
+    return Math.floor(num);
 };
-function fl(num){
-    let res = num ? 1 : 0;
+function fl(val, arr = [0, 1]){
+    let res = val == arr[0] ? arr[1] : arr[0];
     return res;
 }
-
 function anagramSaySay(text, loop = 10, bet = '<br>'){
     let menjo = 0;
     let len = text.length;
@@ -111,7 +149,7 @@ function anagramSaySay(text, loop = 10, bet = '<br>'){
     let cal = (kaijou(len) / optmat) - 1;
 
     let loopen = loop;
-    console.log(`総数:${cal} 回数:${loopen}`);
+    // console.log(`総数:${cal} 回数:${loopen}`);
     if(cal < loopen) menjo = 1;
     
     let reses = [];
@@ -130,123 +168,115 @@ function anagramSaySay(text, loop = 10, bet = '<br>'){
     
     return reses.join(bet);
 }
+function anagramCan(mae, ato){
+    if(mae.length != ato.length) return 0;
+
+    let count = {};
+    for(let ch of mae){
+        count[ch] = (count[ch] || 0) + 1;
+    }
+
+    for(let ch of ato){
+        if(!count[ch]) return 0;
+        count[ch] -= 1;
+    }
+
+    return 1;
+}
 function setLocalStorage(name, value) {
     localStorage.setItem(name, value || "");
 }
 function getLocalStorage(name) {
     return localStorage.getItem(name);
 }
-let r = {
-    and: function(lef, rig){
-        if(lef && rig) return 1
-        return 0
-    },
-    or: function(lef, rig){
-        if(lef || rig) return 1
-        return 0
-    },
-    xor: function(lef, rig){
-        console.log('排他的論理和発動！！')
-        let l = lef ? 1 : 0
-        let r = rig ? 1 : 0
-        if(l != r) return 1
-        return 0
-    },
-    not: function(lef){
-        if(lef) return 0
-        return 1
-    },
-    nand: function(lef, rig){
-        if(lef && rig) return 0
-        return 1
-    },
-    nor: function(lef, rig){
-        if(lef || rig) return 0
-        return 1
-    },
-    xnor: function(lef, rig){
-        console.log('逆排他的論理和発動！！')
-        let l = lef ? 1 : 0
-        let r = rig ? 1 : 0
-        if(l != r) return 0
-        return 1
-    }
-}
-async function error(){
-    addtext('errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
+async function error(text = 'errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr'){
+    addtext(text)
     await delay(2000);
     // window.open('about:blank', '_self').close();
 }
 function hoshoku(color) {
-    color = color.replace(/^#/, ''); // #付きなら取る
+    color = color.replace(/^#/, '');
 
-    if(color.length != 6) return console.log('カラーコードは6桁、ですよ〜？楽しないでくださいね〜♪')
+    if(color.length != 6) return console.log('カラーコードは6桁、ですよ〜？楽しないでくださいね♪')
 
-    // RGB分解
-    const r = parseInt(color.slice(0, 2), 16);
-    const g = parseInt(color.slice(2, 4), 16);
-    const b = parseInt(color.slice(4, 6), 16);
+    let r = parseInt(color.slice(0, 2), 16);
+    let g = parseInt(color.slice(2, 4), 16);
+    let b = parseInt(color.slice(4, 6), 16);
 
-    // 補色：255から引く
-    const compR = (255 - r).toString(16).padStart(2, '0');
-    const compG = (255 - g).toString(16).padStart(2, '0');
-    const compB = (255 - b).toString(16).padStart(2, '0');
+    let compR = (255 - r).toString(16).padStart(2, '0');
+    let compG = (255 - g).toString(16).padStart(2, '0');
+    let compB = (255 - b).toString(16).padStart(2, '0');
 
-    return `#${compR}${compG}${compB}`;
+    let ato = `#${compR}${compG}${compB}`
+
+    return ato;
 }
 function mixshoku(c1, c2, ratio = 0.5) {
-    const toRGB = c => {
+    let toRGB = c => {
         c = c.replace('#', '');
         if (c.length === 3) c = c.split('').map(x => x + x).join('');
-        const n = parseInt(c, 16);
+        let n = parseInt(c, 16);
         return [n >> 16, (n >> 8) & 255, n & 255];
     };
 
-    const [r1, g1, b1] = toRGB(c1);
-    const [r2, g2, b2] = toRGB(c2);
+    let [r1, g1, b1] = toRGB(c1);
+    let [r2, g2, b2] = toRGB(c2);
 
-    const r = Math.round(r1 + (r2 - r1) * ratio);
-    const g = Math.round(g1 + (g2 - g1) * ratio);
-    const b = Math.round(b1 + (b2 - b1) * ratio);
+    let r = Math.round(r1 + (r2 - r1) * ratio);
+    let g = Math.round(g1 + (g2 - g1) * ratio);
+    let b = Math.round(b1 + (b2 - b1) * ratio);
 
-    return (
-        '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('')
-    );
+    let ato = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+
+    return ato;
 }
 //#endregion
 //#region log&text
 let textDiv = document.querySelector('#text');
 let autoDelay = 1;
-let skipText = false; // スキップフラグ
-let clearText = false; // テキスト消去フラグ
+let skipText = false;
+let clearText = false;
 let textShowing = 0;
 
 function colorcheck(rawtext) {
-    const text = [];
-    let isRed = false; // ** で囲まれた部分かどうか
-    let isPink = false; // && で囲まれた部分かどうか
-    let isBlue = false; // ^^ で囲まれた部分かどうか
+    let text = [];
+    let color = null;
+    let colors = [
+        {
+            name: 'red',
+            sym: '*',
+            col: '#ff4040'
+        },
+        {
+            name: 'pink',
+            sym: '&',
+            col: '#ff80bf'
+        },
+        {
+            name: 'yell',
+            sym: '^',
+            col: '#ffff40'
+        }
+    ]
 
     for(let i = 0; i < rawtext.length; i++){
-        if(rawtext[i] == "*" && rawtext[i + 1] == "*"){
-            isRed = !isRed; // 状態を切り替える
-            i++; // 次の * をスキップ
-        }else if(rawtext[i] == "&" && rawtext[i + 1] == "&"){
-            isPink = !isPink;
-            i++; // 次の & をスキップ
-        }else if(rawtext[i] == "^" && rawtext[i + 1] == "^"){
-            isBlue = !isBlue;
-            i++;
-        }else{
-            let color = null;
-            if(isRed) color = 'red';
-            if(isPink) color = 'pink';
-            if(isBlue) color = 'blue';
-            text.push({
-                char: rawtext[i],
-                color: color
-            });
+        let sym = false;
+        for(let c of colors){
+            if(rawtext[i] == c.sym && rawtext[i + 1] == c.sym){
+                console.log(`→${rawtext[i]}← 発見！ ${c.name}色です`)
+                color = color ? null : c.col;
+                i++;
+                sym = true;
+                break;
+            }
         }
+        
+        if(sym) continue;
+        if(color) console.log(color)
+        text.push({
+            char: rawtext[i],
+            color: color
+        });
     }
     return text;
 }
@@ -292,7 +322,7 @@ async function addtext(raw){
                 if (skipText) {
                     // スキップ処理
                     while (index < text.length) {
-                            const span = document.createElement("span");
+                            let span = document.createElement("span");
                             span.textContent = text[index].char;
                             if (text[index].color) {
                             span.classList.add(`color-${text[index].color}`);
@@ -305,7 +335,7 @@ async function addtext(raw){
                     setTimeout(type, 10);
                 } else {
                     // 通常の文字表示
-                    const span = document.createElement("span");
+                    let span = document.createElement("span");
                     span.textContent = text[index].char;
                     if (text[index].color) {
                             span.classList.add(`color-${text[index].color}`);
@@ -317,9 +347,9 @@ async function addtext(raw){
                 }
                 } else {
                 addlog(textDiv.innerHTML);
-                const waitTime = autoDelay * 1000;
-                const timeout = new Promise(resolve => setTimeout(resolve, waitTime));
-                const userAction = new Promise(resolve => {
+                let waitTime = autoDelay * 1000;
+                let timeout = new Promise(resolve => setTimeout(resolve, waitTime));
+                let userAction = new Promise(resolve => {
                     function waitToClear(event) {
                             if (event.type === 'click' || event.key === 'z' || event.key === 'Enter') {
                             document.removeEventListener('click', waitToClear);
@@ -382,30 +412,30 @@ function addlog(text){
 }
 //#endregion
 //#region description
-let movableDescription = document.getElementById('movableDescription');
+let mobileDesc = document.getElementById('mobileDesc');
 document.addEventListener('mousemove', (e) => {
-    movableDescription.style.left = `${e.clientX + 10}px`;
-    movableDescription.style.top = `${e.clientY + 10}px`;
+    mobileDesc.style.left = `${e.clientX + 10}px`;
+    mobileDesc.style.top = `${e.clientY + 10}px`;
 });
 document.addEventListener('mouseover', (e) => {
-    const descTarget = e.target.closest('[data-description]');
-    if (descTarget) {
-        const desc = descTarget.dataset.description;
-        movableDescription.innerHTML = desc;
-        movableDescription.style.display = 'block';
+    let descTarget = e.target.closest('[data-description]');
+    if(descTarget){
+        let desc = descTarget.dataset.description;
+        mobileDesc.innerText = desc;
+        mobileDesc.classList.add('show');
     }
 });
 document.addEventListener('mouseout', (e) => {
-    const descTarget = e.target.closest('[data-description]');
-    if (descTarget) {
-        movableDescription.innerHTML = '';
-        movableDescription.style.display = 'none';
+    let descTarget = e.target.closest('[data-description]');
+    if(descTarget){
+        mobileDesc.innerText = '';
+        mobileDesc.classList.remove('show');
     }
 });
 //#endregion
 //#region draggable
 document.addEventListener('mousedown', e => {
-    // const descTarget = e.target.closest('[data-description]');
+    // let descTarget = e.target.closest('[data-description]');
     let div = e.target;
     
     if(!div.classList.contains('draggable')) return;
@@ -426,52 +456,38 @@ document.addEventListener('mousedown', e => {
     document.addEventListener('mouseup', onMouseUp);
 });
 //#endregion 
-//#region observer
-let keys = {}
-document.addEventListener('keydown', e => {
-let key = e.key.toLowerCase();
-if(e.key == ' ') key = 'space';
-keys[key] = true;
-});
-document.addEventListener('keyup', e => {
-let key = e.key.toLowerCase();
-if(e.key == ' ') key = 'space';
-keys[key] = false;
-});
-
-let clicking = false;
-document.addEventListener('mousedown', () => clicking = true);
-document.addEventListener('mouseup', () => clicking = false);
-//#endregion
 //#region tk
 class tk{
     constructor(type, x = 'half', y = 'half', w = window.innerWidth/2, h = window.innerWidth/2){
         let youso = document.createElement(type);
         youso.className = `tk ${type}`;
 
+        let contex = {x, y, w, h};
+
         let yoko = ['x', 'w'];
         for(let n of yoko){
-            if(typeof eval(n) != 'string' || typeof eval(n) == 'string' && !eval(n).endsWith('%')) continue;
-            let num = eval(n).slice(0, -1);
-            eval(n) = num * window.innerWidth / 100;
+            console.log(n), console.log(eval(n));
+            if(typeof contex[n] != 'string' || typeof contex[n] == 'string' && !contex[n].endsWith('%')) continue;
+            let num = contex[n].slice(0, -1);
+            contex[n] = num * window.innerWidth / 100;
         }
 
         let tate = ['y', 'h'];
         for(let n of tate){
-            if(typeof eval(n) != 'string' || typeof eval(n) == 'string' && !eval(n).endsWith('%')) continue;
-            let num = eval(n).slice(0, -1);
-            eval(n) = num * window.innerHeight / 100;
+            if(typeof contex[n] != 'string' || typeof contex[n] == 'string' && !contex[n].endsWith('%')) continue;
+            let num = contex[n].slice(0, -1);
+            contex[n] = num * window.innerHeight / 100;
         }
 
-        console.log(x, y, w, h);
+        console.log(contex);
 
-        youso.style.width = `${w}px`;
-        youso.style.height = `${h}px`;
+        youso.style.width = `${contex.x}px`;
+        youso.style.height = `${contex.h}px`;
 
-        youso.style.left = `${x}px`;
-        youso.style.top = `${y}px`;
+        youso.style.left = `${contex.x}px`;
+        youso.style.top = `${contex.y}px`;
         
-        if(x == 'half' && y == 'half') youso.classList.add('cenXY');
+        if(contex.x == 'half' && contex.y == 'half') youso.classList.add('cenXY');
          else if(x == 'half') youso.classList.add('cenX');
          else if(y == 'half') youso.classList.add('cenY');
 
@@ -544,6 +560,71 @@ function tkTest(){
 }
 
 //#endregion
+//#region observer
+let keys = {}
+document.addEventListener('keydown', e => {
+    let key = e.key.toLowerCase();
+    if(e.key == ' ') key = 'space';
+    keys[key] = true;
+});
+document.addEventListener('keyup', e => {
+    let key = e.key.toLowerCase();
+    if(e.key == ' ') key = 'space';
+    keys[key] = false;
+});
+
+let clicking = false;
+let cricking = false;
+document.addEventListener('pointerdown', (e) => {
+    if(e.buttons == 0) clicking = true;
+    if(e.buttons == 2) cricking = true;
+});
+document.addEventListener('pointerup', (e) => {
+    if(e.buttons == 0) clicking = false;
+    if(e.buttons == 2) cricking = false;
+});
+document.addEventListener('pointercancel', (e) => {
+    if(e.buttons == 0) clicking = false;
+    if(e.buttons == 2) cricking = false;
+});
+window.addEventListener('blur', () => { clicking = cricking = false; });
+
+let mouseX = 0;
+let mouseY = 0;
+document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+});
+//#endregion
+//#region fonts
+const Fonts = [
+    // {src:'comicsans', type:'ttf'},
+];
+function fontsLoad(){
+    let id = "font_load_css";
+    let existing = document.getElementById(id);
+    if(existing) existing.remove();
+
+    let css = Fonts.map(f => {
+        let src = `url('assets/${f.src}.${f.type}')`;
+        let weight = f.weight ?? 'normal';
+        return `@font-face{
+            font-family:'${f.src}';
+            src: ${src};
+            font-weight: ${weight};
+            font-style: normal;
+            font-display: swap;
+        }`;
+    }).join('\n');
+
+    let el = document.createElement('style');
+    el.id = id;
+    el.type = 'text/css';
+    el.appendChild(document.createTextNode(css));
+    document.head.appendChild(el);
+}
+fontsLoad();
+//#endregion
 
 
 //#region Re:connection!!
@@ -613,21 +694,21 @@ function connect(){
             inv_pick(0, 0, 0);
         }
 
-        if(mes.startsWith('js_get,')){
+        else if(mes.startsWith('js_get,')){
             let lis = mes.split(',');
             let [, name, num] = lis;
             for(let i = 0; i < +num; i++) get(name);
         }
         
-        if(mes.startsWith('sendjs_loadlis_')){
+        else if(mes.startsWith('sendjs_loadlis_')){
             savF.load(mes.slice(15));
         }
 
-        if(mes.startsWith('sendpy')) sendpy(mes.slice(7)); // asdasd
+        else if(mes.startsWith('sendpy')) sendpy(mes.slice(7)); // asdasd
         
-        if(mes == 'helasu') inv_pick_decr();
+        else if(mes == 'helasu') inv_pick_decr();
 
-        if(mes.startsWith('takarabox_')){
+        else if(mes.startsWith('takarabox_')){
             sendpyTx(`create_inventry_${name}_100_100_25_101325_100_111325_-100_None'`)
             //takarabox_${name}_${レア度}
             let [name, rare] = mes.substr(10).split("_")
@@ -640,6 +721,11 @@ function connect(){
                 sendpyTx(`input_item_${name}_50_50_${item}`)
             }
         }
+
+        else if(mes == 'hp_change_'){
+            let [,,code, num] = mes.split("_")
+            HeaF.updw(code, num??1);
+        } 
     };
 }
 
@@ -814,7 +900,6 @@ savF.yomikomi = () => {
 savF.dele = async function(){
     let ok = 0;
 
-
     let lis = [
         ['ほんとうに セーブデータを 削除しますか？', '#ffab91'],
         ['えまじ？？いいの？？？','#a82700'],
@@ -824,13 +909,22 @@ savF.dele = async function(){
     for(let l of lis){
         let [text, iro] = l;
         
-        
         let mono = new tk('t', 'half', 'half', window.innerWidth/2, 300);
         mono.classAdd('mostop')
         mono.styleAdd({background: iro});
         mono.evAdd('click', () => {
             ok = 1;
             mono.remove();
+        });
+
+        let XD = new tk('div', '80%', 'half', 50, 50);
+        XD.classAdd('saveXD');
+        XD.classAdd('mostop');
+        XD.styleAdd({textAlign: 'right'});
+        XD.youso.innerText = 'x';
+        XD.evAdd('click', () => {
+            addtext('ふん..臆したか....');
+            return;
         });
 
         let span = new tk('div', 'half', 'half', window.innerWidth/2, 100);
@@ -841,12 +935,16 @@ savF.dele = async function(){
         mono.youso.appendChild(span.youso);
 
         mono.append();
+        XD.append();
         while(!ok) await delay(10);
 
         ok = 0;
-        if(iro != '#fed0c1') await delay(1000);
     }
 
+    // 消すわよ～～ん♡♡
+    let name = titC.selD.value;
+    if(!name) return addtext('寝言はセーブしてから言おうねっ！');
+    sendpyTx(`rem_save_${name}`);
 }
 
 //꒰𑁬⎛ಲළ൭⎞໒꒱
@@ -1195,11 +1293,8 @@ titC.selD.addEventListener('mouseover', () => {
     if(!loop) return
     sendpyTx('get_savedataname');
 })
-titC.delD.addEventListener('click', () => {
-    //let num = titC.selD.selectedIndex;
-    //let name = titC.selD.options[num].textContent;
-    let name = titC.selD.value
-    sendpyTx(`rem_save_${name}`);
+titC.delD.addEventListener('click', async() => {
+    await savF.dele();
 });
 
 titC.setD.addEventListener('click',() => {
@@ -1486,7 +1581,7 @@ undC.checks = [
     },
     {
         name:'follow',
-        kitei:1,
+        kitei:0,
         pro:10,
         func: () => {
             makeNotice();
@@ -1555,14 +1650,13 @@ undF.load = () => {
     }
 
     for(let slid of undC.slids){
-        // let div = document.createElement('div');
-        // div.className = `slid ${slid.name}`;
+        let div = document.createElement('div');
+        div.className = `slid ${slid.name}`;
         
         let text = document.createElement('div');
         text.className = 'label';
         text.textContent = `${slid.jpnm}:`;
-        // div.appendChild(text);
-        undC.sliD.appendChild(text);
+        div.appendChild(text);
         
         let range = document.createElement('input')
         range.type = "range"
@@ -1571,13 +1665,17 @@ undF.load = () => {
         range.value = 50;
         range.step = 1;
         range.addEventListener('input', (e) => {
-            if(slid.name != 'sound') return;
-            soundVolume(e.target.value)
+            switch(slid.name){
+                case 'sound':
+                    soundVolume(e.target.value);
+                    break;
+                default:
+                    break;
+            }
         })
-        // div.appendChild(range);
-        undC.sliD.appendChild(range)
+        div.appendChild(range);
 
-        // undC.sliD.appendChild(div)
+        undC.sliD.appendChild(div)
     }
 
     for(let foot of undC.foots){
@@ -1632,80 +1730,6 @@ achF.tog = () => {
     achD.classList.toggle('tog');
 }
 
-//#endregion
-
-//#region fontChange
-let fontD = document.getElementById('fonts')
-let fontC = {
-    now: 0,
-    max: null,
-    font: 'comicsans',
-    appe: 0
-}
-let fontF = {};
-fontF.load = () => {
-    let arr = Fonts.filter(a => a.able);
-    fontC.max = arr.length;
-    for(let a of arr){
-        let div = document.createElement('div');
-        div.className = 'f';
-        div.setAttribute('data-name', a.name);
-        div.setAttribute('data-description', a.desc);
-
-        let name = document.createElement('div');
-        name.className = 'name';
-        name.textContent = a.name;
-        div.appendChild(name);
-
-        fontD.appendChild(div);
-    };
-}
-fontF.tekiou = () => {
-    let items = fontD.querySelectorAll('.f');
-    items.forEach(a => {
-        if(a.classList.contains('selected')) a.classList.remove('selected')
-    })
-    items[fontC.now - 1].classList.add('selected')
-    fontC.font = items[fontC.now - 1].getAttribute('data-name');
-}
-fontF.select = () => {
-    fontC.ing = 0;
-    fontD.style.display = 'none';
-    fontF.change(fontC.font);
-}
-fontF.change = (font) => {
-    Style.font.textarea = font;
-    Style.tekiou();
-}
-
-document.addEventListener('keydown', event => {
-    if(event.key == "Shift"){
-        if(fontC.ing) return;
-        fontD.style.display = "flex";
-        fontC.ing = 1;
-    }
-});
-document.addEventListener('keyup', (event) => {
-    if(fontC.ing){
-        switch(event.key){
-            case 'ArrowDown':
-            case 'ArrowRight':
-                fontC.now += 1;
-                if(fontC.max < fontC.now) fontC.now = fontC.max;
-                fontF.tekiou()
-                break;
-            case 'ArrowUp':
-            case 'ArrowLeft':
-                fontC.now -= 1;
-                if(fontC.now < 1) fontC.now = 1;
-                fontF.tekiou()
-                break;
-            case 'Shift':
-                fontF.select();
-                break;
-        };
-    }
-})
 //#endregion
 
 //#region rainbow
@@ -2046,6 +2070,66 @@ document.addEventListener('mouseleave', () => {
 
 //#endregion イシイ
 
+//#region Blue Hearts
+
+//<img src="assets/images/systems/heart.png"/>
+let HeaD = document.getElementById('health');
+let HeaC = {
+    barD: HeaD.querySelector('.bar'),
+    max: 20,
+    now: 20
+}
+let HeaF = {};
+
+HeaF.load = () => {
+    for(let i = 0; i < 10; i++){
+        let img = document.createElement('img');
+        img.src = 'assets/images/systems/heart.png';
+        HeaC.barD.appendChild(img);
+    }
+    HeaF.tekiou();
+}
+
+HeaF.tekiou = () => {
+    HeaC.barD.innerHTML = '';
+    let max = HeaC.max;
+    let now = HeaC.now;
+    // nowを2で割って、商をval, 余りをsoloとする
+    let [val, solo] = [Math.floor(now/2), now%2];
+    for(let i=0; i<(val+solo); i++){
+        let img = document.createElement('img');
+        img.src = 'assets/images/systems/heart.png';
+        if(i == val && solo) img.src = 'assets/images/systems/heart_cake.png';
+        HeaC.barD.appendChild(img);
+    }
+    
+}
+
+HeaF.updw = (code, num = 1) => {
+    // for(let i = 0; i < num; i++){
+    //     if(code == "+"){
+    //         let img = document.createElement('img');
+    //         img.src = 'assets/images/systems/heart.png';
+    //         // HeaD.appendChild(img);
+    //         HeaD.appendChild(img);
+    //     }else if(code == "-"){
+    //         // HeaD.children[0].remove()
+    //         HeaD.children[0].remove()
+    //     }
+    // }
+
+    // return;
+    
+    if(code == '-') num *= -1;
+    HeaC.now += num;
+    if(HeaC.now > HeaC.max) HeaC.now = HeaC.max;
+    if(HeaC.now < 0) HeaC.now = 0;
+
+    HeaF.tekiou();
+}
+
+//#endregion
+
 //#region 売るところ
 let salD = document.getElementById('salen');
 let salC = {
@@ -2159,6 +2243,8 @@ gamF.load = () => {
         gamC.lobyD.querySelector('.row').appendChild(div);
     }
 }
+
+
 
 gamF.move = async function(to){
     if(gamC.moving) return;
@@ -3184,11 +3270,11 @@ function start(){
     
     titF.focusInput();
     inv_make();
+    HeaF.load()
     map_load()
     map_make();
     sideLF.load();
-    undF.load()
-    fontF.load();
+    undF.load();
     canC.resize();
     gamF.load();
     bleF.resize();
@@ -3421,8 +3507,6 @@ soundsNames.forEach(num => {
         soundsLoaded++;
         if(imgC.imagesLoaded == imgC.imagesTotal && soundsLoaded == totalsounds) start();
     }, {once: true});
-
-
     sound.onerror = () => {
         console.error(`Sound ${num} failed to load.`);
         soundsLoaded++;

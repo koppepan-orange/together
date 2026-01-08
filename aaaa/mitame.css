@@ -1,12 +1,3 @@
-@font-face{src:url('assets/fonts/comicsans.ttf');font-family: comicsans;}
-@font-face{src:url("assets/fonts/hangyaku.ttf");font-family: hangyaku; }
-@font-face{src:url('assets/fonts/kurobara.ttf');font-family: kurobara;}
-@font-face{src:url('assets/fonts/starrysky.otf');font-family: starrysky;}
-@font-face{src:url('assets/fonts/kurundeco.otf');font-family: kurundeco;}
-@font-face{src:url('assets/fonts/urara.otf');font-family: urara;}
-@font-face{src: url("assets/fonts/hackgen.ttf");font-family: hackgen;}
-@font-face{src:url('assets/fonts/craft.otf');font-family: craft;}
-@font-face{src: url("assets/fonts/misaki.ttf");font-family: misaki;}
 html{
     margin: -8px;
     overflow: hidden;
@@ -26,11 +17,7 @@ html{
 }
 
 img{
-    /* 画像をドラッグできないようにするやつ */
     -webkit-user-drag: none;
-    -khtml-user-drag: none;
-    -moz-user-drag: none;
-    -o-user-drag: none;
 }
 ::-webkit-scrollbar{
     display: none;
@@ -39,38 +26,38 @@ img{
     outline: none;
 }
 
-
-
-
-.checkbox{
-    display: flex;
-    flex-direction: row;
-    gap: 3px;
-}
-.checkbox .box{
-    width: 25px;
-    aspect-ratio: 1/1;
-    background: #b2b2b2;
-    border: solid 2px #2b2b2b;
-    cursor: pointer;
-}
-.checkbox.tog .box{
-    background: #23c51a;
-}
-
-/*nicotext*/
+/* #region nicotext */
 .nicotext{
     position: fixed;
     top: 0;
     right: 0;
-    background: #f0f8ff80;
+    background-color: #f0f8ff80;
     color: #000000;
     font-size: 20px;
     transition: right 2.0s linear;
     white-space: nowrap;
     pointer-events: none;
 }
-/*logとtext*/
+/* #endregion */
+
+/* #region tobitext */
+.tobitext{
+    opacity: 1;
+    padding: 4px 8px;
+    background: rgba(0,0,0,0.72);
+    border-radius: 8px;
+    transform: translate(-50%, -50%) translateY(0px);
+    white-space: nowrap;
+    color: #ffffff;
+    position: absolute;
+    transition: none;
+    z-index: 2147483647;
+    pointer-events: none;
+}
+/* #endregion */
+
+
+/* #region logとtext */
 #log{
     display: flex;
     flex-direction: row;
@@ -92,7 +79,7 @@ img{
 #log .opener{
     width: 30px;
     height: 100%;
-    background: #000000ef;
+    background-color: #000000ef;
     text-align: center;
     cursor: pointer;
     z-index: inherit;
@@ -102,7 +89,7 @@ img{
     height: 100%;
     max-height: 100%;
     overflow-x: hidden; overflow-y: scroll;
-    background: #000000de;
+    background-color: #000000de;
     text-align: left;
     font-size: 14px;
     transition: right 0.3s;
@@ -143,20 +130,24 @@ img{
 .color-blue{
     color: #1919ff;
 }
+/* #endregion */
 
-/* description */
-#movableDescription{
+/* #region description */
+#mobileDesc{
     display: none;
     position: fixed;
     pointer-events: none;
-    background: #363636e2;
+    background-color: #363636e2;
     color: #f0f8ff;
     text-align: left;
     padding: 5px 10px;
     border-radius: 5px;
     z-index: 256;
 }
-
+#mobileDesc.show{
+    display: block;
+}
+/* #endregion */
 
 /* #region tk */
 .tk{
@@ -285,15 +276,13 @@ img{
     scale: 1.2
 }
 #titleArea .bt.set{
-    justify-content: none;
-    align-items: none;
-    width: 5%;
+    width: 60px;
     aspect-ratio: 1/1;
     position: fixed;
-    right: 0%;
-    top: 0%;
+    top: 0;
+    right: 0;
+    padding: 0;
     object-fit: cover;
-    padding: 0px 0px;
     overflow: hidden;
     cursor: pointer;
 }
@@ -518,6 +507,12 @@ img{
 /* #endregion */
 
 /* #region save */
+.saveXD{
+    display: block;
+    font-size: 50px;
+    font-family: misaki;
+    color: #000000;
+}
 #save{
     display: flex;
     flex-direction: column;
@@ -884,32 +879,30 @@ img{
     align-items: center;
     row-gap: 25px;
     width: 100%;
-    /* height: fit-content; */
-    height: 30px;
+    height: fit-content;
     padding: 20px 0px;
-    /* grid-template-rows: repeat(auto-fit,50px 250px); */
-    grid-template-columns: repeat(auto-fit,50px 250px);
+    grid-template-columns: repeat(auto-fit, 450px);
 }
-/* #underBar .slider .slid{ 
+#underBar .slider .slid{ 
     display: flex;
     flex-direction: row;
     gap: 4px;
-} */
-#underBar .slider .label{
+}
+#underBar .slider .slid .label{
     display: flex;
     flex-direction: row;
     font-size: 19.5px;
     pointer-events: none;
 }
-#underBar .slider input{
-    /* width: 75%; */
+#underBar .slider .slid input{
+    width: 75%;
     appearance: none;
     height: 8px;
     background: #202020;
     border: solid 1px #9d9d9d;
     outline: none;
 }
-#underBar .slider input::-webkit-slider-thumb{
+#underBar .slider .slid input::-webkit-slider-thumb{
     -webkit-appearance: none;
     appearance: none;
     width: 15px;
@@ -918,7 +911,7 @@ img{
     border: solid 1px #202020;
     cursor: pointer;
 }
-#underBar .slider input::-moz-range-thumb {
+#underBar .slider .slid input::-moz-range-thumb {
     width: 15px;
     height: 35px;
     background: #9d9d9d;
@@ -1012,33 +1005,38 @@ img{
 #mainArea{
     flex-wrap: wrap;
 }
+
 #health{
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-    width: 700px;
-    position: absolute;
-    top: 10px;
+    display: block;
+    width: max(50%, 300px);
+    position: fixed;
+    top: 15px;
     right: 10px;
+    z-index: 5;
 }
-#health:not(:fullscreen){
+#health .bar{
     display: grid;
-    /* display: flex; */
-    /* flex-direction: row;
-    justify-content: flex-start;
-    align-items: center; */
-    grid-template-columns: 700px repeat(5, 10%);
-    /* grid-template-rows: repeat(2, 10%); */
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    justify-items: center;
+    grid-template-columns: repeat(auto-fill, calc(10% - 10px));
+    grid-column-gap: 10px;
+    grid-row-gap: 5px;
 }
-#health {
-    /* grid-column-start: 1; */
+#health .bar.oo{
+    grid-row-gap: -5px;
+    
+}
+#health img{
     width: 100%;
-    aspect-ratio: 1;
+    aspect-ratio: 1/1;
 }
 #inventory{
-    display: block;
-    width: 700px;
+    display: grid;
+    width: min(100%, 700px);
+    grid-template-columns: repeat(auto-fit,700px);
+    grid-template-rows: 70px 70px;
     aspect-ratio: 9/5;
     padding: 10px;
     position: fixed;
@@ -1046,9 +1044,12 @@ img{
     left: 5px;
     box-sizing: border-box;
     pointer-events: none;
-    z-index: 4;
+    z-index: 5;
 }
 #inventory .row{
+    width: min(100%, 700px);
+    /* height: 50px; */
+    aspect-ratio: 10/5;
     gap: var(--inv_colG)
 }
 #inventory .opener{

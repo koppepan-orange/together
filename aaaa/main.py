@@ -280,9 +280,11 @@ async def handler(websocket):
                 inventry[str(x[0])][6][x[1]]+=x[2]
             elif message[:16]=="create_inventry_":#f"create_invryentry_{name}_{windth}_{higth}_{onndo}_{aturyoku}_{tainetuMAX}_{taiatu}_{taiatuMIN}_{zokusei}"
                 x=message[16:].split("_")
-                inventry[x[0]]=[[],float(x[1]),float(x[2]),float(x[3]),float(x[4]),tem.copy(),tem.copy(),float(x[5]),float(x[6]),float(x[7]),str(x[8])]
-                inventry[x[0]][6]["酸素"]=float(x[1])*float(x[2])*0.2095
-                inventry[x[0]][6]["窒素"]=float(x[1])*float(x[2])*0.7808
+                if len(x)>1:
+                    inventry[x[0]]=[[],float(x[1]),float(x[2]),float(x[3]),float(x[4]),tem.copy(),tem.copy(),float(x[5]),float(x[6]),float(x[7]),str(x[8])]
+                    inventry[x[0]][6]["酸素"]=float(x[1])*float(x[2])*0.2095
+                    inventry[x[0]][6]["窒素"]=float(x[1])*float(x[2])*0.7808
+                await open_inventry(x[0])
             elif message[:14]=="open_inventry_" and message[14:] not in flag["inventry_name"]:#f"open_inventry_{name}"
                 await open_inventry(message[14:])
             #elif message[:15]=="save_data_load_":
@@ -514,14 +516,20 @@ async def change_yuuten(motono_yuuten:int,motono_kiatu:int,atono_kiatu:int,j_mol
         return float("inf")
     except ValueError:
         return 0.0
+
+async def runaway(num,way): #hitboxで埋まったときに移動するyou
+    if way=="top" or way=="left":
+        num -= 3
+    else:
+        num += 3
+    return num
+        
         
 #filled = {} # [x= , y= , dens] cmd "cls&start tree /f C:"
 num = 0
 async def hitbox(ichi, ichiD, dens, name, width, hight): 
     save=ichi
-    #ichiD=[["name",]...]　#気体密度,3,3/沸点　　←melt-yがわからん..というか今のところこれ使ってない
     #ichi=[x,y,ax,ay,item]
-    #cccc=name,融点 (℃),沸点 (℃),固体密度 (g/cm3) (20℃),液体密度,気体密度,融点気圧(Pa),沸点気圧(Pa),m3/mol,誘拐熱(J/mol),蒸発熱(J/mol),コメント
     #dens= 固体密度
     #print(f"filled1:{filled}")
     global inventry2
@@ -579,9 +587,20 @@ async def hitbox(ichi, ichiD, dens, name, width, hight):
 
         #移動後代入
         
-        if ichi[0] not in filled or ichi[1] not in filled: #iranasou
-            filled[num] = [ichi[0], ichi[1]]
+        
+        if ichi[0]//2 not in filled or ichi[1]//2 not in filled: #nameごとに判定して、二回目の判定でfilledが消えてるので先に判定されるのが埋まる
+            filled[num] = [ichi[0]//2, ichi[1]//2]
             num += 1
+        """
+        else:
+            #左右か上下のどちらのほうが早く埋まっている状態から抜け出せるか判定...する予定
+            while True:
+
+                ichi_kari = await runaway()  #上で判定した方向に合わせてichi[1]とichi[2]を変更  checkpoint
+
+                if ichi[0]//2 not in filled or ichi[1]//2 not in filled:
+                    break
+        """
 
         try:
             inventry2[name][0].remove(save)
@@ -597,44 +616,6 @@ async def hitbox(ichi, ichiD, dens, name, width, hight):
         # inventry2[name][0][idx][3] = ichi[3]
 
     await asyncio.sleep(0.1)
-
-"""
-        if ichi[1] > hight or ichi[1] < 0 :
-
-            if ichi[1] > hight:
-                ichi[1] = hight
-                ichi[3] = 0
-            
-            if ichi[1] < 0:
-                ichi[1] = 0
-                ichi[3] -= ichi[3]*0.9
-
-        if ichi[0] > width or ichi[0] < 0:
-            
-            if ichi[0]*2 > width:
-                ichi[0] = width
-                ichi[2] -= ichi[2]*0.9
-            
-            if ichi[0]*2 < 0:
-                ichi[0] = 0
-                ichi[2] -= ichi[2]*0.9
-
-        if ichi[0] not in filled or ichi[1] not in filled:#elseを作る
-
-            filled[num] = [ichi[0],ichi[1]] #index[0]の値で埋まってるか判定　エラーのもとだよ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
-            num += 1
-        print(ichi)
-
-    await asyncio.sleep(0.1)
-
-        inventry2[name][0][count][0] = ichi[0]
-        inventry2[name][0][count][1] = ichi[1]
-        inventry2[name][0][count][2] = ichi[2]
-        inventry2[name][0][count][3] = ichi[3] 
-    
-
-    #print("filled2:" + str(filled))
-    """
 
 async def change_taiseki(cm3:float,g_cm3_moto:float,g_cm3_ato:float):
     #print("cm3",cm3,"g/cm3_moto",g_cm3_moto,"g/cm3_ato",g_cm3_ato))
