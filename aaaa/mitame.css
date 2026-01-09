@@ -348,9 +348,8 @@ img{
 /* #endregion */
 
 #mainArea{
-    width: calc(100vw - 80px);
-    height: calc(100vh - 80px);
-    /* height: 100vh; */
+    width: 100vw;
+    height: 100vh;
     padding: 40px;
     background: #f0f8ff;
     position: relative;
@@ -1008,11 +1007,16 @@ img{
 
 #health{
     display: block;
+    opacity: 0.75;
     width: max(50%, 300px);
     position: fixed;
     top: 15px;
     right: 10px;
     z-index: 5;
+    pointer-events: none;
+}
+#health.oo{
+    top: 65px;
 }
 #health .bar{
     display: grid;
@@ -1024,13 +1028,15 @@ img{
     grid-column-gap: 10px;
     grid-row-gap: 5px;
 }
-#health .bar.oo{
-    grid-row-gap: -5px;
-    
-}
 #health img{
+    margin-top: 0;
+    display: block;
     width: 100%;
     aspect-ratio: 1/1;
+    object-fit: cover;
+}
+#health.oo img{
+    margin-top: -50px;
 }
 #inventory{
     display: grid;
@@ -1470,27 +1476,47 @@ img{
 #gachan.tog{
     left: 0;
 }
+
+#gachan .change{
+    display: block;
+    width: 40px;
+    aspect-ratio: 1/1;
+    border-radius: 15px 0 0 15px;
+    background: #3535ff;
+    position: absolute;
+    top: 10px;
+    right: 0;
+    color: #ffffff;
+    font-size: 40px;
+    font-family: webdings;
+    content: "q";
+    cursor: pointer;
+    z-index: 10;
+}
+
 #gachan .hontai{
+    display: none;
     width: 100px;
     height: 150px;
     position: relative;
     box-sizing: border-box;
 }
+#gachan .hontai.show{
+    display: block;
+}
 #gachan .hontai .kyuu{
     width: 80%;
     aspect-ratio: 1 / 1;
-    background: #cfe9ff;
     border-radius: 50%;
     position: absolute;
     top: 15%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%);    
     z-index: 5;
 }
 #gachan .hontai .sita{
     width: 80%;
     height: 90%;
-    background: #ac4a08;
     clip-path: polygon(40% 0%, 60% 0%, 100% 100%, 0% 100%);
     position: absolute;
     bottom: 0;
@@ -1499,16 +1525,28 @@ img{
     z-index: 4;
 }
 #gachan .hontai .sita .maru{
-    width: 30%;
+    width: 40%;
     aspect-ratio: 1 / 1;
-    background: #d1793f;
     border-radius: 50%;
     position: absolute;
-    bottom: 12%;
+    bottom: 6%;
     left: 50%;
     transform: translateX(-50%);
     z-index: 4;
 }
+
+#gachan .hontai.a .kyuu{background: #cfe9ff}
+#gachan .hontai.a .sita{background: #ac4a08}
+#gachan .hontai.a .sita .maru{background: #d1793f}
+
+#gachan .hontai.b .kyuu{background: #ffd7d7}
+#gachan .hontai.b .sita{background: #ff6868}
+#gachan .hontai.b .sita .maru{background: #ff83d4}
+
+#gachan .hontai.c .kyuu{background: #cfffd2}
+#gachan .hontai.c .sita{background: #0c5917}
+#gachan .hontai.c .sita .maru{background: #70ac72}
+
 /* #endregion */
 
 /* #region 素材集めcanvas */

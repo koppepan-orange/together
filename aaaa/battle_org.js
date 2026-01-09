@@ -177,8 +177,6 @@ function makeHuman(cam, me){
 
 //#region きゃらのせんたく〜
 async function sele(){
-    if(batC.now) return
-
     let id = 'errored!!'
     id = await new Promise((mis) => {
         function clicked(ev){
@@ -649,7 +647,8 @@ async function dassyutsu(){
     disappear();
     batD.classList.remove('tog');
     
-    canC.get(0).moving = 0;
+    draw()
+    movable = 1;
     await addtext('うまく逃げ切れた！');
 }
 

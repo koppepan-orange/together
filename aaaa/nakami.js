@@ -598,7 +598,15 @@ document.addEventListener('mousemove', (e) => {
 //#endregion
 //#region fonts
 const Fonts = [
-    // {src:'comicsans', type:'ttf'},
+    {src:'comicsans', type:'ttf'},
+    {src:'craft', type:'otf'},
+    {src:'hackgen', type:'ttf'},
+    {src:'hangyaku', type:'ttf'},
+    {src:'kurobara', type:'ttf'},
+    {src:'kurundeco', type:'otf'},
+    {src:'misaki', type:'ttf'},
+    {src:'starrysky', type:'otf'},
+    {src:'urara', type:'otf'},
 ];
 function fontsLoad(){
     let id = "font_load_css";
@@ -606,7 +614,7 @@ function fontsLoad(){
     if(existing) existing.remove();
 
     let css = Fonts.map(f => {
-        let src = `url('assets/${f.src}.${f.type}')`;
+        let src = `url('assets/fonts/${f.src}.${f.type}')`;
         let weight = f.weight ?? 'normal';
         return `@font-face{
             font-family:'${f.src}';
@@ -2072,7 +2080,6 @@ document.addEventListener('mouseleave', () => {
 
 //#region Blue Hearts
 
-//<img src="assets/images/systems/heart.png"/>
 let HeaD = document.getElementById('health');
 let HeaC = {
     barD: HeaD.querySelector('.bar'),
@@ -2094,36 +2101,38 @@ HeaF.tekiou = () => {
     HeaC.barD.innerHTML = '';
     let max = HeaC.max;
     let now = HeaC.now;
-    // nowを2で割って、商をval, 余りをsoloとする
-    let [val, solo] = [Math.floor(now/2), now%2];
-    for(let i=0; i<(val+solo); i++){
+    // nowを2で割って、商をval, 余りをsoloとする。でvalはheart。soloがあるかないかはわからない。数が奇数ならあり、偶数ならなし。soloがあるならば、最後のハートはheart_cakeになる。また、nowがmaxを超えることもある。その場合は超えた分はheart_exになる。heart_exかつ奇数かつ最後ならばheart_ex_cakeになる。
+
+    let val = Math.floor(now/2);
+    let solo = now%2;
+    let hearts = val+solo;
+    let maxHs = Math.ceil(max/2);
+    let outHs = hearts - maxHs;
+     if(outHs < 0) outHs = 0;
+    let innHs = hearts - outHs;
+    
+    for(let i=0; i<hearts; i++){
+        let src = "heart";
+        let ex = innHs <= i;
+        let cake = solo && i == hearts-1;
+
+        if(ex) src += "_ex";
+        if(cake) src += "_cake";
+
         let img = document.createElement('img');
-        img.src = 'assets/images/systems/heart.png';
-        if(i == val && solo) img.src = 'assets/images/systems/heart_cake.png';
+        img.src = `assets/images/systems/${src}.png`;
         HeaC.barD.appendChild(img);
     }
-    
+
+    if(hearts > 50) HeaD.classList.add('oo');
+    else HeaD.classList.remove('oo');
 }
 
 HeaF.updw = (code, num = 1) => {
-    // for(let i = 0; i < num; i++){
-    //     if(code == "+"){
-    //         let img = document.createElement('img');
-    //         img.src = 'assets/images/systems/heart.png';
-    //         // HeaD.appendChild(img);
-    //         HeaD.appendChild(img);
-    //     }else if(code == "-"){
-    //         // HeaD.children[0].remove()
-    //         HeaD.children[0].remove()
-    //     }
-    // }
-
-    // return;
-    
     if(code == '-') num *= -1;
     HeaC.now += num;
-    if(HeaC.now > HeaC.max) HeaC.now = HeaC.max;
-    if(HeaC.now < 0) HeaC.now = 0;
+    if(HeaC.now < 1) HeaC.now = 1;
+    // 上限は超えても良いものとする。
 
     HeaF.tekiou();
 }
@@ -2415,11 +2424,6 @@ canC.ctx.fillStyle = '#ffffff';
 canC.ctx.clearRect(0, 0, canV.width, canV.height);
 window.addEventListener('resize', canC.resize);
 
-
-
-
-
-
 async function drawGrid(){
     canC.ctx.strokeStyle = '#555555';
     for(let i = 0; i <= canC.mas; i++){
@@ -2675,8 +2679,10 @@ canV.addEventListener('click', e => {
 //#region gacha
 let gacD = document.getElementById('gachan');
 let gacC = {
-    open: 0,
-    mawasuD: gacD.querySelector('.hontai .sita .maru')
+    open:0,
+    mode:"a",
+    actB:gacD.querySelectorAll('.hontai .sita .maru'),
+    chanD:gacD.querySelector('.change')
 }
 let gacF = {};
 gacF.tog = () => {
@@ -2684,8 +2690,47 @@ gacF.tog = () => {
     gacD.classList.toggle('tog');
 }
 
-gacC.list = {};
-gacF.roll = (code = 0) => {
+gacF.act = () => {
+    let mode = gacC.mode;
+    gacF[mode]();
+}
+for(let a of gacC.actB) a.addEventListener('click', gacF.act);
+
+gacC.Modes = [
+    {
+        name:"a",
+        jpnm:"Friend",
+        desc:"未来の巨匠koppepan_orangeの手がけたロント・コネクト...\nのキャラたちがやってきた！！\n引け！！！！"
+    },
+    {
+        name:"b",
+        jpnm:"Various",
+        desc:"なんかいろいろ出る！！\nほぼほぼしょぼいぞ！でも演出はすごい！！\n引け！！！！"
+    },
+    {
+        name:"c",
+        jpnm:"Errored",
+        desc:"これは..故障中だ！\nしばし待たれよ！！"
+    }
+]
+gacF.change = (code = 0) => {
+    let arr = gacC.Modes.map(a => a.name);
+    let name = gacC.mode;
+     if(typeof code == 'string') name = code;
+    let now = arr.indexOf(name);
+    let next = now + 1;
+    if(next >= arr.length) next = 0;
+    name = arr[next];
+    gacC.mode = name;
+
+    for(let a of arr) gacD.querySelector(`.hontai.${a}`).classList.remove('show');
+    gacD.querySelector(`.hontai.${name}`).classList.add('show');
+}
+gacC.chanD.addEventListener('click', gacF.change);
+
+
+gacC.listA = {};
+gacF.a = (code = 0) => {
     if(typeof code != 'number') code = 0, console.error('なんかコードが数値じゃなかったんですケド〜？ 0にしておきますね〜♪');
 
     let list = [
@@ -2707,35 +2752,43 @@ gacF.roll = (code = 0) => {
     let n = `${item.name} [☆ ${s}]`;
     // if(s == 3) n = `ミミミミ   ${n}   ミミミミ`;
     
-    if(!gacC.list[item.name]) gacC.list[item.name] = 0;
-    gacC.list[item.name] += 1;
+    if(!gacC.listA[item.name]) gacC.listA[item.name] = 0;
+    gacC.listA[item.name] += 1;
     
+    sendpyTx(`printTx,${n}`);
     return n;
 }
-gacF.main = () => {
-    let item = gacF.roll();
-    sendpyTx(`printTx,${item}`);
-}
-gacC.mawasuD.addEventListener('click', gacF.main);
-
 gacF.appe = () => {
-    let arr0 = Object.keys(gacC.list);
+    let arr0 = Object.keys(gacC.listA);
     let arr = [] 
     for(let name of arr0){
-        let num = gacC.list[name];
-        let text = `${name}(☆)`;
+        let num = gacC.listA[name];
+        let text = `${name}(☆${Friends.find(a => a.name == name).rare})`;
 
-        let text2 =  1 < num ? text2 = ` ${num-1}凸` : '';
+        let text2 =  1 < num ? ` [${num-1}凸]` : '';
         
         let text3 = '';
-        if(10 < num) text3 = '被りすぎだろwww';
-        if(23 < num) text3 = 'な、なんかごめんね？w';
-        if(40 < num) text3 = 'ほんとに..ごめんなさい....';
-        if(99 < num) text3 = '一周回ってこれはあなたが悪いっすよ';
+        if(10 < num) text3 = '  ←被りすぎだろwww';
+        if(23 < num) text3 = '  ←な、なんかごめんね？w';
+        if(40 < num) text3 = '  ←うん..えと....はい。ごめんなさい';
+        if(99 < num) text3 = '  ←一周回ってこれはあなたが悪いっすよ';
 
-        arr.push([name, gacC.list[name]]); //名前, 数
+        // arr.push([name, gacC.listA[name]]); //名前, 数
+        arr.push(`${text}${text2}${text3}`);
     }
+
+    let text = arr.join('\n');
+    sendpyTx(`printTx,${text}`);
 }
+
+gacF.b = () => {
+    // https://scratch.mit.edu/projects/971489912/fullscreen/   
+}
+
+gacF.c = () => {
+    sendpyTx('砂埃[☆0]')
+}
+
 //#endregion
 
 //#region jamer_popup
@@ -2906,8 +2959,8 @@ window.__ghost = {
 //#endregion
 
 //#region battle
-mapmakeD.addEventListener('click', sele);
-mapmakeD.addEventListener('contextmenu', encount);
+mapmakeD.addEventListener('click', () => sele());
+mapmakeD.addEventListener('contextmenu', () => encount());
 
 //あとはbattle.jsに記述
 
