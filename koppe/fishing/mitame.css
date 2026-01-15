@@ -1,0 +1,32 @@
+.test-target{
+    width: 300px;
+    aspect-ratio: 1/1;
+    background: #ad4315;
+    position: fixed;
+    right: 50px;
+    top: 30%;
+    cursor: pointer;
+    user-select: none;
+}
+
+.column{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 70%;
+    height: fit-content;
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    padding-bottom: 40px;
+}
+.column .ls{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    aspect-ratio: 6/1;
+    border-radius: 20px;
+    border: 3px solid #5dc4ff;   
+}

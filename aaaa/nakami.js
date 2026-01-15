@@ -2092,13 +2092,13 @@ HeaF.load = () => {
     for(let i = 0; i < 10; i++){
         let img = document.createElement('img');
         img.src = 'assets/images/systems/heart.png';
-        HeaC.barD.appendChild(img);
+        HeaD.appendChild(img);
     }
     HeaF.tekiou();
 }
 
 HeaF.tekiou = () => {
-    HeaC.barD.innerHTML = '';
+    HeaD.innerHTML = '';
     let max = HeaC.max;
     let now = HeaC.now;
     // nowを2で割って、商をval, 余りをsoloとする。でvalはheart。soloがあるかないかはわからない。数が奇数ならあり、偶数ならなし。soloがあるならば、最後のハートはheart_cakeになる。また、nowがmaxを超えることもある。その場合は超えた分はheart_exになる。heart_exかつ奇数かつ最後ならばheart_ex_cakeになる。
@@ -2121,7 +2121,7 @@ HeaF.tekiou = () => {
 
         let img = document.createElement('img');
         img.src = `assets/images/systems/${src}.png`;
-        HeaC.barD.appendChild(img);
+        HeaD.appendChild(img);
     }
 
     if(hearts > 50) HeaD.classList.add('oo');
