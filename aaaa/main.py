@@ -588,8 +588,9 @@ async def hitbox(ichi, ichiD, dens, name, width, hight):
         #移動後代入
         
         
-        if ichi[0]//2 not in filled or ichi[1]//2 not in filled: #nameごとに判定して、二回目の判定でfilledが消えてるので先に判定されるのが埋まる
-            filled[num] = [ichi[0]//2, ichi[1]//2]
+        if ichi[0]//2 not in filled or ichi[1]//2 not in filled: #nameごとに判定して、二回目の判定でfilledが消えてるので先に判定されるのが埋まる (例：石の移動→もう一度石の移動の時にもともとある石のfilledが消えてるので埋まる)
+            filled[num] = [ichi[0]//2, ichi[1]//2]               
+            """inventry[a][0]をforで回して全部判定する"""
             num += 1
         """
         else:
@@ -965,6 +966,10 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                     canvas["inventry_root_"+str(name)].lift("have")
                     
                 if (index[3]>index[7])or(index[3]<index[9])or(index[4]>index[8]):inventry_break(name)
+            """inventry2[name][0][idx][0] = ichi[0]
+            inventry2[name][0][idx][1] = ichi[1]
+            inventry2[name][0][idx][2] = ichi[2]
+            inventry2[name][0][idx][3] = ichi[3]"""
             inventry=copy.deepcopy(inventry2)
 
             #print("876")

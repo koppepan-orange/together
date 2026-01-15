@@ -1782,13 +1782,16 @@ let invD = document.querySelector('#inventory');
 let invC = {
     openD: invD.querySelector('.opener'),
     areaD: invD.querySelector('.area'),
+    tog:0
 }
-function inv_open(code = null){
-    invC.openD.classList.toggle('tog');
-    invC.areaD.classList.toggle('tog');
+function inv_open(code = NaN){
+    invD.classList.toggle('tog');
+    invC.tog = !invC.tog;
 
-    if(code == 1) invC.openD.classList.add('tog'), invC.areaD.classList.add('tog');
-    if(code == 0) invC.openD.classList.remove('tog'), invC.areaD.classList.remove('tog');
+    if(code == 1) invD.classList.add('tog');
+    if(code == 0) invD.classList.remove('tog');
+    if(!isNaN(code)) invC.tog = code;
+
 }
 invC.openD.addEventListener('click', inv_open);
 invC.openD.addEventListener('contextmenu', (e) => {
@@ -2092,13 +2095,13 @@ HeaF.load = () => {
     for(let i = 0; i < 10; i++){
         let img = document.createElement('img');
         img.src = 'assets/images/systems/heart.png';
-        HeaD.appendChild(img);
+        HeaC.barD.appendChild(img);
     }
     HeaF.tekiou();
 }
 
 HeaF.tekiou = () => {
-    HeaD.innerHTML = '';
+    HeaC.barD.innerHTML = '';
     let max = HeaC.max;
     let now = HeaC.now;
     // nowを2で割って、商をval, 余りをsoloとする。でvalはheart。soloがあるかないかはわからない。数が奇数ならあり、偶数ならなし。soloがあるならば、最後のハートはheart_cakeになる。また、nowがmaxを超えることもある。その場合は超えた分はheart_exになる。heart_exかつ奇数かつ最後ならばheart_ex_cakeになる。
@@ -2121,17 +2124,20 @@ HeaF.tekiou = () => {
 
         let img = document.createElement('img');
         img.src = `assets/images/systems/${src}.png`;
-        HeaD.appendChild(img);
+        HeaC.barD.appendChild(img);
     }
 
     if(hearts > 50) HeaD.classList.add('oo');
     else HeaD.classList.remove('oo');
+    if(hearts > 100) HeaD.classList.add('oo2');
+    else HeaD.classList.remove('oo2');
 }
 
-HeaF.updw = (code, num = 1) => {
+HeaF.updw = (code, num = 1, nani = "now") => {
     if(code == '-') num *= -1;
-    HeaC.now += num;
-    if(HeaC.now < 1) HeaC.now = 1;
+    HeaC[nani] += num;
+    if(code == "=") HeaC[nani] = num;
+    if(HeaC.now < 1) HeaC[nani] = 1;
     // 上限は超えても良いものとする。
 
     HeaF.tekiou();
