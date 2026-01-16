@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Game AI Chat (polling)</title>
+    <style>
+        :root{
+            --user-bg:#d0f0ff;
+            --user-color:#000;
+            --ai-bg:#fff0d0;
+            --ai-color:#000;
+        }
+        body{font-family:system-ui, -apple-system, "Segoe UI", Roboto; padding:20px;}
+        #chat{max-width:720px; margin:0 auto; display:flex; flex-direction:column; gap:12px;}
+        .msg{padding:10px 14px; border-radius:12px; max-width:75%;}
+        .me{align-self:flex-end; background:var(--user-bg); color:var(--user-color);}
+        .ai{align-self:flex-start; background:var(--ai-bg); color:var(--ai-color);}
+        #controls{display:flex; gap:8px; margin-top:12px;}
+        #colorControls{display:flex; gap:8px; margin-bottom:8px; align-items:center;}
+        label{font-size:13px;}
+        input[type="text"]{flex:1; padding:10px; border-radius:8px; border:1px solid #ccc;}
+        button{padding:10px 14px; border-radius:8px; border:none; cursor:pointer;}
+    </style>
+</head>
+<body>
+    <div id="chat">
+        <div id="colorControls">
+            <label>自分-bg <input id="userBg" type="color" value="#d0f0ff"></label>
+            <label>自分-text <input id="userColor" type="color" value="#000000"></label>
+            <label>AI-bg <input id="aiBg" type="color" value="#fff0d0"></label>
+            <label>AI-text <input id="aiColor" type="color" value="#000000"></label>
+        </div>
+
+        <div id="messages"></div>
+
+        <div id="controls">
+            <input id="input" type="text" placeholder="AIに話しかける...">
+            <button id="send">送信</button>
+        </div>
+    </div>
+
+    <script>
+        let messagesEl = document.getElementById('messages');
+        let inputEl = document.getElementById('input');
+        let sendBtn = document.getElementById('send');
+
+        // カラーコントロール
+        let userBg = document.getElementById('userBg');
+        let userColor = document.getElementById('userColor');
+        let aiBg = document.getElementById('aiBg');
+        let aiColor = document.getElementById('aiColor');
+
+        function applyColors(){
+            document.documentElement.style.setProperty('--user-bg', userBg.value);
+            document.documentElement.style.setProperty('--user-color', userColor.value);
+            document.documentElement.style.setProperty('--ai-bg', aiBg.value);
+            document.documentElement.style.setProperty('--ai-color', aiColor.value);
+        }
+        userBg.oninput = userColor.oninput = aiBg.oninput = aiColor.oninput = applyColors;
+        applyColors();
+
+        function appendMessage(text, who){
+            let d = document.createElement('div');
+            d.className = 'msg ' + (who === 'me' ? 'me' : 'ai');
+            d.textContent = text;
+            messagesEl.appendChild(d);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        async function sendMessage(){
+            let txt = inputEl.value.trim();
+            if(!txt) return;
+            appendMessage(txt, 'me');
+            inputEl.value = '';
+            // サーバへ送信（/api/chat はサーバ側の実装を想定）
+            try{
+                let res = await fetch('/api/chat', {
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({message:txt})
+                });
+                if(!res.ok){
+                    appendMessage('サーバエラー: '+res.status, 'ai');
+                    return;
+                }
+                let data = await res.json();
+                appendMessage(data.reply || 'AIが無反応だった…', 'ai');
+            }catch(e){
+                appendMessage('接続失敗: '+e.message, 'ai');
+            }
+        }
+
+        sendBtn.onclick = sendMessage;
+        inputEl.onkeydown = function(e){
+            if(e.key == 'Enter') sendMessage();
+        };
+    </script>
+</body>
+</html>
