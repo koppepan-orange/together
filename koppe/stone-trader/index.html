@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <title>Stone Trader Game Desu</title>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/idb@7/build/umd.js"></script>
+    <link rel="stylesheet" href="mitame.css">
+</head>
+<body>
+    <div id="main">
+        <div id="mobileDesc"></div>
+        <div id="log">
+            <div class="opener"><</div>
+            <div class="log"></div>
+        </div>
+
+        <div class="select">
+            <div class="row">
+                <div class="selection buyer"><img src="assets/systems/buyer.png"></div>
+                <div class="selection mine"><img src="assets/systems/mine.png"></div>
+            </div>
+            <div class="row">
+                <div class="selection shop"><img src="assets/systems/shop.png"></div>
+                <div class="selection still"><img src="assets/systems/still.png"></div> <!-- わるいね、ここは"まだ"営業してないのさ ..まあでも（お金を半分盗まれた）"スティール"はするがね！はっはっは〜  ...ってやつ、やりたい-->
+            </div>
+        </div>
+
+        <div class="buyer">
+            <div class="back"></div>
+            <div class="owner">
+                <div class="chara"><img src="assets/portraits/buyer_normal.png"></div>
+                <div class="text"></div>
+            </div>
+            <div class="place">
+                <div class="row">
+                    <div class="item coal"><img src="assets/stones/coal.png"></div>
+                    <div class="item iron"><img src="assets/stones/iron.png"></div>
+                </div>
+                <div class="row">
+                    <div class="item ruby"><img src="assets/stones/ruby.png"></div>
+                    <div class="item gold"><img src="assets/stones/gold.png"></div>
+                </div>
+                <div class="row">
+                    <div class="item larimar"><img src="assets/stones/larimar.png"></div>
+                    <div class="item none"><img src="assets/stones/none.png"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mine">
+            <div class="back"></div>
+            <div class="vein"></div>
+        </div>
+
+        <div class="shop">
+            <div class="back"></div>
+            <div class="text">
+                ここは店だぜ<br>
+                夢で友達に、「マリカで今ここが流行ってる」<br>
+                って言われたのが"セイムマート"ってステージで<br>
+                そのまま流用してここの名前はセイムマートなのだぜ
+            </div>
+        </div>
+
+        <div class="still">
+            <div class="back"></div>
+            <div class="text">
+                ここはまだ何もできてないとこだよ<br>
+                わかったらさっさと帰んな
+            </div>
+        </div>
+
+    </div>
+
+    <div id="debug">
+        <div class="data draggable"></div>
+        <div class="menu draggable"></div>
+    </div>
+
+    <script src="data.js" defer></script> 
+    <script src="nakami.js" defer></script>
+</body>
+</html>

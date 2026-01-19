@@ -1,0 +1,458 @@
+/* #region スターターパック */
+html{
+    margin: -8px;
+    overflow: hidden;
+    user-select:none;
+}
+body{
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    white-space: nowrap;
+    touch-action: none;
+}
+.row{
+    display: flex;
+    flex-direction: row;
+}
+.column{
+    display: flex;
+    flex-direction: column;
+}
+.hidden{
+    opacity: 0;
+    pointer-events: none;
+}
+
+img{
+    -webkit-user-drag: none;
+}
+::-webkit-scrollbar{
+    display: none;
+}
+:focus{
+    outline: none;
+}
+
+/* #region nicotext */
+.nicotext{
+    position: fixed;
+    top: 0;
+    right: 0;
+    background-color: #f0f8ff80;
+    color: #000000;
+    font-size: 20px;
+    transition: right 2.0s linear;
+    white-space: nowrap;
+    pointer-events: none;
+}
+/* #endregion */
+
+/* #region tobitext */
+.tobitext{
+    opacity: 1;
+    padding: 4px 8px;
+    background: rgba(0,0,0,0.72);
+    border-radius: 8px;
+    transform: translate(-50%, -50%) translateY(0px);
+    white-space: nowrap;
+    color: #ffffff;
+    position: absolute;
+    transition: none;
+    z-index: 2147483647;
+    pointer-events: none;
+}
+/* #endregion */
+
+/* #region logとtext */
+#log{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    width: 320px;
+    height: 24vh;
+    border: 2px solid #ffffff;
+     border-left: none;
+    position: fixed;
+    left: -334px;
+    color: #fefefe;
+    overflow-y: hidden;
+    transition: left 1.0s ease;
+    z-index: 10;
+}
+#log.tog{
+    left: 54px;
+}
+#log .opener{
+    width: 30px;
+    height: 100%;
+    background-color: #000000ef;
+    text-align: center;
+    cursor: pointer;
+    z-index: inherit;
+}
+#log .log{
+    width: 300px;
+    height: 100%;
+    max-height: 100%;
+    overflow-x: hidden; overflow-y: scroll;
+    background-color: #000000de;
+    text-align: left;
+    font-size: 14px;
+    transition: right 0.3s;
+    z-index: inherit;
+}
+#text{
+    display: none;
+    background: rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 1.2em;
+    position: fixed;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000;
+
+    white-space: nowrap;
+    overflow: hidden;
+    width: fit-content; /* 文字の長さに応じた幅 */
+    animation: fadeIn 0.5s ease forwards;
+}
+@keyframes fadeIn {
+    0%{
+        opacity: 0;
+    }
+    100%{
+        opacity: 1;
+    }
+}
+/* #endregion */
+
+/* #region description */
+#mobileDesc{
+    display: none;
+    position: fixed;
+    pointer-events: none;
+    background-color: #363636e2;
+    color: #f0f8ff;
+    text-align: left;
+    padding: 5px 10px;
+    border-radius: 5px;
+    z-index: 256;
+}
+#mobileDesc.show{
+    display: block;
+}
+/* #endregion */
+
+/* #region tk */
+.tk{
+    position: fixed;
+}
+.tk.mostop{
+    z-index: 2147483647;
+}
+.tk.cenXY{
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+}
+.tk.cenX{
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+}
+.tk.cenY{
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+}
+/* #endregion */
+
+/* #region alertD */
+.alertD{
+    display: block;
+    width: 320px;
+    height: 70px;
+    border-radius: 15px;
+    box-shadow: #000000 5px 5px 20px;
+    position: fixed;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: bottom 0.1s linear;
+    will-change: bottom;
+    overflow: hidden;
+    box-sizing: border-box;
+    z-index: 2147483647;
+}
+.alertD.show{
+    bottom: 20px;
+}
+.alertD .row{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+.alertD .row .icon{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    font-size: 20px;
+}
+.alertD .row .text{
+    font-size: 18px;
+}
+.alertD .x{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 20px;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    background: #00000000;
+    position: absolute;
+    right: 5px;
+    top: 0;
+    font-size: 20px;
+    cursor: pointer;
+}
+.alertD .bar{
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 5px;
+    border-radius: 0 0 15px 15px;
+    overflow: hidden;
+}
+.alertD .bar .inner{
+    width: 0px;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+}
+/* #endregion */
+
+水色 #f0f8ff, #eaf5ff, #def0ff, #cfe9ff, #b5dcff
+紫色 #f8f6ff, #f5f2ff, #f1edff, #ece8ff, #e9e4ff
+橙色 #fffaf3, #fff7eb, #fff3e2, #fff0d9, #ffeccf
+緑色 #f6fff2, #eeffe7, #e6ffdc, #ddffd0, #d4ffc3
+
+#template{
+    /* 順番だけ */
+    margin-top: 5px;
+    margin-left: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 100px;
+    height: 100px;
+    /* aspect-ratio: 1/1; */
+    padding: 5px;
+    background-color: #f0f8ff;
+    border: 1px solid #000000;
+    color: #000000;
+    font-size: 12px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    animation: fadeIn 0.5s ease forwards;
+    z-index: 999;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+/* #endregion */
+
+#main{
+    display: block;
+    width: 768px;
+    height: 100vh;
+    margin: 0 auto;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    user-select: none;
+    box-sizing: border-box;
+}
+
+/*debugのやつ*/
+#debug .data{
+    display: block;
+    width: auto;
+    height: auto;
+    padding: 10px;
+    background-color: #cfe9ff;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    font-size: 20px;
+    text-align: left;
+}
+#debug .data .ore{
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+#debug .data .ore img{
+    width: 20px;
+    aspect-ratio: 1;
+}
+
+#select{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 45px;
+    padding-top: 25%;
+}
+#select .row{
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 45px;
+}
+#select .selection{
+    width: 150px;
+    height: 150px;
+    background-color: #8d8d8d;
+}
+#select .selection img{
+    width: 100%;
+    aspect-ratio: 1;
+    /* object-fit: contain; */ /*これはなんかimgの比率を全体から調節してくれるらしい*/ 
+}
+#main .back{
+    width: 80px;
+    aspect-ratio: 1/1;
+    border-radius: 40%;
+}
+
+/* buyer */
+#buyer{
+    display: none;
+    width: 100%;
+    height: 100%;
+    background-color: #4d2500;
+    position: relative;
+}
+#buyer .owner{
+    /*感情の表現が顕著で、あーこれはｽﾊﾞﾗｼｲﾃﾞｽﾈ~~ ぜ〜ひとも私に売っていただきたいですね〜〜 ....いやこれはだめだな、なんか....宝の質屋だな*/
+    /*...セイムマートを少年にして、こっちはシーナ風、つまり おや？こんな時間に客とは珍しいねぇ.. やあお兄さん、私に何を売ってくれるんだい？ ....いいね*/
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+    height: 15%;
+    padding: 5px;
+    background-color: #5e2d00;
+    border-bottom: 3px dotted #3f1f009d;
+    position: relative;
+}
+#buyer .owner .chara{
+    height: 100%;
+    aspect-ratio: 1;
+    position: absolute;
+    top: 0px;
+    /* left: -5%; */
+}
+#buyer .owner .chara img{
+    width: 100%;
+    aspect-ratio: 1;
+}
+#buyer .owner .text{
+    width: calc(80% - 24px);
+    height: 82%;
+    margin-left: 18%;
+    color: #f0f8ff;
+    background-color: #00000082;
+    border: 2px solid;
+    font-size: 16px;
+    text-align: left;
+    position: absolute;
+    bottom: 0px;
+}
+#buyer .place{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 25px;
+    width: calc(100% - 20px);
+    height: 85%;
+    padding: 10px;
+}
+#buyer .place .row{
+    width: 90%;
+    justify-content: center;
+    gap: 10%;
+    padding: 0 5%;
+}
+#buyer .place .row .item{
+    width: 30%;
+    aspect-ratio: 1;
+}
+#buyer .place .row .item img{
+    width: 100%;
+    aspect-ratio: 1;
+}
+
+/* mine */
+#mine{
+    display: none;
+    width: 100%;
+    height: 100%;
+    background-color: #3d3d3d;
+    position: relative;
+}
+#mine .vein{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+}
+#mine .vein .row{
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+#mine .vein .row .stone{
+    width: 200px;
+    aspect-ratio: 1;
+}
+#mine .vein .row .stone img{
+    width: 100%;
+    aspect-ratio: 1;
+}
+
+/*shop*/
+#shop{
+    display: none;
+    width: 100%;
+    height: 100%;
+    background-color: #f0f8ff;
+    position: relative;
+}
+
+/*still*/
+#still{
+    display: none;
+    width: 100%;
+    height: 100%;
+    background-color: #dedede;
+    position: relative;
+}

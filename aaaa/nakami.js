@@ -967,7 +967,7 @@ savF.yomikomi2 = () => {
         let opt = document.createElement('option');
         opt.value = name;
         opt.textContent = name;
-        datalist.appendChild(opt);  
+        datalist.appendChild(opt);
     }
 }
 
