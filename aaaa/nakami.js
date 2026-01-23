@@ -2082,7 +2082,6 @@ document.addEventListener('mouseleave', () => {
 //#endregion イシイ
 
 //#region Blue Hearts
-
 let HeaD = document.getElementById('health');
 let HeaC = {
     barD: HeaD.querySelector('.bar'),
