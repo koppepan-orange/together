@@ -1048,6 +1048,7 @@ img{
 #health.oo2 img{
     margin-top: -80px;
 }
+
 #inventory{
     display: grid;
     direction: rtl;
@@ -1059,7 +1060,7 @@ img{
     padding: 10px;
     position: fixed;
     top: 5px;
-    left: 5px;
+    right: 5px;
     box-sizing: border-box;
     pointer-events: none;
     z-index: 5;

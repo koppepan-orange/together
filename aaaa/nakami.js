@@ -2114,9 +2114,9 @@ HeaF.tekiou = () => {
      if(outHs < 0) outHs = 0;
     let innHs = hearts - outHs;
     
-    for(let i=0; i<hearts; i++){
+    for(let i=0; i<(maxHs+outHs); i++){
         let src = "heart";
-        let ex = innHs <= i;
+        let ex = i >= innHs;
         let cake = solo && i == hearts-1;
 
         if(ex) src += "_ex";
