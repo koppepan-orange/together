@@ -892,11 +892,47 @@ soundVolume(50);
 document.addEventListener('DOMContentLoaded', async() => await loaF.load());
 //#endregion
 
+let adC = {
+    num:6,
+    wid:300,
+    asp:3/1
+}
+let adF = {};
+// background: #ad4315;
+// right: 50px;
+// top: 20%;
+adF.load = () => {
+
+    for(let i=0; i<adC.num; i++){
+        let text = arraySelect(ADs.texts);
+        let url0 = arraySelect(ADs.urls);
+        let url = `https://koppepan-orange.github.io/${url0}`;
+
+        let back = ranshoku();
+        let col = hoshoku(back);
+        let left = random(0, window.innerWidth - adC.wid);
+        let top = random(0, window.innerHeight - adC.wid / adC.asp);
+
+        let div = document.createElement('div');
+        div.className = `ad test-target draggable`;
+        div.style.background = back;
+        div.style.color = col;
+        div.style.left = `${left}px`;
+        div.style.top = `${top}px`;
+        div.innerText = text;
+        div.addEventListener('click', () => window.open(url, '_blank'))
+
+        document.querySelector('body').appendChild(div);
+        
+    }
+}
+
 let disD = document.getElementById('dis');
 let disC = {
     colD: disD.querySelector('.column')
 };
 let disF = {};
+
 disF.load = () => {
     for(let ls of SVList){
         let div = document.createElement('div');
@@ -914,5 +950,6 @@ disF.load = () => {
 function start(){
     Style.tekiou();
     disF.load();
+    adF.load();
 }
 //#endregion

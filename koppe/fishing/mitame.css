@@ -277,24 +277,16 @@ img{
 }
 /* #endregion */
 
-.test-target{
+.ad{
     width: 300px;
-    aspect-ratio: 1/1;
+    aspect-ratio: 3/1;
+    padding: 5px;
     position: fixed;
     cursor: pointer;
+    word-wrap: break-word;
+    white-space: wrap;
     user-select: none;
 }
-.donkey{
-    background: #ad4315;
-    right: 50px;
-    top: 30%;
-}
-.kakuyas{
-    background: #87ebff;
-    left: 50px;
-    top: 30%;
-}
-
 #main{
     display: flex;
     flex-direction: column;
@@ -304,6 +296,10 @@ img{
     width: 100vw;
     height: 100vh;
     padding: 20px;
+}
+
+#main b{
+    white-space: wrap;
 }
 
 #dis{
