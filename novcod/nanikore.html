@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+        <meta charset="UTF-8">
+        <title>色分けができるテキストエリア（のようなもの）</title>
+    </head>
+    <body>
+        <h5>コントロールで赤色の箱を作れます。<br>あとc_textarea_cangotoautsideというクラスをc_textareaにつけると意味はないですがカーソルが外まで出られるようになります。</h5>
+        <div class="code_area" style="width: 1000px;height: 500px;"></div>
+        <script src="code_txt.js"></script>
+        <script type="module">
+            import {Additional_Controls} from "./coloer_textarea.js"
+            Additional_Controls["Control"]=function(carsol){carsol.insertAdjacentHTML('beforebegin','<dir style="display:inline;color:red;padding-inline-start: 0px;"></dir>')}
+        </script>
+    </body>
+</html>

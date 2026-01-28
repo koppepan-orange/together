@@ -528,6 +528,7 @@ async def runaway(num,way): #hitboxで埋まったときに移動するyou
 #filled = {} # [x= , y= , dens] cmd "cls&start tree /f C:"
 num = 0
 async def hitbox(ichi, ichiD, dens, name, width, hight): 
+    global inventry2
     save=ichi
     #ichi=[x,y,ax,ay,item]
     #dens= 固体密度
@@ -537,7 +538,6 @@ async def hitbox(ichi, ichiD, dens, name, width, hight):
     #now = [ichi[0]//2,ichi[1]//2,dens]
     gox=0
     goy=0
-    #if now[0] not in filled or now[1] not in filled:
     if ichi[0]//2 not in filled or ichi[1]//2 not in filled:
 
         if ichi[2] != 0:
@@ -585,36 +585,31 @@ async def hitbox(ichi, ichiD, dens, name, width, hight):
                     ichi[1] = 0
                     ichi[3] -= ichi[3]*0.9
 
-        #移動後代入
+        #当たり判定用位置　2pxごと
+        new_place = [ichi[0]//2,ichi[1]//2,dens]
         
-        
-        if ichi[0]//2 not in filled or ichi[1]//2 not in filled: #nameごとに判定して、二回目の判定でfilledが消えてるので先に判定されるのが埋まる (例：石の移動→もう一度石の移動の時にもともとある石のfilledが消えてるので埋まる)
-            filled[num] = [ichi[0]//2, ichi[1]//2]               
-            """inventry[a][0]をforで回して全部判定する"""
+        #埋まり判定 2pxごと
+        #if ichi[0]//2 not in filled or ichi[1]//2 not in filled :      nameごとに判定して、別の物体の判定でfilledが消えてるので先に判定されるのが埋まる (例：石の移動→完了→木の移動→filledが消えてるので埋まる)
+            #filled[num] = [ichi[0]//2, ichi[1]//2]     filled消すので意味ない   
+            """filledにinventry2と同じものを作って判定　←inventry2持ってくる方がよくね？　　こっちにするcheckpoint"""
+            for i in inventry2.key:
+                for j in inventry[i][0]:
+                    if new_place == j:
+                        #左右か上下のどちらのほうが早く埋まっている状態から抜け出せるか判定...する予定
+                        while True:
+
+                            new_place = await runaway()  #上で判定した方向に合わせてichi[1]とichi[2]を変更  
+
+                            if ichi[0]//2 not in filled or ichi[1]//2 not in filled: #変更予定
+                                break
             num += 1
-        """
-        else:
-            #左右か上下のどちらのほうが早く埋まっている状態から抜け出せるか判定...する予定
-            while True:
-
-                ichi_kari = await runaway()  #上で判定した方向に合わせてichi[1]とichi[2]を変更  checkpoint
-
-                if ichi[0]//2 not in filled or ichi[1]//2 not in filled:
-                    break
-        """
 
         try:
             inventry2[name][0].remove(save)
             inventry2[name][0].append(ichi)
         except ValueError:
             # 念のため（オブジェクトが見つからない場合）
-            # await asyncio.sleep(0.1)
             return
-
-        # inventry2[name][0][idx][0] = ichi[0]
-        # inventry2[name][0][idx][1] = ichi[1]
-        # inventry2[name][0][idx][2] = ichi[2]
-        # inventry2[name][0][idx][3] = ichi[3]
 
     await asyncio.sleep(0.1)
 
@@ -731,7 +726,6 @@ async def inventry_update(): #print(await serch({"鉄":2,"アルミニウム":1}
                     #canvas["inventry_root_"+str(name)].create_image(0,0, image=img[i[4]])
                 count=0
                 delet_list=[]
-                filled = {} #消す
                 num=0
                 for i in index[0]:
                     try:

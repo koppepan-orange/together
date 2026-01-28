@@ -2110,15 +2110,21 @@ HeaF.tekiou = () => {
     let maxHs = Math.ceil(max/2);
     let outHs = hearts - maxHs;
      if(outHs < 0) outHs = 0;
-    let innHs = hearts - outHs;
-    
-    for(let i=0; i<(maxHs+outHs); i++){
-        let src = "heart";
-        let ex = i >= innHs;
-        let cake = solo && i == hearts-1;
+    let innHs = maxHs - outHs;
 
-        if(ex) src += "_ex";
-        if(cake) src += "_cake";
+    console.log(`innHs: ${innHs}, outHs: ${outHs}, allHs: ${hearts}, (maxHs: ${maxHs})`);
+    
+    for(let i=0; i<innHs; i++){
+        let src = "heart";
+        if(solo && outHs == 0 && i == innHs-1) src += "_cake";
+
+        let img = document.createElement('img');
+        img.src = `assets/images/systems/${src}.png`;
+        HeaC.barD.appendChild(img);
+    }
+    for(let i=0; i<outHs; i++){
+        let src = "heart_ex";
+        if(solo && 0 < outHs && i == outHs-1) src += "_cake";
 
         let img = document.createElement('img');
         img.src = `assets/images/systems/${src}.png`;
@@ -2140,7 +2146,6 @@ HeaF.updw = (code, num = 1, nani = "now") => {
 
     HeaF.tekiou();
 }
-
 //#endregion
 
 //#region 売るところ
