@@ -53,6 +53,9 @@ function tobiText(youso, mes) {
 
     requestAnimationFrame(frame);
 };
+function copytext(text){
+    navigator.clipboard.writeText(text);
+}
 function kaijou(num){
     if(num == 0) return 0;
     if(num == 1) return 1;
@@ -225,7 +228,7 @@ function hoshoku(color){
 function mixshoku(c1, c2, ratio = 0.5){
     let toRGB = c => {
         c = c.replace('#', '');
-        if (c.length === 3) c = c.split('').map(x => x + x).join('');
+        if (c.length == 3) c = c.split('').map(x => x + x).join('');
         let n = parseInt(c, 16);
         return [n >> 16, (n >> 8) & 255, n & 255];
     };
@@ -364,7 +367,7 @@ async function addtext(raw){
                 let timeout = new Promise(resolve => setTimeout(resolve, waitTime));
                 let userAction = new Promise(resolve => {
                     function waitToClear(event) {
-                        if(event.type === 'click' || event.key === 'z' || event.key === 'Enter'){
+                        if(event.type == 'click' || event.key == 'z' || event.key == 'Enter'){
                             document.removeEventListener('click', waitToClear);
                             document.removeEventListener('keydown', waitToClear);
                             resolve();
@@ -388,12 +391,12 @@ async function addtext(raw){
     });
 };
 document.addEventListener('keydown', (e) => {
-    if(e.key === 'z' || e.key === 'Enter'){
+    if(e.key == 'z' || e.key == 'Enter'){
         skipText = true;
     }
 });
 document.addEventListener('keyup', (e) => {
-    if(e.key === 'z' || e.key === 'Enter'){
+    if(e.key == 'z' || e.key == 'Enter'){
         skipText = false;
     }
 });
@@ -892,59 +895,246 @@ soundVolume(50);
 document.addEventListener('DOMContentLoaded', async() => await loaF.load());
 //#endregion
 
+
+// #region ad
 let adC = {
-    num:6,
-    wid:300,
-    asp:3/1
+    num:random(5,10),
+    wid:Style.ad.wid,
+    asp:Style.ad.asp
 }
 let adF = {};
 // background: #ad4315;
 // right: 50px;
 // top: 20%;
 adF.load = () => {
-
-    for(let i=0; i<adC.num; i++){
-        let text = arraySelect(ADs.texts);
-        let url0 = arraySelect(ADs.urls);
-        let url = `https://koppepan-orange.github.io/${url0}`;
-
-        let back = ranshoku();
-        let col = hoshoku(back);
-        let left = random(0, window.innerWidth - adC.wid);
-        let top = random(0, window.innerHeight - adC.wid / adC.asp);
-
-        let div = document.createElement('div');
-        div.className = `ad test-target draggable`;
-        div.style.background = back;
-        div.style.color = col;
-        div.style.left = `${left}px`;
-        div.style.top = `${top}px`;
-        div.innerText = text;
-        div.addEventListener('click', () => window.open(url, '_blank'))
-
-        document.querySelector('body').appendChild(div);
-        
-    }
+    for(let i=0; i<adC.num; i++) adF.summon();
 }
+adF.summon = () => {
+    let text = arraySelect(ADs.texts);
+    let url0 = arraySelect(ADs.urls);
+    let url = `https://koppepan-orange.github.io/${url0}`;
 
+    let back = ranshoku();
+    let col = hoshoku(back);
+    let left = random(0, window.innerWidth - adC.wid);
+    let top = random(0, window.innerHeight - adC.wid / adC.asp);
+
+    let div = document.createElement('div');
+    div.className = `ad test-target draggable`;
+    div.style.background = back;
+    div.style.color = col;
+    div.style.left = `${left}px`;
+    div.style.top = `${top}px`;
+    div.innerText = text;
+    div.addEventListener('click', () => window.open(url, '_blank'))
+
+    document.querySelector('body').appendChild(div);
+}
+// #endregion
+
+// #region discord
 let disD = document.getElementById('dis');
 let disC = {
-    colD: disD.querySelector('.column')
+    deka: 0,
 };
 let disF = {};
 
 disF.load = () => {
     for(let ls of SVList){
         let div = document.createElement('div');
-        div.className = `ls ${ls.src}`;
-        div.textContent = ls.name;
+        div.className = `ls`;
+        div.style.background = ls.col;
+        div.style.borderColor = hoshoku(ls.col);
+
+        let img = document.createElement('img');
+        img.src = `assets/images/dis_${ls.i.toString().padStart(2,'0')}.png`;
+        div.appendChild(img);
+        
+        let text = document.createElement('div');
+        text.innerText = ls.name;   
+        text.style.color = hoshoku(ls.col);
+        div.appendChild(text);
+        
         div.dataset.description = ls.desc;
         div.addEventListener('click', function(){
-            window.open(`https://discord.gg/${ls.src}`, '_blank');
+            if(disC.deka) return;
+            disF.deka(ls);
         });
-        disC.colD.appendChild(div);
+        disD.appendChild(div);
     }
 }
+disF.deka = (ls) => {
+    disC.deka = 1;
+
+    let div = document.createElement('div');
+    div.className = 'dis-deka';
+
+    let x = document.createElement('div');
+    x.className = 'x';
+    x.innerText = '×';
+    x.addEventListener('click', () => {div.remove(); disC.deka = 0});
+    div.appendChild(x);
+
+    let ueb = document.createElement('div');
+    ueb.className = 'ueb';
+    ueb.style.background = ls.col;
+    div.appendChild(ueb);
+
+    let icon = document.createElement('img');
+    icon.src = `assets/images/dis_${ls.i.toString().padStart(2,'0')}.png`;
+    div.appendChild(icon);
+
+    let name = document.createElement('div');
+    name.className = 'name';
+    name.innerText = ls.name;
+    div.appendChild(name);
+
+    let row = document.createElement('div');
+    row.className = 'row';
+
+     let copyD = document.createElement('div');
+     copyD.className = 'bt copy';
+     copyD.innerText = '📋リンクをコピー';
+     copyD.addEventListener('click', () => {copytext(ls.src); tobiText(copyD, 'コピーしました')});
+     row.appendChild(copyD);
+
+     let join = document.createElement('div');
+     join.className = 'bt join';
+     join.innerText = '↗️参加';
+     join.addEventListener('click', () => window.open(`https://discord.gg/${ls.src}`, '_blank'));
+     row.appendChild(join);
+
+    div.appendChild(row);
+
+    let desc = document.createElement('div');
+    desc.className = 'desc';
+    
+     let tuite = document.createElement('div');
+     tuite.className = 'tuite';
+     tuite.innerText = 'サーバーについて';
+     desc.appendChild(tuite);
+
+     let naka = document.createElement('div');
+     naka.className = 'naka';
+     naka.innerText = ls.desc;
+     desc.appendChild(naka);
+
+    div.appendChild(desc);
+
+    document.querySelector('body').appendChild(div);
+    // window.open(`https://discord.gg/${ls.src}`, '_blank');
+}
+
+function ex(img){
+    let canvas = document.createElement('canvas');
+    let ctx = canvas.getContext('2d');
+    let maxSide = 150;
+    let w = img.naturalWidth || img.width;
+    let h = img.naturalHeight || img.height;
+    if(!w || !h) return '#000000';
+    let scale = Math.min(1, maxSide / Math.max(w,h));
+    canvas.width = Math.max(1, Math.round(w * scale));
+    canvas.height = Math.max(1, Math.round(h * scale));
+    ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    let data = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+    let shift = 4;
+    let counts = {};
+    let totals = {};
+    let step = 4*3;
+    for(let i = 0; i < data.length; i += step){
+        let a = data[i+3];
+        if(a == 0) continue;
+        let r = data[i];
+        let g = data[i+1];
+        let b = data[i+2];
+        let key = ((r >> shift) << 16) | ((g >> shift) << 8) | (b >> shift);
+        let k = key.toString(16);
+        if(counts[k] == null){ counts[k] = 0; totals[k] = [0,0,0]; }
+        counts[k] += 1;
+        totals[k][0] += r;
+        totals[k][1] += g;
+        totals[k][2] += b;
+    }
+    let maxCount = 0;
+    let maxKey = null;
+    for(let k in counts){ if(counts[k] > maxCount){ maxCount = counts[k]; maxKey = k; } }
+    if(maxKey == null) return '#000000';
+    let avgR = Math.round(totals[maxKey][0] / counts[maxKey]);
+    let avgG = Math.round(totals[maxKey][1] / counts[maxKey]);
+    let avgB = Math.round(totals[maxKey][2] / counts[maxKey]);
+    let hex = '#'+((1<<24)|(avgR<<16)|(avgG<<8)|avgB).toString(16).slice(1);
+    return hex.toLowerCase();
+}
+// #endregion
+
+// #region youare
+let youC = {
+    n:0,
+    w: Style.youare.wid,
+    wm: window.innerWidth,
+    hm: window.innerHeight
+}
+youC.h = youC.w*Style.youare.asp;
+let youF = {};
+youF.summon = (code = 0) => {
+    let div = document.createElement('div');
+    div.className = 'youare';
+    if(code) div.style.background = ranshoku()
+    
+    let text = document.createElement('div');
+    text.className = 'text';
+    text.textContent = 'YOU ARE A SMART!!';
+    div.appendChild(text);
+
+    let img = document.createElement('img');
+    img.src = `rabbit.gif`;
+    div.appendChild(img);
+
+    div.addEventListener('click', () => {
+        let p = 20;
+        if(code) p += 10;
+        if(probability(p)){
+            clearInterval(ing);
+            div.remove();
+        }
+        else youF.summon(1);
+    });
+
+    let [top, left] = [0, 0]
+    let teki = () => {
+        div.style.top = `${top}px`;
+         if(youC.hm < top+youC.h) dh *= -1;
+         if(top < 0) dh *= -1;
+        div.style.left = `${left}px`;
+         if(youC.wm < left+youC.w) dw *= -1;
+         if(left < 0) dw *= -1;
+    }
+    teki();
+
+    document.querySelector('body').appendChild(div);
+    youC.n += 1;
+
+    let [dw, dh] = [random(5,15), random(5,15)];
+    let ing = setInterval(() => {
+        top += dh;
+        left += dw;
+        teki();
+    }, 10);
+
+    document.addEventListener('keyup', e => {
+        if(e.key == 'p'){
+            clearInterval(ing);
+            div.remove();
+        }
+    })
+}
+document.addEventListener('keyup', e => {if(e.key == 'l') youF.summon()})
+
+// #endregion
+
+window.setInterval(() => {
+    for(let ja of Jamers) if(probability(ja.p)) ja.func();
+}, 1000)
 
 //#region start
 function start(){
