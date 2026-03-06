@@ -1632,6 +1632,11 @@ undF.load = () => {
         let div = document.createElement('div');
         div.className = 'check';
         div.dataset.cl = ch.kitei ? 0 : 1;
+        
+        let span = document.createElement('div');
+        span.className = 'span';
+        span.textContent = ch.name;
+        div.appendChild(span);
 
         function clcl(){
             if(div.dataset.cl == 1) div.dataset.cl = 0;
@@ -1642,13 +1647,6 @@ undF.load = () => {
             else div.classList.remove('tog');
         }
         div.addEventListener('click', clcl);
-
-        let span = document.createElement('div');
-        span.className = 'span';
-        span.textContent = ch.name;
-        div.appendChild(span);
-
-
 
         undC.checkD.appendChild(div);
 
