@@ -528,7 +528,7 @@ async def runaway(num,way): #hitboxで埋まったときに移動するyou
 #filled = {} # [x= , y= , dens] cmd "cls&start tree /f C:"
 num = 0
 async def hitbox(ichi, ichiD, dens, name, width, hight): 
-    global inventry2
+    global inventry2,inventry
     save=ichi
     #ichi=[x,y,ax,ay,item]
     #dens= 固体密度
@@ -555,10 +555,10 @@ async def hitbox(ichi, ichiD, dens, name, width, hight):
 
         #now = [ichi[0]//2,ichi[1]//2,dens] #割る値によって当たり判定の大きさ変わる
 
-#ここから移動後
+    #ここから移動後
     if ichi[0]//2 not in filled or ichi[1]//2 not in filled:
 
-        #移動と制限
+        #移動と画面外への移動制限
         if ichi[2] != 0:
             gox = dens*(ichi[2]**2)*4.8
             ichi[0] += gox
@@ -585,24 +585,35 @@ async def hitbox(ichi, ichiD, dens, name, width, hight):
                     ichi[1] = 0
                     ichi[3] -= ichi[3]*0.9
 
-        #当たり判定用位置　2pxごと
-        new_place = [ichi[0]//2,ichi[1]//2,dens]
-        
-        #埋まり判定 2pxごと
-        #if ichi[0]//2 not in filled or ichi[1]//2 not in filled :      nameごとに判定して、別の物体の判定でfilledが消えてるので先に判定されるのが埋まる (例：石の移動→完了→木の移動→filledが消えてるので埋まる)
-            #filled[num] = [ichi[0]//2, ichi[1]//2]     filled消すので意味ない   
-            """filledにinventry2と同じものを作って判定　←inventry2持ってくる方がよくね？　　こっちにするcheckpoint"""
-            for i in inventry2.key:
-                for j in inventry[i][0]:
-                    if new_place == j:
-                        #左右か上下のどちらのほうが早く埋まっている状態から抜け出せるか判定...する予定
-                        while True:
+        #当たり判定用位置
+        new_place = [ichi[0],ichi[1],dens]
+        obj_pile = 0
 
-                            new_place = await runaway()  #上で判定した方向に合わせてichi[1]とichi[2]を変更  
+        #if ichi[0]//2 not in filled or ichi[1]//2 not in filled :      nameごとに判定して、別の物体の判定でfilledが消えてるので先に判定されるのが埋まる (例：石の移動→完了→木の移動→filledが消えてるので埋まる)  
+        #inventry2の全てのものと距離計算
+        """全判定だから自分を認識して反発している"""
+        for i in inventry.keys():
+            for j in inventry[i][0]:
+                x = new_place[0] - j[0]
+                y = new_place[1] - j[1]
+                kyori = (abs(x)**2 + abs(y)**2)**0.5
+                if kyori <= 2:
+                    obj_pile += 1
+                if 2 <= obj_pile:
+                    #x,yが+なら物が左へ移動
+                    #左右か上下のどちらのほうが早く埋まっている状態から抜け出せるか判定...する予定
+                    while True:
+                        if 0 <= x:
+                            new_place[0] = await runaway(new_place[0],"+")
+                        else:
+                            new_place[0] = await runaway(new_place[0],"-")
+                        if 0 <= y:
+                            pass #下のものが移動することはないはず…?
+                        else:
+                            new_place[1] = await runaway(new_place[1],"-")
 
-                            if ichi[0]//2 not in filled or ichi[1]//2 not in filled: #変更予定
-                                break
-            num += 1
+                        if kyori <= 2:
+                            break
 
         try:
             inventry2[name][0].remove(save)
@@ -610,8 +621,6 @@ async def hitbox(ichi, ichiD, dens, name, width, hight):
         except ValueError:
             # 念のため（オブジェクトが見つからない場合）
             return
-
-    await asyncio.sleep(0.1)
 
 async def change_taiseki(cm3:float,g_cm3_moto:float,g_cm3_ato:float):
     #print("cm3",cm3,"g/cm3_moto",g_cm3_moto,"g/cm3_ato",g_cm3_ato))
