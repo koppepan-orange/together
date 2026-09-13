@@ -238,7 +238,7 @@ let skipText = false;
 let clearText = false;
 let textShowing = 0;
 
-function colorcheck(rawtext) {
+function colorcheck(rawtext){
     let text = [];
     let color = null;
     let colors = [
